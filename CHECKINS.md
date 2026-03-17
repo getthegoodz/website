@@ -21,3 +21,8 @@
   - `assets/site.js` for mobile nav toggle + FAQ accordion behavior
   - `assets/site.css` for mobile nav visibility + accordion transition styles
 - Injected local assets into all root deployment pages and `static-pages/*` so behavior no longer depends exclusively on Webflow runtime for nav/FAQ basics.
+
+## 2026-03-17 17:52 EDT (Sprint 2 pilot page)
+- Pilot de-Webflow cut completed on `/faq` page:
+  - Removed Webflow runtime + jQuery scripts from `faq.html` and `static-pages/faq.html`.
+  - Verified production page no longer loads Webflow runtime scripts while local `assets/site.js` still powers accordion behavior.
