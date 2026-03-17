@@ -2,17 +2,17 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/static-pages/index.html" },
-    { "source": "/about", "destination": "/static-pages/about.html" },
-    { "source": "/custom", "destination": "/static-pages/custom.html" },
-    { "source": "/artist-goodz", "destination": "/static-pages/artist-goodz.html" },
-    { "source": "/faq", "destination": "/static-pages/faq.html" },
-    { "source": "/support", "destination": "/static-pages/support.html" },
-    { "source": "/contact", "destination": "/static-pages/contact.html" },
-    { "source": "/privacy", "destination": "/static-pages/privacy.html" },
-    { "source": "/terms", "destination": "/static-pages/terms.html" },
-    { "source": "/privacy-policy", "destination": "/static-pages/privacy.html" },
-    { "source": "/terms-of-service", "destination": "/static-pages/terms.html" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/custom", "destination": "/custom.html" },
+    { "source": "/artist-goodz", "destination": "/artist-goodz.html" },
+    { "source": "/faq", "destination": "/faq.html" },
+    { "source": "/support", "destination": "/support.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/privacy-policy", "destination": "/privacy.html" },
+    { "source": "/terms-of-service", "destination": "/terms.html" }
   ],
   "headers": [
     {

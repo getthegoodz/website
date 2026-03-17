@@ -33,7 +33,8 @@ Goal: move `getthegoodz.com` off Webflow incrementally.
 4. Smoke-test page rendering and internal link integrity across all static pages.
 
 ## Sprint update (2026-03-17 afternoon)
-- Added `vercel.json` at project root with clean routing for migrated static pages:
+- Added `vercel.json` at project root with clean routing for migrated static pages.
+- Promoted current page snapshots to repo root HTML files for immediate static-host compatibility on Vercel.
   - `/`, `/about`, `/custom`, `/artist-goodz`, `/faq`, `/support`, `/contact`, `/privacy`, `/terms`
   - Compatibility aliases preserved: `/privacy-policy` -> `privacy.html`, `/terms-of-service` -> `terms.html`
 - This means we can deploy the migration project to Vercel now and keep URL structure stable while we progressively remove Webflow dependencies.
