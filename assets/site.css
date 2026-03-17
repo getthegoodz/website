@@ -1,0 +1,30 @@
+/* Sprint 2: lightweight, local interaction layer (nav + FAQ fallback) */
+
+/* Hide the mobile menu by default, then show when toggled. */
+@media (max-width: 991px) {
+  .w-nav .w-nav-menu {
+    display: none;
+  }
+
+  .w-nav.is-open .w-nav-menu,
+  .w-nav .w-nav-menu.is-open {
+    display: block;
+  }
+
+  .w-nav .w-nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+}
+
+/* FAQ accordion fallback animation */
+.faq3_answer {
+  overflow: hidden;
+  transition: height 220ms ease;
+}
+
+.faq3_accordion.is-open .faq3_answer {
+  /* height handled in JS for smooth auto-size transition */
+}
