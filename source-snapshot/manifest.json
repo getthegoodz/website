@@ -1,0 +1,20 @@
+{
+  "base": "https://www.getthegoodz.com",
+  "captured": [
+    "/",
+    "/about",
+    "/artist-goodz",
+    "/contact",
+    "/custom",
+    "/faq",
+    "/privacy-policy",
+    "/support",
+    "/terms-of-service"
+  ],
+  "saved_files": [
+    "artist-goodz.html",
+    "custom.html",
+    "index.html",
+    "support.html"
+  ]
+}
