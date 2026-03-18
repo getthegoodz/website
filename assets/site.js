@@ -35,6 +35,12 @@
     return turnstileScriptPromise;
   }
 
+  function stripLegacyRecaptcha() {
+    document.querySelectorAll('script[src*="recaptcha/api.js"], script[src*="recaptcha.net/recaptcha/api.js"]').forEach(function (s) {
+      s.remove();
+    });
+  }
+
   function initNav() {
     var navs = document.querySelectorAll('.w-nav');
     navs.forEach(function (nav) {
@@ -118,8 +124,11 @@
         var cfg = vals[0] || {};
         if (!cfg.turnstileSiteKey || !window.turnstile) return;
 
+        container.classList.remove('g-recaptcha', 'g-recaptcha-error', 'g-recaptcha-disabled');
         container.classList.add('cf-turnstile');
+        container.removeAttribute('data-sitekey');
         container.innerHTML = '';
+
         window.turnstile.render(container, {
           sitekey: cfg.turnstileSiteKey,
           callback: function (token) { onToken(token || ''); },
@@ -293,6 +302,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    stripLegacyRecaptcha();
     initNav();
     initFaq();
     initContactForm();
