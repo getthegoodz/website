@@ -26,4 +26,38 @@ if(playlist_url && playlist_url.length>0) {
   var change_playlist_button = document.querySelector('#change_playlist')
   change_playlist_button.href = `${change_playlist_button.href}?code=${code}&playlist_url=${playlist_url}`;
 }
-</script></body></html>
+</script>
+<script>
+(function(){
+  function qs(name){
+    try {
+      var u = new URL(window.location.href);
+      return u.searchParams.get(name) || '';
+    } catch(e){ return ''; }
+  }
+  function safeDecode(v){
+    if(!v) return '';
+    try { return decodeURIComponent(v); } catch(e) { return v; }
+  }
+  function ensureFallback(){
+    var root=document.body;
+    if(!root) return;
+    var hasPrimary = document.querySelector('h1, .heading-style-h2, .success-text, .paragraph');
+    if(hasPrimary) return;
+    var code = safeDecode(qs('code'));
+    var playlist = safeDecode(qs('playlist_url'));
+    var wrap=document.createElement('div');
+    wrap.style.cssText='font-family:Arial,sans-serif;padding:32px;max-width:760px;margin:0 auto;';
+    wrap.innerHTML=''
+      + '<h1 style="font-size:24px;margin-bottom:12px;">Your Goodz link has been updated</h1>'
+      + '<p style="margin-bottom:10px;">Code: <strong>' + (code || '(unknown)') + '</strong></p>'
+      + (playlist ? '<p style="margin-bottom:18px;"><a href="'+playlist+'" target="_blank" rel="noopener">Open playlist link</a></p>' : '')
+      + '<p><a href="/tapped-edit-url?code='+encodeURIComponent(code)+'&playlist_url='+encodeURIComponent(playlist)+'">Change playlist link</a></p>';
+    root.appendChild(wrap);
+  }
+  window.addEventListener('error', function(){ setTimeout(ensureFallback, 50); });
+  setTimeout(ensureFallback, 250);
+})();
+</script>
+
+</body></html>
