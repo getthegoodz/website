@@ -1,0 +1,72 @@
+# Webflow Runtime Audit
+
+- Total HTML files: **77**
+- Files with Webflow JS: **63**
+- Files with jQuery script refs: **0**
+- Files with reCAPTCHA markup/script refs: **67**
+- Files already loading /assets/site.js: **14**
+
+## Files still loading Webflow JS
+- `privacy-policy.html`
+- `privacy.html`
+- `static-pages/404.html`
+- `static-pages/dj-marc-echeveste-aries.html`
+- `static-pages/dj-marc-echeveste-el-aventurero.html`
+- `static-pages/dj-marc-echeveste-summerfell.html`
+- `static-pages/elements2024.html`
+- `static-pages/gated-content-example.html`
+- `static-pages/gated-content-fail.html`
+- `static-pages/handles/artopenings-la.html`
+- `static-pages/handles/circle46gallery.html`
+- `static-pages/handles/contemporaryartsociety.html`
+- `static-pages/handles/fernbergergallery.html`
+- `static-pages/handles/kerlingallery.html`
+- `static-pages/handles/thomasvandykegallery.html`
+- `static-pages/ianandjenny24.html`
+- `static-pages/k10.html`
+- `static-pages/landing/adamash.html`
+- `static-pages/landing/amber-nicole-sutton-gs25.html`
+- `static-pages/landing/bnvc-presents-best-night-in-los-angeles.html`
+- `static-pages/landing/cascadeequinox2024.html`
+- `static-pages/landing/chocolatesushi2025.html`
+- `static-pages/landing/cline-holiday-card-2024.html`
+- `static-pages/landing/gated-content-fail-bnvc.html`
+- `static-pages/landing/goodz-deluxe-album-experience-lemonade.html`
+- `static-pages/landing/hulaween2024.html`
+- `static-pages/landing/jb501.html`
+- `static-pages/landing/jb502.html`
+- `static-pages/landing/jb503.html`
+- `static-pages/landing/jb504.html`
+- `static-pages/landing/kunz25.html`
+- `static-pages/landing/louisa.html`
+- `static-pages/landing/motorola-add-link-copy.html`
+- `static-pages/landing/motorola-add-link.html`
+- `static-pages/landing/motorola1.html`
+- `static-pages/landing/sgtpeppers.html`
+- `static-pages/landing/stratos-colorado-vibes.html`
+- `static-pages/landing/stratos-jazzy-nights-vibes.html`
+- `static-pages/landing/stratos-powder-day-vibes.html`
+- `static-pages/landing/stratos-sounds-like-summer.html`
+- `static-pages/landing/tropicalhotel-spa.html`
+- `static-pages/landing/workout-mix.html`
+- `static-pages/lily-loves-cassidy.html`
+- `static-pages/motorola-add-link.html`
+- `static-pages/musicians.html`
+- `static-pages/my-grass-is-blue.html`
+- `static-pages/old-home.html`
+- `static-pages/privacy.html`
+- `static-pages/sgtpeppers.html`
+- `static-pages/stratos-d1.html`
+- `static-pages/stratos-d2.html`
+- `static-pages/stratos-d3.html`
+- `static-pages/stratos-d4.html`
+- `static-pages/stratos-d5.html`
+- `static-pages/tapped-add-url.html`
+- `static-pages/tapped-confirmation.html`
+- `static-pages/tapped-edit-url.html`
+- `static-pages/tapped.html`
+- `static-pages/tapped2.html`
+- `static-pages/terms.html`
+- `static-pages/test-lander.html`
+- `terms-of-service.html`
+- `terms.html`

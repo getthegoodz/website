@@ -1,0 +1,626 @@
+{
+  "total_html_files": 77,
+  "with_webflow_js": 63,
+  "with_jquery": 0,
+  "with_recaptcha_markup_or_script": 67,
+  "with_site_js": 14,
+  "with_forms": 69,
+  "rows": [
+    {
+      "path": "about.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "artist-goodz.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "contact.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "custom.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "faq.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "index.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "privacy-policy.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "privacy.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/404.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/about.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "static-pages/artist-goodz.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "static-pages/contact.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "static-pages/custom.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "static-pages/dj-marc-echeveste-aries.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/dj-marc-echeveste-el-aventurero.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/dj-marc-echeveste-summerfell.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/elements2024.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/faq.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "static-pages/gated-content-example.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/gated-content-fail.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/handles/artopenings-la.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/handles/circle46gallery.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/handles/contemporaryartsociety.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/handles/fernbergergallery.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/handles/kerlingallery.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/handles/thomasvandykegallery.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/ianandjenny24.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/index.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "static-pages/k10.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/adamash.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/amber-nicole-sutton-gs25.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/bnvc-presents-best-night-in-los-angeles.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/cascadeequinox2024.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/chocolatesushi2025.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/cline-holiday-card-2024.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/gated-content-fail-bnvc.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/goodz-deluxe-album-experience-lemonade.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/hulaween2024.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/jb501.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/jb502.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/jb503.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/jb504.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/kunz25.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/louisa.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/motorola-add-link-copy.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/motorola-add-link.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/landing/motorola1.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/sgtpeppers.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/stratos-colorado-vibes.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/stratos-jazzy-nights-vibes.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/stratos-powder-day-vibes.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/stratos-sounds-like-summer.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/tropicalhotel-spa.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/landing/workout-mix.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/lily-loves-cassidy.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/motorola-add-link.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": false,
+      "site_js": false,
+      "forms": false
+    },
+    {
+      "path": "static-pages/musicians.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/my-grass-is-blue.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/old-home.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/privacy.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/sgtpeppers.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/stratos-d1.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/stratos-d2.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/stratos-d3.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/stratos-d4.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/stratos-d5.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/support.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "static-pages/tapped-add-url.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/tapped-confirmation.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/tapped-edit-url.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/tapped.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/tapped2.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/terms.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "static-pages/test-lander.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "support.html",
+      "webflow_js": false,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": true,
+      "forms": true
+    },
+    {
+      "path": "terms-of-service.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    },
+    {
+      "path": "terms.html",
+      "webflow_js": true,
+      "jquery": false,
+      "recaptcha": true,
+      "site_js": false,
+      "forms": true
+    }
+  ]
+}
