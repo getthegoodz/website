@@ -2,32 +2,287 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/custom", "destination": "/custom.html" },
-    { "source": "/artist-goodz", "destination": "/artist-goodz.html" },
-    { "source": "/faq", "destination": "/faq.html" },
-    { "source": "/support", "destination": "/support.html" },
-    { "source": "/contact", "destination": "/contact.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/privacy-policy", "destination": "/privacy.html" },
-    { "source": "/terms-of-service", "destination": "/terms.html" },
-    { "source": "/tapped-add-url", "destination": "/static-pages/tapped-add-url.html" },
-    { "source": "/tapped-edit-url", "destination": "/static-pages/tapped-edit-url.html" },
-    { "source": "/landing/louisa", "destination": "/static-pages/landing/louisa.html" },
-    { "source": "/handles/artopenings-la", "destination": "/static-pages/handles/artopenings-la.html" },
-    { "source": "/handles/circle46gallery", "destination": "/static-pages/handles/circle46gallery.html" },
-    { "source": "/handles/contemporaryartsociety", "destination": "/static-pages/handles/contemporaryartsociety.html" },
-    { "source": "/handles/fernbergergallery", "destination": "/static-pages/handles/fernbergergallery.html" },
-    { "source": "/handles/kerlingallery", "destination": "/static-pages/handles/kerlingallery.html" },
-    { "source": "/handles/thomasvandykegallery", "destination": "/static-pages/handles/thomasvandykegallery.html" }
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/custom",
+      "destination": "/custom.html"
+    },
+    {
+      "source": "/artist-goodz",
+      "destination": "/artist-goodz.html"
+    },
+    {
+      "source": "/faq",
+      "destination": "/faq.html"
+    },
+    {
+      "source": "/support",
+      "destination": "/support.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms-of-service",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/tapped-add-url",
+      "destination": "/static-pages/tapped-add-url.html"
+    },
+    {
+      "source": "/tapped-edit-url",
+      "destination": "/static-pages/tapped-edit-url.html"
+    },
+    {
+      "source": "/landing/louisa",
+      "destination": "/static-pages/landing/louisa.html"
+    },
+    {
+      "source": "/handles/artopenings-la",
+      "destination": "/static-pages/handles/artopenings-la.html"
+    },
+    {
+      "source": "/handles/circle46gallery",
+      "destination": "/static-pages/handles/circle46gallery.html"
+    },
+    {
+      "source": "/handles/contemporaryartsociety",
+      "destination": "/static-pages/handles/contemporaryartsociety.html"
+    },
+    {
+      "source": "/handles/fernbergergallery",
+      "destination": "/static-pages/handles/fernbergergallery.html"
+    },
+    {
+      "source": "/handles/kerlingallery",
+      "destination": "/static-pages/handles/kerlingallery.html"
+    },
+    {
+      "source": "/handles/thomasvandykegallery",
+      "destination": "/static-pages/handles/thomasvandykegallery.html"
+    },
+    {
+      "source": "/motorola-add-link",
+      "destination": "/static-pages/motorola-add-link.html"
+    },
+    {
+      "source": "/sgtpeppers",
+      "destination": "/static-pages/sgtpeppers.html"
+    },
+    {
+      "source": "/ianandjenny24",
+      "destination": "/static-pages/ianandjenny24.html"
+    },
+    {
+      "source": "/stratos-d5",
+      "destination": "/static-pages/stratos-d5.html"
+    },
+    {
+      "source": "/stratos-d4",
+      "destination": "/static-pages/stratos-d4.html"
+    },
+    {
+      "source": "/stratos-d3",
+      "destination": "/static-pages/stratos-d3.html"
+    },
+    {
+      "source": "/stratos-d2",
+      "destination": "/static-pages/stratos-d2.html"
+    },
+    {
+      "source": "/stratos-d1",
+      "destination": "/static-pages/stratos-d1.html"
+    },
+    {
+      "source": "/elements2024",
+      "destination": "/static-pages/elements2024.html"
+    },
+    {
+      "source": "/lily-loves-cassidy",
+      "destination": "/static-pages/lily-loves-cassidy.html"
+    },
+    {
+      "source": "/dj-marc-echeveste-summerfell",
+      "destination": "/static-pages/dj-marc-echeveste-summerfell.html"
+    },
+    {
+      "source": "/dj-marc-echeveste-el-aventurero",
+      "destination": "/static-pages/dj-marc-echeveste-el-aventurero.html"
+    },
+    {
+      "source": "/dj-marc-echeveste-aries",
+      "destination": "/static-pages/dj-marc-echeveste-aries.html"
+    },
+    {
+      "source": "/my-grass-is-blue",
+      "destination": "/static-pages/my-grass-is-blue.html"
+    },
+    {
+      "source": "/test-lander",
+      "destination": "/static-pages/test-lander.html"
+    },
+    {
+      "source": "/k10",
+      "destination": "/static-pages/k10.html"
+    },
+    {
+      "source": "/tapped2",
+      "destination": "/static-pages/tapped2.html"
+    },
+    {
+      "source": "/gated-content-fail",
+      "destination": "/static-pages/gated-content-fail.html"
+    },
+    {
+      "source": "/gated-content-example",
+      "destination": "/static-pages/gated-content-example.html"
+    },
+    {
+      "source": "/musicians",
+      "destination": "/static-pages/musicians.html"
+    },
+    {
+      "source": "/tapped-confirmation",
+      "destination": "/static-pages/tapped-confirmation.html"
+    },
+    {
+      "source": "/tapped",
+      "destination": "/static-pages/tapped.html"
+    },
+    {
+      "source": "/404",
+      "destination": "/static-pages/404.html"
+    },
+    {
+      "source": "/old-home",
+      "destination": "/static-pages/old-home.html"
+    },
+    {
+      "source": "/landing/jb504",
+      "destination": "/static-pages/landing/jb504.html"
+    },
+    {
+      "source": "/landing/jb503",
+      "destination": "/static-pages/landing/jb503.html"
+    },
+    {
+      "source": "/landing/jb502",
+      "destination": "/static-pages/landing/jb502.html"
+    },
+    {
+      "source": "/landing/jb501",
+      "destination": "/static-pages/landing/jb501.html"
+    },
+    {
+      "source": "/landing/adamash",
+      "destination": "/static-pages/landing/adamash.html"
+    },
+    {
+      "source": "/landing/stratos-sounds-like-summer",
+      "destination": "/static-pages/landing/stratos-sounds-like-summer.html"
+    },
+    {
+      "source": "/landing/kunz25",
+      "destination": "/static-pages/landing/kunz25.html"
+    },
+    {
+      "source": "/landing/motorola-add-link-copy",
+      "destination": "/static-pages/landing/motorola-add-link-copy.html"
+    },
+    {
+      "source": "/landing/motorola-add-link",
+      "destination": "/static-pages/landing/motorola-add-link.html"
+    },
+    {
+      "source": "/landing/motorola1",
+      "destination": "/static-pages/landing/motorola1.html"
+    },
+    {
+      "source": "/landing/amber-nicole-sutton-gs25",
+      "destination": "/static-pages/landing/amber-nicole-sutton-gs25.html"
+    },
+    {
+      "source": "/landing/chocolatesushi2025",
+      "destination": "/static-pages/landing/chocolatesushi2025.html"
+    },
+    {
+      "source": "/landing/cline-holiday-card-2024",
+      "destination": "/static-pages/landing/cline-holiday-card-2024.html"
+    },
+    {
+      "source": "/landing/stratos-jazzy-nights-vibes",
+      "destination": "/static-pages/landing/stratos-jazzy-nights-vibes.html"
+    },
+    {
+      "source": "/landing/stratos-powder-day-vibes",
+      "destination": "/static-pages/landing/stratos-powder-day-vibes.html"
+    },
+    {
+      "source": "/landing/stratos-colorado-vibes",
+      "destination": "/static-pages/landing/stratos-colorado-vibes.html"
+    },
+    {
+      "source": "/landing/workout-mix",
+      "destination": "/static-pages/landing/workout-mix.html"
+    },
+    {
+      "source": "/landing/gated-content-fail-bnvc",
+      "destination": "/static-pages/landing/gated-content-fail-bnvc.html"
+    },
+    {
+      "source": "/landing/bnvc-presents-best-night-in-los-angeles",
+      "destination": "/static-pages/landing/bnvc-presents-best-night-in-los-angeles.html"
+    },
+    {
+      "source": "/landing/hulaween2024",
+      "destination": "/static-pages/landing/hulaween2024.html"
+    },
+    {
+      "source": "/landing/goodz-deluxe-album-experience-lemonade",
+      "destination": "/static-pages/landing/goodz-deluxe-album-experience-lemonade.html"
+    },
+    {
+      "source": "/landing/tropicalhotel-spa",
+      "destination": "/static-pages/landing/tropicalhotel-spa.html"
+    },
+    {
+      "source": "/landing/cascadeequinox2024",
+      "destination": "/static-pages/landing/cascadeequinox2024.html"
+    },
+    {
+      "source": "/landing/sgtpeppers",
+      "destination": "/static-pages/landing/sgtpeppers.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "index,follow" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "index,follow"
+        }
       ]
     }
   ]
