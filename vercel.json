@@ -12,7 +12,16 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/privacy-policy", "destination": "/privacy.html" },
-    { "source": "/terms-of-service", "destination": "/terms.html" }
+    { "source": "/terms-of-service", "destination": "/terms.html" },
+    { "source": "/tapped-add-url", "destination": "/static-pages/tapped-add-url.html" },
+    { "source": "/tapped-edit-url", "destination": "/static-pages/tapped-edit-url.html" },
+    { "source": "/landing/louisa", "destination": "/static-pages/landing/louisa.html" },
+    { "source": "/handles/artopenings-la", "destination": "/static-pages/handles/artopenings-la.html" },
+    { "source": "/handles/circle46gallery", "destination": "/static-pages/handles/circle46gallery.html" },
+    { "source": "/handles/contemporaryartsociety", "destination": "/static-pages/handles/contemporaryartsociety.html" },
+    { "source": "/handles/fernbergergallery", "destination": "/static-pages/handles/fernbergergallery.html" },
+    { "source": "/handles/kerlingallery", "destination": "/static-pages/handles/kerlingallery.html" },
+    { "source": "/handles/thomasvandykegallery", "destination": "/static-pages/handles/thomasvandykegallery.html" }
   ],
   "headers": [
     {
