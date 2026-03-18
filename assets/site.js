@@ -76,8 +76,118 @@
     });
   }
 
+  function disableNewsletterForms() {
+    var forms = document.querySelectorAll('form[id="Newsletter-Form"], form[name="wf-form-Newsletter-Email"]');
+    forms.forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var block = form.closest('.w-form') || form.parentElement;
+        if (!block) return;
+        var done = block.querySelector('.w-form-done');
+        var fail = block.querySelector('.w-form-fail');
+        if (fail) fail.style.display = 'none';
+        if (done) {
+          done.style.display = 'block';
+          var msg = done.querySelector('div');
+          if (msg) msg.textContent = 'Newsletter is currently paused. Please use the contact page for inquiries.';
+        }
+      });
+    });
+  }
+
+  function initContactForm() {
+    var form = document.getElementById('email-form');
+    if (!form) return;
+
+    var turnstileToken = '';
+    var turnstileContainer = document.getElementById('turnstile-container');
+
+    if (turnstileContainer && window.fetch) {
+      fetch('/api/public-config')
+        .then(function (r) { return r.json(); })
+        .then(function (cfg) {
+          if (!cfg || !cfg.turnstileSiteKey || !window.turnstile) return;
+          window.turnstile.render('#turnstile-container', {
+            sitekey: cfg.turnstileSiteKey,
+            callback: function (token) { turnstileToken = token || ''; },
+            'error-callback': function () { turnstileToken = ''; },
+            'expired-callback': function () { turnstileToken = ''; }
+          });
+        })
+        .catch(function () {});
+    }
+
+    var submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
+    var formBlock = form.closest('.w-form') || form.parentElement;
+    var done = formBlock ? formBlock.querySelector('.w-form-done') : null;
+    var fail = formBlock ? formBlock.querySelector('.w-form-fail') : null;
+
+    function setMessage(ok, text) {
+      if (done) done.style.display = ok ? 'block' : 'none';
+      if (fail) fail.style.display = ok ? 'none' : 'block';
+      var target = ok ? done : fail;
+      if (!target) return;
+      var msg = target.querySelector('div');
+      if (msg && text) msg.textContent = text;
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      setMessage(false, '');
+
+      var firstName = (form.querySelector('[name="First-name"]') || {}).value || '';
+      var lastName = (form.querySelector('[name="Last-name"]') || {}).value || '';
+      var email = (form.querySelector('[name="Email---Contact-Form"]') || {}).value || '';
+      var message = (form.querySelector('[name="Message---Contact-Form"]') || {}).value || '';
+      var company = (form.querySelector('[name="company"]') || {}).value || '';
+
+      // token is provided by Turnstile callback
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.value = 'Sending...';
+      }
+
+      try {
+        var res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            message: message,
+            company: company,
+            turnstileToken: turnstileToken
+          })
+        });
+
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok) {
+          throw new Error(data.error || 'Submission failed');
+        }
+
+        form.reset();
+        if (window.turnstile) {
+          try { window.turnstile.reset('#turnstile-container'); } catch (_e) {}
+        }
+        turnstileToken = '';
+        setMessage(true, 'Thanks. Your message has been sent to the Goodz team.');
+      } catch (err) {
+        setMessage(false, (err && err.message) ? err.message : 'Could not send. Please try again.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.value = 'Submit';
+        }
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initNav();
     initFaq();
+    disableNewsletterForms();
+    initContactForm();
   });
 })();
