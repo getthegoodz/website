@@ -1,4 +1,40 @@
 (function () {
+  var turnstileCfgPromise = null;
+  var turnstileScriptPromise = null;
+
+  function getTurnstileConfig() {
+    if (!turnstileCfgPromise) {
+      turnstileCfgPromise = fetch('/api/public-config')
+        .then(function (r) { return r.json(); })
+        .catch(function () { return {}; });
+    }
+    return turnstileCfgPromise;
+  }
+
+  function ensureTurnstileScript() {
+    if (window.turnstile) return Promise.resolve();
+    if (turnstileScriptPromise) return turnstileScriptPromise;
+
+    turnstileScriptPromise = new Promise(function (resolve, reject) {
+      var existing = document.querySelector('script[data-turnstile="1"]');
+      if (existing) {
+        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('error', reject, { once: true });
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      s.async = true;
+      s.defer = true;
+      s.setAttribute('data-turnstile', '1');
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error('Turnstile script failed to load')); };
+      document.head.appendChild(s);
+    });
+
+    return turnstileScriptPromise;
+  }
+
   function initNav() {
     var navs = document.querySelectorAll('.w-nav');
     navs.forEach(function (nav) {
@@ -76,48 +112,25 @@
     });
   }
 
-  function disableNewsletterForms() {
-    var forms = document.querySelectorAll('form[id="Newsletter-Form"], form[name="wf-form-Newsletter-Email"]');
-    forms.forEach(function (form) {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var block = form.closest('.w-form') || form.parentElement;
-        if (!block) return;
-        var done = block.querySelector('.w-form-done');
-        var fail = block.querySelector('.w-form-fail');
-        if (fail) fail.style.display = 'none';
-        if (done) {
-          done.style.display = 'block';
-          var msg = done.querySelector('div');
-          if (msg) msg.textContent = 'Newsletter is currently paused. Please use the contact page for inquiries.';
-        }
-      });
-    });
+  function attachTurnstile(form, container, onToken) {
+    return Promise.all([getTurnstileConfig(), ensureTurnstileScript()])
+      .then(function (vals) {
+        var cfg = vals[0] || {};
+        if (!cfg.turnstileSiteKey || !window.turnstile) return;
+
+        container.classList.add('cf-turnstile');
+        container.innerHTML = '';
+        window.turnstile.render(container, {
+          sitekey: cfg.turnstileSiteKey,
+          callback: function (token) { onToken(token || ''); },
+          'error-callback': function () { onToken(''); },
+          'expired-callback': function () { onToken(''); }
+        });
+      })
+      .catch(function () {});
   }
 
-  function initContactForm() {
-    var form = document.getElementById('email-form');
-    if (!form) return;
-
-    var turnstileToken = '';
-    var turnstileContainer = document.getElementById('turnstile-container');
-
-    if (turnstileContainer && window.fetch) {
-      fetch('/api/public-config')
-        .then(function (r) { return r.json(); })
-        .then(function (cfg) {
-          if (!cfg || !cfg.turnstileSiteKey || !window.turnstile) return;
-          window.turnstile.render('#turnstile-container', {
-            sitekey: cfg.turnstileSiteKey,
-            callback: function (token) { turnstileToken = token || ''; },
-            'error-callback': function () { turnstileToken = ''; },
-            'expired-callback': function () { turnstileToken = ''; }
-          });
-        })
-        .catch(function () {});
-    }
-
-    var submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
+  function setupMessages(form, successText, errorText) {
     var formBlock = form.closest('.w-form') || form.parentElement;
     var done = formBlock ? formBlock.querySelector('.w-form-done') : null;
     var fail = formBlock ? formBlock.querySelector('.w-form-fail') : null;
@@ -128,8 +141,29 @@
       var target = ok ? done : fail;
       if (!target) return;
       var msg = target.querySelector('div');
-      if (msg && text) msg.textContent = text;
+      if (msg) msg.textContent = text || (ok ? successText : errorText);
     }
+
+    return setMessage;
+  }
+
+  function initContactForm() {
+    var form = document.getElementById('email-form');
+    if (!form) return;
+
+    var turnstileToken = '';
+    var turnstileContainer = document.getElementById('turnstile-container') || form.querySelector('.w-form-formrecaptcha');
+    if (turnstileContainer) {
+      turnstileContainer.id = turnstileContainer.id || 'turnstile-container';
+      attachTurnstile(form, turnstileContainer, function (token) { turnstileToken = token; });
+    }
+
+    var submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
+    var setMessage = setupMessages(
+      form,
+      'Thanks. Your message has been sent to the Goodz team.',
+      'Could not send. Please try again.'
+    );
 
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -140,8 +174,6 @@
       var email = (form.querySelector('[name="Email---Contact-Form"]') || {}).value || '';
       var message = (form.querySelector('[name="Message---Contact-Form"]') || {}).value || '';
       var company = (form.querySelector('[name="company"]') || {}).value || '';
-
-      // token is provided by Turnstile callback
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -163,16 +195,14 @@
         });
 
         var data = await res.json().catch(function () { return {}; });
-        if (!res.ok) {
-          throw new Error(data.error || 'Submission failed');
-        }
+        if (!res.ok) throw new Error(data.error || 'Submission failed');
 
         form.reset();
-        if (window.turnstile) {
-          try { window.turnstile.reset('#turnstile-container'); } catch (_e) {}
+        if (window.turnstile && turnstileContainer) {
+          try { window.turnstile.reset(turnstileContainer); } catch (_e) {}
         }
         turnstileToken = '';
-        setMessage(true, 'Thanks. Your message has been sent to the Goodz team.');
+        setMessage(true);
       } catch (err) {
         setMessage(false, (err && err.message) ? err.message : 'Could not send. Please try again.');
       } finally {
@@ -184,10 +214,88 @@
     });
   }
 
+  function initNewsletterForms() {
+    var forms = document.querySelectorAll('form[id="Newsletter-Form"], form[name="wf-form-Newsletter-Email"]');
+    forms.forEach(function (form, idx) {
+      var turnstileToken = '';
+      var submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
+      var emailInput = form.querySelector('input[type="email"]');
+      if (!emailInput) return;
+
+      var honeypot = form.querySelector('input[name="company"]');
+      if (!honeypot) {
+        honeypot = document.createElement('input');
+        honeypot.type = 'text';
+        honeypot.name = 'company';
+        honeypot.autocomplete = 'off';
+        honeypot.tabIndex = -1;
+        honeypot.style.position = 'absolute';
+        honeypot.style.left = '-9999px';
+        honeypot.style.opacity = '0';
+        honeypot.style.pointerEvents = 'none';
+        form.appendChild(honeypot);
+      }
+
+      var captchaContainer = form.querySelector('.w-form-formrecaptcha');
+      if (!captchaContainer) {
+        captchaContainer = document.createElement('div');
+        form.insertBefore(captchaContainer, submitBtn || null);
+      }
+      captchaContainer.id = captchaContainer.id || ('newsletter-turnstile-' + idx);
+
+      attachTurnstile(form, captchaContainer, function (token) { turnstileToken = token; });
+
+      var setMessage = setupMessages(
+        form,
+        'Thanks. We got your email and will follow up directly.',
+        'Could not submit. Please try again.'
+      );
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.value = 'Sending...';
+        }
+
+        try {
+          var res = await fetch('/api/newsletter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: emailInput.value || '',
+              company: honeypot.value || '',
+              turnstileToken: turnstileToken,
+              page: window.location.pathname
+            })
+          });
+
+          var data = await res.json().catch(function () { return {}; });
+          if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+          form.reset();
+          if (window.turnstile && captchaContainer) {
+            try { window.turnstile.reset(captchaContainer); } catch (_e) {}
+          }
+          turnstileToken = '';
+          setMessage(true);
+        } catch (err) {
+          setMessage(false, (err && err.message) ? err.message : 'Could not submit. Please try again.');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.value = 'Subscribe';
+          }
+        }
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initNav();
     initFaq();
-    disableNewsletterForms();
     initContactForm();
+    initNewsletterForms();
   });
 })();
