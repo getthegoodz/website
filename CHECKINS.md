@@ -26,3 +26,24 @@
 - Pilot de-Webflow cut completed on `/faq` page:
   - Removed Webflow runtime + jQuery scripts from `faq.html` and `static-pages/faq.html`.
   - Verified production page no longer loads Webflow runtime scripts while local `assets/site.js` still powers accordion behavior.
+
+## 2026-03-19 17:00 EDT (Tapped flow stabilization + prod audit)
+- Resolved NFC blank-white confirmation issue by replacing tapped pages with runtime-independent implementations:
+  - `static-pages/tapped-confirmation.html`
+  - `static-pages/tapped-edit-url.html`
+- Ensured submit path still writes via existing endpoint (`https://d9nh35kfsda0s.cloudfront.net/api/tag`) and redirects reliably to confirmation.
+- Applied Goodz-branded shell styling to both pages and matched body background tone to site-wide color.
+- Removed card-code text from confirmation copy per request.
+- Shipped multiple production deployments to `www.getthegoodz.com` while validating fixes.
+- Ran full live route audit against rewrite map and stored results:
+  - `reports/prod-webflow-audit-2026-03-19.txt`
+  - `reports/prod-webflow-audit-2026-03-19-v2.txt`
+- Audit summary at checkpoint:
+  - 68 routes checked
+  - 59 still loading Webflow runtime JS/jQuery
+  - 9 currently without runtime JS
+- Next planned execution order:
+  1. Core pages de-Webflow (`/`, `/about`, `/custom`, `/artist-goodz`, `/faq`, `/support`, `/contact`, `/privacy`, `/terms` + aliases)
+  2. Remaining tapped pages (`/tapped`, `/tapped-add-url`, `/tapped2`)
+  3. Handles/landing/campaign page families
+  4. Final asset migration off `cdn.prod.website-files.com` + zero-marker audit

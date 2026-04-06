@@ -4,47 +4,51 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/index.html"
+      "destination": "/static-pages-dev/index.html"
     },
     {
       "source": "/about",
-      "destination": "/about.html"
+      "destination": "/static-pages-dev/about.html"
     },
     {
       "source": "/custom",
-      "destination": "/custom.html"
+      "destination": "/static-pages-dev/custom.html"
     },
     {
       "source": "/artist-goodz",
-      "destination": "/artist-goodz.html"
+      "destination": "/static-pages-dev/artist-goodz.html"
     },
     {
       "source": "/faq",
-      "destination": "/faq.html"
+      "destination": "/static-pages-dev/faq.html"
     },
     {
       "source": "/support",
-      "destination": "/support.html"
+      "destination": "/static-pages-dev/support.html"
     },
     {
       "source": "/contact",
-      "destination": "/contact.html"
+      "destination": "/static-pages-dev/contact.html"
     },
     {
       "source": "/privacy",
-      "destination": "/privacy.html"
+      "destination": "/static-pages-dev/privacy.html"
     },
     {
       "source": "/terms",
-      "destination": "/terms.html"
+      "destination": "/static-pages-dev/terms.html"
     },
     {
       "source": "/privacy-policy",
-      "destination": "/privacy.html"
+      "destination": "/static-pages-dev/privacy.html"
     },
     {
       "source": "/terms-of-service",
-      "destination": "/terms.html"
+      "destination": "/static-pages-dev/terms.html"
+    },
+    {
+      "source": "/turnstile-proof",
+      "destination": "/static-pages-dev/turnstile-proof.html"
     },
     {
       "source": "/tapped-add-url",
