@@ -19,6 +19,29 @@ def transform_html(t: str) -> str:
     # Remove jquery includes
     t = re.sub(r'<script[^>]+jquery[^>]*></script>', '', t, flags=re.I)
 
+    # Rewrite contact-page captcha placeholder to explicit Turnstile container
+    if 'id="email-form"' in t and 'id="turnstile-container"' not in t:
+        t = t.replace('<div class="w-form-formrecaptcha"></div>', '<div id="turnstile-container" class="cf-turnstile"></div>', 1)
+
+    # Normalize newsletter/footer captcha placeholders to explicit Turnstile markup
+    t = t.replace('<div class="w-form-formrecaptcha"></div>', '<div class="w-form-formrecaptcha cf-turnstile"></div>')
+    t = re.sub(
+        r'<div([^>]*?)class="([^"]*?)w-form-formrecaptcha([^"]*?)"([^>]*)></div>',
+        '<div class="w-form-formrecaptcha cf-turnstile"></div>',
+        t,
+        flags=re.I,
+    )
+    t = re.sub(
+        r'<div([^>]*?)class="([^"]*?)g-recaptcha([^"]*?)"([^>]*)></div>',
+        '<div class="w-form-formrecaptcha cf-turnstile"></div>',
+        t,
+        flags=re.I,
+    )
+
+    # Ensure Turnstile loader is present once when needed
+    if ('cf-turnstile' in t or 'turnstile-container' in t) and 'challenges.cloudflare.com/turnstile/v0/api.js' not in t:
+        t = t.replace('</body>', '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script></body>')
+
     # Ensure site.js is present once
     if '/assets/site.js' not in t:
         t = t.replace('</body>', '<script src="/assets/site.js"></script></body>')
