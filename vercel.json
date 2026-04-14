@@ -15,6 +15,18 @@
       "destination": "/static-pages-dev/custom.html"
     },
     {
+      "source": "/custom-goodz",
+      "destination": "/custom-goodz/index.html"
+    },
+    {
+      "source": "/custom-goodz/(.*)",
+      "destination": "/custom-goodz/$1"
+    },
+    {
+      "source": "/api/custom-goodz-order",
+      "destination": "/api/custom-goodz-order.js"
+    },
+    {
       "source": "/artist-goodz",
       "destination": "/static-pages-dev/artist-goodz.html"
     },
