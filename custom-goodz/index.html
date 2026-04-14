@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bandcamp Builder — Goodz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --orange: #E86900;
       --orange-light: #fff5eb;
+      --yellow: #ffc852;
+      --yellow-light: #fff8e7;
       --green-bg: #f0fdf4;
       --green-border: #bbf7d0;
       --green-text: #166534;
@@ -24,80 +27,168 @@
       --red-bg: #fef2f2;
       --red-border: #fecaca;
       --red-text: #dc2626;
+      --site-bg: #ceccbb;
+      --text-dark: #1a1a1a;
+      --text-mid: #555;
+      --text-light: #888;
+      --border: #e0e0e0;
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: #fefefe;
-      color: #1a1a1a;
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background-color: var(--site-bg);
+      color: var(--text-dark);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* HEADER */
-    .header {
-      border-bottom: 1px solid #eee;
-      padding: 1rem 2rem;
+    /* ── NAVBAR (matching site) ── */
+    .navbar1_component {
+      background-color: transparent;
+      border-bottom: 2px solid #000;
+      align-items: center;
+      width: 100%;
+      min-height: 4.5rem;
+      padding-left: 5%;
+      padding-right: 5%;
+      display: flex;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ceccbb;
+    }
+    .navbar1_container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      justify-content: space-between;
     }
-    .header-brand {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--orange);
-      letter-spacing: -0.02em;
+    .navbar1_logo-link { text-decoration: none; }
+    .navbar1_logo {
+      height: 36px;
+      width: auto;
     }
-    .header-sep { color: #ccc; }
-    .header-page { font-weight: 600; }
+    .navbar1_menu {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    @media (max-width: 767px) {
+      .navbar1_menu { display: none; }
+      .navbar1_menu.open { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: #ceccbb; border-bottom: 2px solid #000; padding: 1rem; gap: 0.5rem; }
+    }
+    .new_navlink {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: #000;
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0;
+      transition: opacity 0.15s;
+    }
+    .new_navlink:hover { opacity: 0.65; }
+    .navbar1_menu-buttons { margin-left: 0.5rem; }
+    .menu-icon1 { display: none; cursor: pointer; padding: 0.5rem; }
+    @media (max-width: 767px) {
+      .menu-icon1 { display: block; }
+    }
+    .menu-icon1_line-top,
+    .menu-icon1_line-middle,
+    .menu-icon1_line-bottom {
+      width: 22px;
+      height: 2px;
+      background: #000;
+      margin: 4px 0;
+      transition: transform 0.2s;
+    }
 
-    /* LAYOUT */
+    /* Mobile menu toggle */
+    .menu-open .menu-icon1_line-top { transform: rotate(45deg) translate(4px, 4px); }
+    .menu-open .menu-icon1_line-middle { opacity: 0; }
+    .menu-open .menu-icon1_line-bottom { transform: rotate(-45deg) translate(4px, -4px); }
+
+    /* ── LAYOUT ── */
+    .page-wrapper {
+      padding-left: 5%;
+      padding-right: 5%;
+      padding-top: 2.5rem;
+      padding-bottom: 4rem;
+    }
     .layout {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 2rem;
       display: grid;
       grid-template-columns: 340px 1fr;
       gap: 2.5rem;
       align-items: start;
     }
-
-    @media (max-width: 768px) {
-      .layout {
-        grid-template-columns: 1fr;
-        padding: 1rem;
-      }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; gap: 2rem; }
     }
 
-    /* PREVIEW PANEL */
+    /* ── PAGE HEADER ── */
+    .page-header {
+      max-width: 1100px;
+      margin: 0 auto 2rem;
+    }
+    .page-header-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--orange);
+      margin-bottom: 0.5rem;
+    }
+    .page-header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: #000;
+      margin-bottom: 0.5rem;
+    }
+    .page-header p {
+      font-size: 1rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    /* ── PREVIEW PANEL ── */
     .preview-panel {
       position: sticky;
-      top: 2rem;
+      top: 6rem;
     }
-
-    .goodz-preview {
-      background: #f5f5f5;
-      border-radius: 16px;
-      padding: 2rem;
+    .preview-card {
+      background: #f4f1e8;
+      border: 2px solid #000;
+      border-radius: 0;
+      padding: 1.75rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1.5rem;
-      min-height: 320px;
+      min-height: 300px;
     }
-
     .preview-label {
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #999;
+      letter-spacing: 0.12em;
+      color: var(--text-light);
     }
 
-    /* The Goodz card — no black border */
+    /* The Goodz card */
     .card {
       width: 140px;
       height: 140px;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 8px 32px rgba(0,0,0,0.18), inset 0 0 0 2px rgba(0,0,0,0.08);
       background: #111;
@@ -108,258 +199,229 @@
       flex-direction: column;
       gap: 0.25rem;
     }
-
     .card.has-art { background: transparent; }
-
     .card-placeholder-text {
       font-size: 0.6rem;
       color: #666;
       text-align: center;
       line-height: 1.4;
     }
+    .card-art { width: 100%; height: 100%; object-fit: cover; }
 
-    .card-art {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Sleeve mockup — solid square, card pokes out the top via clipPath */
+    /* Sleeve mockup */
     .sleeve-wrap {
       position: relative;
       width: 148px;
       height: 152px;
+      display: none;
     }
-
+    .sleeve-wrap.visible { display: block; }
     .sleeve-box {
       width: 148px;
       height: 148px;
       border-radius: 8px;
       background: #d4c5b0;
       position: absolute;
-      bottom: 0;
-      left: 0;
+      bottom: 0; left: 0;
       box-shadow: 0 4px 16px rgba(0,0,0,0.15);
       overflow: hidden;
       display: flex;
       align-items: flex-end;
       justify-content: center;
     }
-
     .sleeve-card-peek {
       width: 120px;
       height: 120px;
       border-radius: 6px;
       overflow: hidden;
       position: absolute;
-      top: -14px;
-      left: 14px;
+      top: -14px; left: 14px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
-
-    .sleeve-card-peek .card-art {
-      width: 100%;
-      height: 100%;
-    }
-
+    .sleeve-card-peek .card-art { width: 100%; height: 100%; }
     .sleeve-label {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       text-align: center;
       font-size: 0.55rem;
       color: rgba(0,0,0,0.25);
       padding: 2px 0;
       background: rgba(255,255,255,0.6);
     }
-
     .preview-hint {
       font-size: 0.65rem;
-      color: #999;
-      letter-spacing: 0.05em;
+      color: var(--text-light);
+      letter-spacing: 0.03em;
     }
 
+    /* Status badges */
     .status-ok {
       margin-top: 1rem;
-      padding: 0.75rem 1rem;
+      padding: 0.65rem 1rem;
       background: var(--green-bg);
       border: 1px solid var(--green-border);
-      border-radius: 8px;
+      border-radius: 0;
       font-size: 0.8rem;
       color: var(--green-text);
+      width: 100%;
     }
-
     .status-info {
       margin-top: 0.5rem;
-      padding: 0.75rem 1rem;
+      padding: 0.65rem 1rem;
       background: var(--blue-bg);
       border: 1px solid var(--blue-border);
-      border-radius: 8px;
+      border-radius: 0;
       font-size: 0.8rem;
       color: var(--blue-text);
+      width: 100%;
     }
 
-    /* CONFIG PANEL */
-    .config-panel {
-      min-width: 0;
-    }
+    /* ── CONFIG PANEL ── */
+    .config-panel { min-width: 0; }
 
     .config-panel h2 {
-      font-size: 1.4rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
       font-weight: 700;
+      color: #000;
       margin-bottom: 0.25rem;
+      letter-spacing: -0.01em;
     }
-
     .config-panel > p {
-      color: #666;
+      color: var(--text-mid);
       font-size: 0.9rem;
       margin-bottom: 1.5rem;
       line-height: 1.6;
     }
 
-    /* STEP BAR */
+    /* Step bar */
     .step-bar {
       display: flex;
-      gap: 0.25rem;
+      gap: 0.35rem;
       margin-bottom: 2rem;
     }
-
     .step-segment {
       flex: 1;
       height: 4px;
       border-radius: 2px;
-      background: #e5e5e5;
-      transition: background 0.2s;
+      background: #c8c4b8;
+      transition: background 0.25s;
     }
-
     .step-segment.done,
     .step-segment.active { background: var(--orange); }
 
-    /* UPLOAD GRID */
+    /* Section titles within steps */
+    .step h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+    .step > p {
+      color: var(--text-mid);
+      font-size: 0.875rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    /* Upload grid */
     .upload-grid {
       display: flex;
       gap: 2rem;
       flex-wrap: wrap;
     }
-
-    .upload-box {
-      flex: 1 1 200px;
-      min-width: 180px;
-    }
-
+    .upload-box { flex: 1 1 200px; min-width: 180px; }
     .upload-label {
       display: block;
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #666;
+      letter-spacing: 0.06em;
+      color: var(--text-dark);
       margin-bottom: 0.5rem;
     }
 
+    /* Drop zone */
     .drop-zone {
       width: 100%;
       aspect-ratio: 1;
-      border: 2px dashed #ccc;
-      border-radius: 12px;
+      border: 2px dashed #aaa;
+      border-radius: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      background: #fafafa;
+      background: #f4f1e8;
       transition: all 0.15s ease;
       overflow: hidden;
       position: relative;
       text-align: center;
     }
-
     .drop-zone:hover, .drop-zone.drag-over {
       border-color: var(--orange);
       background: var(--orange-light);
     }
-
-    .drop-zone.is-loading {
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
-    .drop-zone.has-error {
-      border-color: var(--red-text);
-      background: var(--red-bg);
-    }
-
+    .drop-zone.is-loading { opacity: 0.65; pointer-events: none; }
+    .drop-zone.has-error { border-color: var(--red-text); background: var(--red-bg); }
     .drop-zone-content { padding: 1rem; }
-    .drop-zone-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-    .drop-zone-text { font-size: 0.8rem; color: #999; line-height: 1.5; }
-    .drop-zone-text span { color: var(--orange); }
-
-    .drop-zone img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
+    .drop-zone-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    .drop-zone-text { font-size: 0.8rem; color: var(--text-mid); line-height: 1.5; }
+    .drop-zone-text span { color: var(--orange); font-weight: 600; }
+    .drop-zone img { width: 100%; height: 100%; object-fit: cover; }
     .file-input { display: none; }
-
     .file-name {
       margin-top: 0.5rem;
       font-size: 0.75rem;
-      color: #666;
+      color: var(--text-mid);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* SLEEVE TOGGLE — 3 options */
+    /* Sleeve toggle */
     .sleeve-toggle {
       display: flex;
       gap: 0.75rem;
       margin-bottom: 1rem;
     }
-
     .sleeve-option {
       flex: 1;
       padding: 1rem 0.75rem;
-      border: 2px solid #e5e5e5;
-      border-radius: 12px;
+      border: 2px solid #000;
+      border-radius: 0;
       background: #fff;
       cursor: pointer;
       text-align: center;
       transition: all 0.15s;
     }
-
     .sleeve-option.selected {
       border-color: var(--orange);
       background: var(--orange-light);
     }
+    .sleeve-option-title { font-weight: 700; font-size: 0.95rem; color: #000; }
+    .sleeve-option-sub { font-size: 0.75rem; color: var(--text-light); margin-top: 0.2rem; }
 
-    .sleeve-option-title { font-weight: 700; font-size: 0.95rem; }
-    .sleeve-option-sub { font-size: 0.75rem; color: #888; margin-top: 0.2rem; }
-
-    /* SLEEVE INFO BOX */
+    /* Sleeve info box */
     .sleeve-info {
       padding: 0.75rem 1rem;
       background: var(--yellow-bg);
       border: 1px solid var(--yellow-border);
-      border-radius: 8px;
+      border-radius: 0;
       font-size: 0.8rem;
       color: var(--yellow-text);
       margin-bottom: 1.5rem;
     }
-
     .sleeve-info strong { font-weight: 700; }
 
-    /* BANDCAMP MODE TOGGLE */
+    /* Mode toggle (CSV vs URL) */
     .mode-toggle {
       display: flex;
       gap: 0;
       margin-bottom: 1rem;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 2px solid #e5e5e5;
+      border: 2px solid #000;
     }
-
     .mode-btn {
       flex: 1;
       padding: 0.65rem 1rem;
@@ -367,266 +429,219 @@
       border: none;
       font-size: 0.85rem;
       font-weight: 600;
-      color: #666;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-mid);
       cursor: pointer;
       transition: all 0.15s;
       text-align: center;
     }
+    .mode-btn.active { background: #000; color: #fff; }
 
-    .mode-btn.active {
-      background: var(--orange);
-      color: #fff;
-    }
-
-    /* CSV UPLOAD */
+    /* CSV zone */
     .csv-zone {
-      border: 2px dashed #ccc;
-      border-radius: 12px;
+      border: 2px dashed #aaa;
+      border-radius: 0;
       padding: 2rem;
       text-align: center;
       cursor: pointer;
-      background: #fafafa;
+      background: #f4f1e8;
       transition: all 0.15s ease;
     }
-
     .csv-zone:hover, .csv-zone.drag-over { border-color: var(--orange); background: var(--orange-light); }
     .csv-zone.has-error { border-color: var(--red-text); background: var(--red-bg); }
     .csv-zone.is-loading { opacity: 0.7; pointer-events: none; }
     .csv-icon { font-size: 2rem; margin-bottom: 0.75rem; }
-    .csv-title { font-weight: 600; margin-bottom: 0.25rem; }
-    .csv-sub { font-size: 0.85rem; color: #666; }
-    .csv-sub span { color: var(--orange); }
-    .csv-optional { font-size: 0.8rem; color: #888; margin-top: 0.5rem; }
-    .csv-error { margin-top: 0.75rem; padding: 0.75rem; background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 8px; color: var(--red-text); font-size: 0.85rem; }
-    .csv-success { margin-top: 1rem; padding: 1rem; background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 8px; }
-    .csv-success-title { font-weight: 600; color: var(--green-text); margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .csv-title { font-weight: 700; margin-bottom: 0.25rem; color: #000; font-size: 0.95rem; }
+    .csv-sub { font-size: 0.85rem; color: var(--text-mid); }
+    .csv-sub span { color: var(--orange); font-weight: 600; }
+    .csv-optional { font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; }
+    .csv-error { margin-top: 0.75rem; padding: 0.75rem; background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 0; color: var(--red-text); font-size: 0.85rem; }
+    .csv-success { margin-top: 1rem; padding: 1rem; background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 0; }
+    .csv-success-title { font-weight: 700; color: var(--green-text); margin-bottom: 0.5rem; font-size: 0.9rem; }
     .csv-success-sub { font-size: 0.8rem; color: #15803d; }
     .csv-preview { margin-top: 0.5rem; }
     .csv-preview summary { font-size: 0.75rem; color: var(--green-text); cursor: pointer; }
     .csv-preview ul { margin: 0.5rem 0 0 1.25rem; padding: 0; font-size: 0.7rem; color: var(--green-text); word-break: break-all; }
-    .csv-warning { margin-top: 0.75rem; padding: 0.75rem 1rem; background: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: 8px; font-size: 0.85rem; color: var(--yellow-text); }
+    .csv-warning { margin-top: 0.75rem; padding: 0.75rem 1rem; background: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: 0; font-size: 0.85rem; color: var(--yellow-text); }
     .csv-warning strong { font-weight: 700; }
 
-    /* ALT URL INPUT */
+    /* Alt URL input */
     .alt-url-box { margin-top: 0; }
-
     .alt-url-input {
       width: 100%;
       padding: 0.75rem 1rem;
-      border-radius: 8px;
-      border: 2px solid #e5e5e5;
+      border-radius: 0;
+      border: 2px solid #000;
       font-size: 0.9rem;
-      font-family: inherit;
+      font-family: 'DM Sans', sans-serif;
       box-sizing: border-box;
       transition: border-color 0.15s;
+      background: #fff;
     }
+    .alt-url-input:focus { outline: none; border-color: var(--orange); }
+    .alt-url-hint { margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-light); }
 
-    .alt-url-input:focus {
-      outline: none;
-      border-color: var(--orange);
-    }
+    /* Bandcamp help */
+    .bandcamp-help { font-size: 0.875rem; color: var(--text-mid); margin-bottom: 1.25rem; line-height: 1.6; }
+    .bandcamp-help a { color: var(--orange); text-decoration: none; font-weight: 600; }
+    .bandcamp-help a:hover { text-decoration: underline; }
 
-    .alt-url-hint {
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      color: #888;
-    }
-
-    /* BANDCAMP HELP LINK */
-    .bandcamp-help {
-      font-size: 0.85rem;
-      color: #666;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-
-    .bandcamp-help a {
-      color: var(--orange);
-      text-decoration: none;
-    }
-
-    /* QUANTITY */
+    /* Quantity */
     .qty-label {
       display: block;
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #666;
+      letter-spacing: 0.06em;
+      color: var(--text-dark);
       margin-bottom: 0.5rem;
     }
-
     .qty-input {
       width: 100%;
       padding: 0.75rem 1rem;
-      border-radius: 8px;
-      border: 2px solid #e5e5e5;
+      border-radius: 0;
+      border: 2px solid #000;
       font-size: 1.5rem;
-      font-weight: 700;
+      font-weight: 800;
+      font-family: 'Poppins', sans-serif;
       text-align: center;
       margin-bottom: 0.25rem;
       box-sizing: border-box;
-    }
-
-    .qty-hint {
-      font-size: 0.8rem;
-      color: #666;
-      margin-bottom: 1rem;
-      line-height: 1.5;
-    }
-
-    .tier-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-
-    .tier-btn {
-      padding: 0.4rem 0.75rem;
-      border-radius: 20px;
-      border: 2px solid #e5e5e5;
       background: #fff;
-      color: #666;
-      font-weight: 600;
+      color: #000;
+    }
+    .qty-input:focus { outline: none; border-color: var(--orange); }
+    .qty-hint { font-size: 0.8rem; color: var(--text-mid); margin-bottom: 1rem; line-height: 1.5; }
+    .tier-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .tier-btn {
+      padding: 0.4rem 0.85rem;
+      border-radius: 0;
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
+      font-weight: 700;
       font-size: 0.75rem;
+      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
       transition: all 0.1s ease;
     }
-
     .tier-btn.active {
-      border-color: var(--orange);
-      background: var(--orange-light);
-      color: var(--orange);
+      background: #000;
+      color: #fff;
     }
 
+    /* Pricing box */
     .pricing-box {
-      padding: 1rem;
-      background: #f8f8f8;
-      border-radius: 8px;
-      border: 1px solid #e5e5e5;
+      padding: 1.25rem;
+      background: #fff;
+      border: 2px solid #000;
+      margin-bottom: 1.5rem;
     }
+    .pricing-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem; }
+    .pricing-per { font-size: 0.85rem; color: var(--text-mid); }
+    .pricing-tier { font-size: 0.7rem; color: var(--text-light); }
+    .pricing-total { font-size: 2rem; font-weight: 800; font-family: 'Poppins', sans-serif; color: #000; }
+    .pricing-total-label { font-size: 0.8rem; color: var(--text-mid); font-weight: 400; }
 
-    .pricing-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.25rem;
-    }
-
-    .pricing-per { font-size: 0.8rem; color: #666; }
-    .pricing-tier { font-size: 0.7rem; color: #999; }
-    .pricing-total { font-size: 1.75rem; font-weight: 800; }
-    .pricing-total-label { font-size: 0.8rem; color: #666; font-weight: 400; }
-
-    /* SUMMARY */
+    /* Summary */
     .summary-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0.85rem 1rem;
-      background: #f8f8f8;
-      border-radius: 8px;
-      font-size: 0.9rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      font-size: 0.875rem;
     }
-
     .summary-row.bold {
-      background: #1a1a1a;
+      background: #000;
       color: #fff;
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1rem;
+      border: none;
     }
-
-    .summary-row.warn { color: var(--red-text); background: var(--red-bg); }
-    .summary-rows { display: grid; gap: 0.75rem; margin-bottom: 1.5rem; }
-
+    .summary-row.warn { color: var(--red-text); background: var(--red-bg); border-color: var(--red-border); }
+    .summary-rows { display: grid; gap: 0.5rem; margin-bottom: 1.25rem; }
     .summary-warning {
       margin-bottom: 1rem;
       padding: 0.85rem 1rem;
       background: var(--red-bg);
       border: 1px solid var(--red-border);
-      border-radius: 8px;
+      border-radius: 0;
       color: var(--red-text);
       font-size: 0.85rem;
     }
 
-    /* BUTTONS */
+    /* Buttons */
     .btn-row {
       display: flex;
       justify-content: space-between;
       margin-top: 1.5rem;
+      gap: 1rem;
     }
-
     .btn {
       padding: 0.7rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
+      border-radius: 0;
+      font-weight: 700;
       font-size: 0.9rem;
+      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
       transition: all 0.15s;
-      border: none;
+      border: 2px solid transparent;
+      text-decoration: none;
+      display: inline-block;
     }
-
     .btn-back {
       background: #fff;
-      color: #666;
-      border: 2px solid #e5e5e5;
+      color: #000;
+      border-color: #000;
     }
-
+    .btn-back:hover { background: #f0f0f0; }
     .btn-primary {
       background: var(--orange);
       color: #fff;
+      border-color: var(--orange);
     }
-
-    .btn-primary:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .btn-primary:hover:not(:disabled) { background: #d05d00; }
-
+    .btn-primary:disabled { background: #ccc; border-color: #ccc; cursor: not-allowed; }
+    .btn-primary:hover:not(:disabled) { background: #c05a00; border-color: #c05a00; }
     .btn-order {
       padding: 0.85rem 2rem;
       font-size: 1rem;
+      background: #000;
+      color: #fff;
+      border-color: #000;
     }
+    .btn-order:hover:not(:disabled) { background: #333; }
 
-    /* STEP CONTENT */
+    /* Step content */
     .step { display: none; }
     .step.active { display: block; }
 
-    /* ORDER SUCCESS */
-    .order-success {
-      text-align: center;
-      padding: 3rem 2rem;
-    }
-
+    /* Order success */
+    .order-success { text-align: center; padding: 3rem 2rem; }
     .order-success-icon { font-size: 4rem; margin-bottom: 1rem; }
-    .order-success h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-    .order-success p { color: #666; margin-bottom: 1.5rem; }
+    .order-success h2 { font-family: 'Poppins', sans-serif; font-size: 1.8rem; margin-bottom: 0.5rem; color: #000; }
+    .order-success p { color: var(--text-mid); margin-bottom: 1.5rem; }
     .order-success-detail {
       display: inline-block;
       padding: 0.75rem 1.5rem;
-      background: #f8f8f8;
-      border-radius: 8px;
+      background: #f4f1e8;
+      border: 2px solid #000;
+      border-radius: 0;
       font-size: 0.9rem;
-      color: #666;
+      color: var(--text-mid);
       margin-bottom: 1.5rem;
     }
-    .order-success-detail a {
-      color: var(--orange);
-      text-decoration: none;
-      font-weight: 600;
-      display: block;
-      margin-top: 0.5rem;
-    }
+    .order-success-detail a { color: var(--orange); text-decoration: none; font-weight: 600; display: block; margin-top: 0.5rem; }
 
-    /* LOADING SPINNER */
-    .btn-loading {
-      position: relative;
-      color: transparent !important;
-    }
+    /* Loading spinner */
+    .btn-loading { position: relative; color: transparent !important; }
     .btn-loading::after {
       content: '';
       position: absolute;
       width: 16px;
       height: 16px;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       margin: -8px 0 0 -8px;
       border: 2px solid #fff;
       border-top-color: transparent;
@@ -634,225 +649,254 @@
       animation: spin 0.6s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Mobile nav toggle */
+    .mobile-nav-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+    @media (max-width: 767px) {
+      .mobile-nav-btn { display: block; }
+      .btn-row { flex-direction: column-reverse; }
+      .btn-row .btn { width: 100%; text-align: center; }
+    }
   </style>
 </head>
-<body>
+<body class="body">
 
-<div class="header">
-  <div class="header-brand">Goodz</div>
-  <div class="header-sep">/</div>
-  <div class="header-page">Bandcamp Builder</div>
+<!-- Navbar (matching site structure) -->
+<div class="navbar1_component w-nav" data-easing2="ease" data-collapse="medium" data-duration="400">
+  <div class="navbar1_container">
+    <a href="/" class="navbar1_logo-link w-nav-brand">
+      <img src="https://cdn.prod.website-files.com/654d45c59db76623f5f1a2b8/65568b11f91e8d11ccd581d2_Goodz-logo-Black-5x.png"
+           loading="lazy"
+           alt="Goodz"
+           class="navbar1_logo">
+    </a>
+    <nav role="navigation" class="navbar1_menu w-nav-menu" id="nav-menu">
+      <a href="/" class="new_navlink w-nav-link">Home</a>
+      <a href="/about" class="new_navlink w-nav-link">About</a>
+      <a href="/custom" class="new_navlink w-nav-link">Custom</a>
+      <a href="/artist-goodz" class="new_navlink w-nav-link">Artist</a>
+      <a href="/faq" class="new_navlink w-nav-link">FAQ</a>
+      <a href="/support" class="new_navlink w-nav-link">Support</a>
+      <a href="/contact" class="new_navlink w-nav-link">Contact</a>
+      <div class="navbar1_menu-buttons">
+        <a href="https://shop.getthegoodz.com/collections/frontpage" class="button primary w-button">Shop</a>
+      </div>
+    </nav>
+    <button class="mobile-nav-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+      <div class="menu-icon1" id="menu-icon">
+        <div class="menu-icon1_line-top"></div>
+        <div class="menu-icon1_line-middle"><div class="menu-icon_line-middle-inner"></div></div>
+        <div class="menu-icon1_line-bottom"></div>
+      </div>
+    </button>
+  </div>
 </div>
 
-<div class="layout">
-  <!-- LEFT: Live Preview -->
-  <div class="preview-panel">
-    <div class="goodz-preview">
-      <div class="preview-label">Live Preview</div>
-
-      <div id="card-wrap">
-        <div class="card" id="card">
-          <div id="card-placeholder" class="card-placeholder-text">CARD FACE<br><span style="color:#555">Upload art →</span></div>
-          <img id="card-art" class="card-art" style="display:none" src="" alt="Card face">
-        </div>
-      </div>
-
-      <!-- Sleeve mockup: shown only when hasSleeve is true -->
-      <div id="sleeve-wrap" class="sleeve-wrap" style="display:none">
-        <div class="sleeve-box">
-          <div class="sleeve-label">Goodz</div>
-        </div>
-        <div class="sleeve-card-peek" id="sleeve-peek">
-          <div class="card" id="sleeve-card-inner" style="width:120px;height:120px">
-            <img id="sleeve-card-art" class="card-art" style="display:none" src="" alt="">
-          </div>
-        </div>
-      </div>
-
-      <div class="preview-hint" id="preview-hint">Upload album art to preview</div>
-    </div>
-
-    <div id="status-art" class="status-ok" style="display:none">✅ Artwork uploaded — preview updated</div>
-    <div id="status-codes" class="status-info" style="display:none"></div>
+<div class="page-wrapper">
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-header-eyebrow">Custom Goodz</div>
+    <h1>Bandcamp Builder</h1>
+    <p>Upload your album art, link your Bandcamp download codes, and order custom Goodz for your next release — all in one place.</p>
   </div>
 
-  <!-- RIGHT: Configurator -->
-  <div class="config-panel">
+  <div class="layout">
+    <!-- LEFT: Live Preview -->
+    <div class="preview-panel">
+      <div class="preview-card">
+        <div class="preview-label">Live Preview</div>
 
-    <!-- Step indicator: 5 segments -->
-    <div class="step-bar" id="step-bar">
-      <div class="step-segment active" data-step="0"></div>
-      <div class="step-segment" data-step="1"></div>
-      <div class="step-segment" data-step="2"></div>
-      <div class="step-segment" data-step="3"></div>
-      <div class="step-segment" data-step="4"></div>
-    </div>
-
-    <!-- STEP 0: Artwork -->
-    <div class="step active" id="step-0">
-      <h2>Upload your album artwork</h2>
-      <p>This will be printed on the front of each of your Goodz.</p>
-
-      <div class="upload-grid">
-        <div class="upload-box">
-          <label class="upload-label">Album Art (Front)</label>
-          <div class="drop-zone" id="drop-front" onclick="document.getElementById('input-front').click()">
-            <div class="drop-zone-content" id="front-placeholder">
-              <div class="drop-zone-icon">🖼️</div>
-              <div class="drop-zone-text">Drop image or<br><span>click to browse</span></div>
-            </div>
-            <img id="front-preview" style="display:none" src="" alt="Front preview">
+        <div id="card-wrap">
+          <div class="card" id="card">
+            <div id="card-placeholder" class="card-placeholder-text">CARD FACE<br><span style="color:#888">Upload art →</span></div>
+            <img id="card-art" class="card-art" style="display:none" src="" alt="Card face">
           </div>
-          <input type="file" id="input-front" class="file-input" accept="image/*">
-          <div class="file-name" id="front-name"></div>
         </div>
+
+        <!-- Sleeve mockup -->
+        <div id="sleeve-wrap" class="sleeve-wrap">
+          <div class="sleeve-box">
+            <div class="sleeve-label">Goodz</div>
+          </div>
+          <div class="sleeve-card-peek" id="sleeve-peek">
+            <div class="card" id="sleeve-card-inner" style="width:120px;height:120px">
+              <img id="sleeve-card-art" class="card-art" style="display:none" src="" alt="">
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-hint" id="preview-hint">Upload album art to preview</div>
       </div>
 
-      <div class="btn-row">
-        <div></div>
-        <button class="btn btn-primary" id="btn-step0" onclick="goToStep(1)" disabled>Next: Sleeve →</button>
-      </div>
+      <div id="status-art" class="status-ok" style="display:none">✓ Artwork uploaded — preview updated</div>
+      <div id="status-codes" class="status-info" style="display:none"></div>
     </div>
 
-    <!-- STEP 1: Sleeve -->
-    <div class="step" id="step-1">
-      <h2>Add a sleeve?</h2>
-      <p>Customize your sleeve with a stamp or a sticker if you want. Even blank, they give your Goodz a more packaged feel at the merch table.</p>
+    <!-- RIGHT: Configurator -->
+    <div class="config-panel">
 
-      <div class="sleeve-toggle">
-        <div class="sleeve-option selected" id="opt-no-sleeve" onclick="setSleeveType('none')">
-          <div class="sleeve-option-title">No sleeve</div>
-          <div class="sleeve-option-sub">Card only</div>
+      <!-- Step indicator -->
+      <div class="step-bar" id="step-bar">
+        <div class="step-segment active" data-step="0"></div>
+        <div class="step-segment" data-step="1"></div>
+        <div class="step-segment" data-step="2"></div>
+        <div class="step-segment" data-step="3"></div>
+        <div class="step-segment" data-step="4"></div>
+      </div>
+
+      <!-- STEP 0: Artwork -->
+      <div class="step active" id="step-0">
+        <h2>Upload your album artwork</h2>
+        <p>This will be printed on the front of each of your Goodz.</p>
+        <div class="upload-grid">
+          <div class="upload-box">
+            <label class="upload-label">Album Art (Front)</label>
+            <div class="drop-zone" id="drop-front" onclick="document.getElementById('input-front').click()">
+              <div class="drop-zone-content" id="front-placeholder">
+                <div class="drop-zone-icon">🖼️</div>
+                <div class="drop-zone-text">Drop image or<br><span>click to browse</span></div>
+              </div>
+              <img id="front-preview" style="display:none" src="" alt="Front preview">
+            </div>
+            <input type="file" id="input-front" class="file-input" accept="image/*">
+            <div class="file-name" id="front-name"></div>
+          </div>
         </div>
-        <div class="sleeve-option" id="opt-with-sleeve" onclick="setSleeveType('sleeve')">
-          <div class="sleeve-option-title">Add sleeve</div>
-          <div class="sleeve-option-sub">+$<span id="sleeve-unit-price">0.20</span> per Goodz</div>
+        <div class="btn-row">
+          <div></div>
+          <button class="btn btn-primary" id="btn-step0" onclick="goToStep(1)" disabled>Next: Sleeve →</button>
         </div>
       </div>
 
-      <div class="sleeve-info" id="sleeve-info-box" style="display:none">
-        A protective cardboard sleeve with a header card will be added to each Goodz.
-        Total sleeve cost: <strong>$<span id="sleeve-upcharge-amount">0.00</span></strong> for <span id="sleeve-qty">50</span> units.
+      <!-- STEP 1: Sleeve -->
+      <div class="step" id="step-1">
+        <h2>Add a sleeve?</h2>
+        <p>Customize your Goodz with a protective cardboard sleeve — gives them a more packaged, premium feel at the merch table.</p>
+        <div class="sleeve-toggle">
+          <div class="sleeve-option selected" id="opt-no-sleeve" onclick="setSleeveType('none')">
+            <div class="sleeve-option-title">No sleeve</div>
+            <div class="sleeve-option-sub">Card only</div>
+          </div>
+          <div class="sleeve-option" id="opt-with-sleeve" onclick="setSleeveType('sleeve')">
+            <div class="sleeve-option-title">Add sleeve</div>
+            <div class="sleeve-option-sub">+$<span id="sleeve-unit-price">0.20</span> per Goodz</div>
+          </div>
+        </div>
+        <div class="sleeve-info" id="sleeve-info-box" style="display:none">
+          A protective cardboard sleeve will be added to each Goodz.
+          Total sleeve cost: <strong>$<span id="sleeve-upcharge-amount">0.00</span></strong> for <span id="sleeve-qty">50</span> units.
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-back" onclick="goToStep(0)">← Back</button>
+          <button class="btn btn-primary" id="btn-step1" onclick="goToStep(2)">Next: Link Music →</button>
+        </div>
       </div>
 
-      <div class="btn-row">
-        <button class="btn btn-back" onclick="goToStep(0)">← Back</button>
-        <button class="btn btn-primary" id="btn-step1" onclick="goToStep(2)">Next: Link Music →</button>
+      <!-- STEP 2: Bandcamp Codes -->
+      <div class="step" id="step-2">
+        <h2>Link your music</h2>
+        <p class="bandcamp-help">
+          Goodz can come pre-loaded with your Bandcamp download codes so fans can buy something physical and still get your music digitally.{" "}
+          <a href="https://get.bandcamp.help/hc/en-us/articles/23020666567191-Track-album-code-tutorial" target="_blank" rel="noreferrer">Learn how to generate your codes</a>.
+          Or link to any other URL instead.
+        </p>
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="mode-csv-btn" onclick="setBandcampMode('csv')">Bandcamp codes (CSV)</button>
+          <button class="mode-btn" id="mode-url-btn" onclick="setBandcampMode('url')">Another URL</button>
+        </div>
+        <div id="bandcamp-csv-area">
+          <div class="csv-zone" id="csv-zone" onclick="document.getElementById('input-csv').click()">
+            <div class="csv-icon">📋</div>
+            <div class="csv-title">Upload Bandcamp CSV of unique URLs</div>
+            <div class="csv-sub">Drop your Bandcamp CSV here or <span>click to browse</span></div>
+            <div class="csv-optional">Optional — skip if you don't have codes ready yet</div>
+            <input type="file" id="input-csv" class="file-input" accept=".csv">
+          </div>
+          <div id="csv-error" class="csv-error" style="display:none"></div>
+          <div id="csv-success" class="csv-success" style="display:none">
+            <div class="csv-success-title" id="csv-success-title"></div>
+            <div class="csv-success-sub">Each Goodz will be pre-loaded with one unique URL from this file.</div>
+            <details class="csv-preview">
+              <summary>Preview first 5 URLs</summary>
+              <ul id="csv-url-list"></ul>
+            </details>
+          </div>
+          <div id="csv-warning" class="csv-warning" style="display:none"></div>
+        </div>
+        <div id="bandcamp-url-area" style="display:none" class="alt-url-box">
+          <input type="url" id="alt-url-input" class="alt-url-input"
+            placeholder="https://yourbandcamp.com, https://spotify.com/..., etc."
+            oninput="handleAltURLChange()">
+          <div class="alt-url-hint">All Goodz in this order will link to this single URL.</div>
+          <div id="alt-url-success" class="csv-success" style="display:none; margin-top:0.75rem">
+            <div class="csv-success-title">✓ URL saved</div>
+            <div class="csv-success-sub">All <span id="alt-url-qty">50</span> Goodz will link to this URL.</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-back" onclick="goToStep(1)">← Back</button>
+          <button class="btn btn-primary" id="btn-step2" onclick="goToStep(3)">Next: Quantity →</button>
+        </div>
       </div>
+
+      <!-- STEP 3: Quantity -->
+      <div class="step" id="step-3">
+        <h2>Choose your quantity</h2>
+        <p class="qty-hint">Custom Goodz orders start at 50 units and take 4–5 weeks to manufacture and ship.</p>
+        <label class="qty-label">Quantity</label>
+        <input type="number" id="qty-input" class="qty-input" min="50" value="50">
+        <div class="qty-hint" id="qty-hint-text">Minimum order: 50 units</div>
+        <div class="tier-buttons" id="tier-buttons"></div>
+        <div class="pricing-box">
+          <div class="pricing-row">
+            <span class="pricing-per" id="pricing-per">$3.44 per Goodz</span>
+            <span class="pricing-tier" id="pricing-tier">50–99 units</span>
+          </div>
+          <div class="pricing-row">
+            <span></span>
+            <span class="pricing-total" id="pricing-total">$172<span class="pricing-total-label"> total</span></span>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-back" onclick="goToStep(2)">← Back</button>
+          <button class="btn btn-primary" id="btn-step3" onclick="goToStep(4)" disabled>Next: Review →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Summary -->
+      <div class="step" id="step-4">
+        <h2>Review your order</h2>
+        <p>Click below to check out securely via Shopify. You'll enter payment and shipping there.</p>
+        <div class="summary-rows" id="summary-rows"></div>
+        <div id="summary-warning" class="summary-warning" style="display:none"></div>
+        <div class="btn-row">
+          <button class="btn btn-back" onclick="goToStep(3)">← Back</button>
+          <button class="btn btn-primary btn-order" id="btn-order" onclick="checkOut()" disabled>
+            Check Out Now
+          </button>
+        </div>
+      </div>
+
     </div>
-
-    <!-- STEP 2: Bandcamp Codes -->
-    <div class="step" id="step-2">
-      <h2>Link your music</h2>
-      <p class="bandcamp-help">
-        Goodz can come pre-loaded with your Bandcamp download codes so your fans can buy something physical while still getting your music digitally.{" "}
-        <a href="https://get.bandcamp.help/hc/en-us/articles/23020666567191-Track-album-code-tutorial" target="_blank" rel="noreferrer">Learn how to generate your codes here</a>.
-        If you'd prefer your Goodz to link to another URL instead, just provide that below.
-      </p>
-
-      <div class="mode-toggle">
-        <button class="mode-btn active" id="mode-csv-btn" onclick="setBandcampMode('csv')">Bandcamp codes (CSV)</button>
-        <button class="mode-btn" id="mode-url-btn" onclick="setBandcampMode('url')">Another URL</button>
-      </div>
-
-      <!-- CSV mode -->
-      <div id="bandcamp-csv-area">
-        <div class="csv-zone" id="csv-zone" onclick="document.getElementById('input-csv').click()">
-          <div class="csv-icon">📋</div>
-          <div class="csv-title">Upload Bandcamp CSV of unique URLs</div>
-          <div class="csv-sub">Drop your Bandcamp CSV here or <span>click to browse</span></div>
-          <div class="csv-optional">Optional — skip if you don't have codes ready yet</div>
-          <input type="file" id="input-csv" class="file-input" accept=".csv">
-        </div>
-
-        <div id="csv-error" class="csv-error" style="display:none"></div>
-
-        <div id="csv-success" class="csv-success" style="display:none">
-          <div class="csv-success-title" id="csv-success-title"></div>
-          <div class="csv-success-sub">Each Goodz will be pre-loaded with one unique URL from this file.</div>
-          <details class="csv-preview">
-            <summary>Preview first 5 URLs</summary>
-            <ul id="csv-url-list"></ul>
-          </details>
-        </div>
-
-        <div id="csv-warning" class="csv-warning" style="display:none"></div>
-      </div>
-
-      <!-- URL mode -->
-      <div id="bandcamp-url-area" style="display:none" class="alt-url-box">
-        <input
-          type="url"
-          id="alt-url-input"
-          class="alt-url-input"
-          placeholder="https://yourbandcamp.com, https://spotify.com/..., etc."
-          oninput="handleAltURLChange()"
-        >
-        <div class="alt-url-hint">All Goodz in this order will link to this single URL.</div>
-        <div id="alt-url-success" class="csv-success" style="display:none; margin-top:0.75rem">
-          <div class="csv-success-title">✅ URL saved</div>
-          <div class="csv-success-sub">All <span id="alt-url-qty">50</span> Goodz will link to this URL.</div>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-back" onclick="goToStep(1)">← Back</button>
-        <button class="btn btn-primary" id="btn-step2" onclick="goToStep(3)">Next: Quantity →</button>
-      </div>
-    </div>
-
-    <!-- STEP 3: Quantity -->
-    <div class="step" id="step-3">
-      <h2>Choose your quantity</h2>
-      <p class="qty-hint">Custom Goodz orders start at 50 units and take 4–5 weeks to manufacture and ship.</p>
-
-      <label class="qty-label">Quantity</label>
-      <input type="number" id="qty-input" class="qty-input" min="50" value="50">
-      <div class="qty-hint" id="qty-hint-text">Minimum order: 50 units</div>
-
-      <div class="tier-buttons" id="tier-buttons"></div>
-
-      <div class="pricing-box">
-        <div class="pricing-row">
-          <span class="pricing-per" id="pricing-per">$3.44 per Goodz</span>
-          <span class="pricing-tier" id="pricing-tier">50–99 units</span>
-        </div>
-        <div class="pricing-row">
-          <span></span>
-          <span class="pricing-total" id="pricing-total">$172<span class="pricing-total-label"> total</span></span>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-back" onclick="goToStep(2)">← Back</button>
-        <button class="btn btn-primary" id="btn-step3" onclick="goToStep(4)" disabled>Next: Review →</button>
-      </div>
-    </div>
-
-    <!-- STEP 4: Summary -->
-    <div class="step" id="step-4">
-      <h2>Review your order</h2>
-      <p>Click below to check out securely via Shopify. You'll enter payment and shipping there.</p>
-
-      <div class="summary-rows" id="summary-rows"></div>
-
-      <div id="summary-warning" class="summary-warning" style="display:none"></div>
-
-      <div class="btn-row">
-        <button class="btn btn-back" onclick="goToStep(3)">← Back</button>
-        <button class="btn btn-primary btn-order" id="btn-order" onclick="checkOut()" disabled>
-          Check Out Now
-        </button>
-      </div>
-    </div>
-
-
-
   </div>
 </div>
 
 <script>
-// ─── Config ───────────────────────────────────────────────────────────────────
+// ── Mobile menu ───────────────────────────────────────────────────────────────
+function toggleMobileMenu() {
+  const menu = document.getElementById('nav-menu');
+  const icon = document.getElementById('menu-icon');
+  menu.classList.toggle('open');
+  icon.parentElement.classList.toggle('menu-open');
+}
+
+// ── Config ────────────────────────────────────────────────────────────────────
 const TIERS = [
   { min: 50,   max: 99,   price: 3.44 },
   { min: 100,  max: 199,  price: 3.32 },
@@ -867,7 +911,7 @@ const API_URL = '/api/custom-goodz-order';
 const CLOUDINARY_CLOUD = 'dg6kjrhid';
 const CLOUDINARY_UPLOAD_PRESET = 'goodz_uploads';
 
-// ─── Cloudinary Upload ─────────────────────────────────────────────────────────
+// ── Cloudinary Upload ─────────────────────────────────────────────────────────
 function uploadToCloudinary(file, resourceType = 'image') {
   return new Promise((resolve, reject) => {
     const formData = new FormData();
@@ -887,13 +931,13 @@ function uploadToCloudinary(file, resourceType = 'image') {
   });
 }
 
-function setDropZoneLoading(elId, loading) {
-  const el = document.getElementById(elId);
-  if (loading) {
-    el.classList.add('is-loading');
-  } else {
-    el.classList.remove('is-loading');
-  }
+function createLoadingEl(id) {
+  const el = document.createElement('div');
+  el.id = id;
+  el.style.cssText = 'display:none;text-align:center;padding:1rem';
+  el.innerHTML = '<div style="font-size:0.8rem;color:#555;margin-bottom:0.5rem">Uploading...</div><div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:#E86900;border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto"></div>';
+  document.getElementById('drop-front').appendChild(el);
+  return el;
 }
 
 function showUploadError(elId, msg) {
@@ -903,7 +947,7 @@ function showUploadError(elId, msg) {
   if (!errEl) {
     errEl = document.createElement('div');
     errEl.className = 'upload-error';
-    errEl.style.cssText = 'color:#dc2626;font-size:0.8rem;margin-top:0.5rem;padding:0.5rem;background:#fef2f2;border:1px solid #fecaca;border-radius:6px';
+    errEl.style.cssText = 'color:#dc2626;font-size:0.8rem;margin-top:0.5rem;padding:0.5rem;background:#fef2f2;border:1px solid #fecaca';
     el.appendChild(errEl);
   }
   errEl.textContent = msg;
@@ -916,23 +960,13 @@ function clearUploadError(elId) {
   if (errEl) errEl.remove();
 }
 
-function createLoadingEl(id) {
-  const el = document.createElement('div');
-  el.id = id;
-  el.style.cssText = 'display:none;text-align:center;padding:1rem';
-  el.innerHTML = '<div style="font-size:0.8rem;color:#666;margin-bottom:0.5rem">Uploading...</div><div style="width:32px;height:32px;border:3px solid #e5e5e5;border-top-color:#E86900;border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto"></div>';
-  document.getElementById('drop-front').appendChild(el);
-  return el;
-}
-
-// Loading state for CSV zone
 function showCSVLoading() {
   let el = document.getElementById('csv-loading');
   if (!el) {
     el = document.createElement('div');
     el.id = 'csv-loading';
     el.style.cssText = 'display:none;text-align:center;padding:1rem;margin-top:0.75rem';
-    el.innerHTML = '<div style="font-size:0.8rem;color:#666;margin-bottom:0.5rem">Uploading CSV...</div><div style="width:32px;height:32px;border:3px solid #e5e5e5;border-top-color:#E86900;border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto"></div>';
+    el.innerHTML = '<div style="font-size:0.8rem;color:#555;margin-bottom:0.5rem">Uploading CSV...</div><div style="width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:#E86900;border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto"></div>';
     document.getElementById('csv-zone').parentNode.appendChild(el);
   }
   el.style.display = 'block';
@@ -943,21 +977,21 @@ function hideCSVLoading() {
   if (el) el.style.display = 'none';
 }
 
-// ─── State ───────────────────────────────────────────────────────────────────
+// ── State ───────────────────────────────────────────────────────────────────
 let state = {
-  frontArt: null,           // Cloudinary secure_url for artwork
+  frontArt: null,
   uploadingArt: false,
-  sleeveType: 'none',       // 'none' | 'sleeve'
-  bandcampMode: 'csv',     // 'csv' | 'url'
-  bandcampURLs: [],         // parsed array from CSV (for UI display)
-  bandcampCSVUrl: '',       // Cloudinary secure_url for CSV file
+  sleeveType: 'none',
+  bandcampMode: 'csv',
+  bandcampURLs: [],
+  bandcampCSVUrl: '',
   uploadingCSV: false,
   altURL: '',
   quantity: 50,
   currentStep: 0,
 };
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────────────────────────
 function init() {
   renderTierButtons();
   setupDragDrop('drop-front', handleFrontFile);
@@ -970,7 +1004,7 @@ function init() {
   updatePricing();
 }
 
-// ─── Tier helpers ──────────────────────────────────────────────────────────────
+// ── Tier helpers ──────────────────────────────────────────────────────────────
 function renderTierButtons() {
   const el = document.getElementById('tier-buttons');
   el.innerHTML = TIERS.map(t => {
@@ -1018,30 +1052,24 @@ function setQty(min) {
 function updatePricing() {
   const tier = getTier(state.quantity);
   if (!tier) return;
-
   const hasSleeve = state.sleeveType === 'sleeve';
   const sleeveAmt = hasSleeve ? state.quantity * SLEEVE_UPCHARGE : 0;
-  const unitWithSleeve = tier.price + (hasSleeve ? SLEEVE_UPCHARGE : 0);
   const grandTotal = (tier.price * state.quantity) + sleeveAmt;
-
   document.getElementById('pricing-per').textContent =
     `$${tier.price.toFixed(2)} per Goodz${hasSleeve ? ` + $${SLEEVE_UPCHARGE.toFixed(2)} sleeve` : ''}`;
   const tierLabel = tier.max ? `${tier.min}–${tier.max} units` : `${tier.min}+ units`;
   document.getElementById('pricing-tier').textContent = tierLabel;
   document.getElementById('pricing-total').innerHTML =
     `$${grandTotal.toFixed(2)}<span class="pricing-total-label"> total</span>`;
-
   document.querySelectorAll('.tier-btn').forEach(btn => {
     btn.classList.toggle('active', parseInt(btn.dataset.min) === tier.min);
   });
-
-  // Update sleeve info in sleeve step
   document.getElementById('sleeve-upcharge-amount').textContent = (state.quantity * SLEEVE_UPCHARGE).toFixed(2);
   document.getElementById('sleeve-unit-price').textContent = SLEEVE_UPCHARGE.toFixed(2);
   document.getElementById('sleeve-qty').textContent = state.quantity;
 }
 
-// ─── File handling ─────────────────────────────────────────────────────────────
+// ── File handling ─────────────────────────────────────────────────────────────
 function setupDragDrop(id, handler) {
   const el = document.getElementById(id);
   el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
@@ -1074,8 +1102,6 @@ function setupDragDropCSV() {
 
 function handleFrontFile(file) {
   if (!file.type.startsWith('image/')) return;
-
-  // Show loading state immediately
   const dropZone = document.getElementById('drop-front');
   const placeholder = document.getElementById('front-placeholder');
   const loadingEl = document.getElementById('front-loading') || createLoadingEl('front-loading');
@@ -1086,7 +1112,6 @@ function handleFrontFile(file) {
   state.uploadingArt = true;
   updateStepButtons();
 
-  // Read file for local preview while uploading
   const reader = new FileReader();
   reader.onload = e => {
     document.getElementById('front-preview').src = e.target.result;
@@ -1124,8 +1149,6 @@ function handleCSV(file) {
     showError('Please upload a .csv file from Bandcamp');
     return;
   }
-
-  // Parse URLs for display
   const reader = new FileReader();
   reader.onload = e => {
     const urls = parseCSVURLs(e.target.result);
@@ -1136,13 +1159,10 @@ function handleCSV(file) {
     state.bandcampURLs = urls;
     state.altURL = '';
     hideError();
-
-    // Show loading while uploading to Cloudinary
     const csvZone = document.getElementById('csv-zone');
     csvZone.classList.add('is-loading');
     state.uploadingCSV = true;
     updateStepButtons();
-
     uploadToCloudinary(file, 'raw')
       .then(url => {
         state.bandcampCSVUrl = url;
@@ -1190,25 +1210,22 @@ function hideError() {
 }
 
 function showCSVSuccess(urls, csvUrl) {
-  document.getElementById('csv-success-title').textContent = `✅ ${urls.length} unique Bandcamp URLs loaded`;
-  const shortUrl = csvUrl.length > 60 ? csvUrl.substring(0, 60) + '...' : csvUrl;
+  document.getElementById('csv-success-title').textContent = `✓ ${urls.length} unique Bandcamp URLs loaded`;
   document.getElementById('csv-url-list').innerHTML =
     `<li style="margin-bottom:0.5rem">📄 <a href="${csvUrl}" target="_blank" style="color:#166534;font-size:0.75rem">View uploaded CSV</a></li>` +
     urls.slice(0, 5).map(u => `<li>${u}</li>`).join('') +
-    (urls.length > 5 ? `<li style="color:#999">...and ${urls.length - 5} more</li>` : '');
+    (urls.length > 5 ? `<li style="color:#888">...and ${urls.length - 5} more</li>` : '');
   document.getElementById('csv-success').style.display = 'block';
 }
 
-// ─── Bandcamp mode toggle ─────────────────────────────────────────────────────
+// ── Bandcamp mode toggle ─────────────────────────────────────────────────────
 function setBandcampMode(mode) {
   state.bandcampMode = mode;
   document.getElementById('mode-csv-btn').classList.toggle('active', mode === 'csv');
   document.getElementById('mode-url-btn').classList.toggle('active', mode === 'url');
   document.getElementById('bandcamp-csv-area').style.display = mode === 'csv' ? 'block' : 'none';
   document.getElementById('bandcamp-url-area').style.display = mode === 'url' ? 'block' : 'none';
-  if (mode === 'url') {
-    document.getElementById('alt-url-qty').textContent = state.quantity;
-  }
+  if (mode === 'url') document.getElementById('alt-url-qty').textContent = state.quantity;
   updateStepButtons();
   updateSummary();
 }
@@ -1229,24 +1246,24 @@ function handleAltURLChange() {
   updateSummary();
 }
 
-// ─── Sleeve type ──────────────────────────────────────────────────────────────
+// ── Sleeve type ──────────────────────────────────────────────────────────────
 function setSleeveType(type) {
   state.sleeveType = type;
   document.getElementById('opt-no-sleeve').classList.toggle('selected', type === 'none');
   document.getElementById('opt-with-sleeve').classList.toggle('selected', type === 'sleeve');
   document.getElementById('sleeve-info-box').style.display = type === 'sleeve' ? 'block' : 'none';
-  document.getElementById('sleeve-wrap').style.display = (type === 'sleeve') ? 'block' : 'none';
+  const sleeveWrap = document.getElementById('sleeve-wrap');
+  sleeveWrap.classList.toggle('visible', type === 'sleeve');
   updatePricing();
   updateSummary();
 }
 
-// ─── Preview updates ────────────────────────────────────────────────────────────
+// ── Preview updates ────────────────────────────────────────────────────────────
 function updateCardPreview() {
   const card = document.getElementById('card');
   const art = document.getElementById('card-art');
   const placeholder = document.getElementById('card-placeholder');
   const hint = document.getElementById('preview-hint');
-
   if (state.frontArt) {
     art.src = state.frontArt;
     art.style.display = 'block';
@@ -1264,16 +1281,14 @@ function updateCardPreview() {
     card.classList.remove('has-art');
     hint.textContent = 'Upload album art to preview';
   }
-
-  // Sleeve peek card
   if (state.sleeveType === 'sleeve') {
-    document.getElementById('sleeve-wrap').style.display = 'block';
+    document.getElementById('sleeve-wrap').classList.add('visible');
     if (state.frontArt) {
       document.getElementById('sleeve-card-art').src = state.frontArt;
       document.getElementById('sleeve-card-art').style.display = 'block';
     }
   } else {
-    document.getElementById('sleeve-wrap').style.display = 'none';
+    document.getElementById('sleeve-wrap').classList.remove('visible');
   }
 }
 
@@ -1281,31 +1296,28 @@ function updateStatusBar() {
   const artStatus = document.getElementById('status-art');
   const codesStatus = document.getElementById('status-codes');
   artStatus.style.display = state.frontArt ? 'block' : 'none';
-
   const hasCodes = state.bandcampURLs.length > 0 || (state.bandcampMode === 'url' && state.altURL);
   if (hasCodes) {
     codesStatus.style.display = 'block';
     codesStatus.textContent =
       state.bandcampMode === 'csv'
-        ? `✅ ${state.bandcampURLs.length} Bandcamp codes loaded`
-        : '✅ URL saved — all Goodz will link to this URL';
+        ? `✓ ${state.bandcampURLs.length} Bandcamp codes loaded`
+        : '✓ URL saved — all Goodz will link to this URL';
   } else {
     codesStatus.style.display = 'none';
   }
 }
 
-// ─── Step navigation ─────────────────────────────────────────────────────────
+// ── Step navigation ─────────────────────────────────────────────────────────
 function goToStep(n) {
   state.currentStep = n;
   renderStep(n);
   updateSummary();
-  updateStepButtons();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderStep(n) {
-  document.querySelectorAll('.step').forEach((el, i) => {
-    el.classList.toggle('active', i === n);
-  });
+  document.querySelectorAll('.step').forEach((el, i) => el.classList.toggle('active', i === n));
   document.querySelectorAll('.step-segment').forEach((el, i) => {
     el.classList.toggle('active', i === n);
     el.classList.toggle('done', i < n);
@@ -1315,22 +1327,14 @@ function renderStep(n) {
 function updateStepButtons() {
   const qty = state.quantity;
   const hasArt = !!state.frontArt;
-  const hasCodes = state.bandcampURLs.length > 0 || (state.bandcampMode === 'url' && state.altURL);
   const hasURL = state.altURL && (state.altURL.startsWith('http://') || state.altURL.startsWith('https://'));
-
-  // Step 0: needs artwork AND not currently uploading
   document.getElementById('btn-step0').disabled = !hasArt || state.uploadingArt;
-  // Step 1: always advanceable
   document.getElementById('btn-step1').disabled = false;
-  // Step 2: needs either CSV or URL AND not currently uploading CSV
   const step2OK = (state.bandcampMode === 'csv' || hasURL) && !state.uploadingCSV;
   document.getElementById('btn-step2').disabled = !step2OK;
-  // Step 3: quantity >= 50
   document.getElementById('btn-step3').disabled = qty < 50;
-  // Order button: art + codes + qty
-  const canOrder = hasArt && hasCodes && qty >= 50;
-  const btn = document.getElementById('btn-order');
-  btn.disabled = !canOrder;
+  const canOrder = hasArt && (state.bandcampURLs.length > 0 || hasURL) && qty >= 50;
+  document.getElementById('btn-order').disabled = !canOrder;
 }
 
 function updateSummary() {
@@ -1339,33 +1343,23 @@ function updateSummary() {
   const hasSleeve = state.sleeveType === 'sleeve';
   const sleeveAmt = hasSleeve ? state.quantity * SLEEVE_UPCHARGE : 0;
   const total = (unitPrice * state.quantity) + sleeveAmt;
-
-  const sleeveLabel = state.sleeveType === 'sleeve'
-    ? `Blank sleeve (+$${sleeveAmt.toFixed(2)})`
-    : 'None';
-
+  const sleeveLabel = hasSleeve ? `Blank sleeve (+$${sleeveAmt.toFixed(2)})` : 'None';
   const codesLabel = state.bandcampMode === 'url' && state.altURL
     ? state.altURL
-    : state.bandcampURLs.length > 0
-      ? `${state.bandcampURLs.length} Bandcamp codes`
-      : 'None';
-
+    : state.bandcampURLs.length > 0 ? `${state.bandcampURLs.length} Bandcamp codes` : 'None';
   const rows = [
-    { label: 'Album art', value: state.frontArt ? 'Uploaded ✓' : 'Missing ✗', ok: !!state.frontArt },
+    { label: 'Album art', value: state.frontArt ? 'Uploaded' : 'Missing', ok: !!state.frontArt },
     { label: 'Sleeve', value: sleeveLabel, ok: true },
     { label: 'Download links', value: codesLabel, ok: !!(state.bandcampURLs.length || (state.altURL && state.bandcampMode === 'url')) },
     { label: 'Quantity', value: `${state.quantity} units` },
     { label: 'Unit price', value: unitPrice ? `$${unitPrice.toFixed(2)}${hasSleeve ? ` + $${SLEEVE_UPCHARGE.toFixed(2)} sleeve` : ''}` : '—' },
     { label: 'Total', value: total ? `$${total.toFixed(2)}` : '—', bold: true },
   ];
-
   document.getElementById('summary-rows').innerHTML = rows.map(r =>
     `<div class="summary-row${r.bold ? ' bold' : ''}${r.ok === false ? ' warn' : ''}">
       <span>${r.label}</span><span>${r.value}</span>
     </div>`
   ).join('');
-
-  // Warning: codes vs quantity mismatch
   const warnEl = document.getElementById('summary-warning');
   if (state.bandcampMode === 'csv' && state.bandcampURLs.length > 0 && state.bandcampURLs.length < state.quantity) {
     warnEl.style.display = 'block';
@@ -1378,12 +1372,11 @@ function updateSummary() {
   }
 }
 
-// ─── Check Out ──────────────────────────────────────────────────────────────
+// ── Check Out ──────────────────────────────────────────────────────────────
 async function checkOut() {
   const btn = document.getElementById('btn-order');
   btn.classList.add('btn-loading');
   btn.disabled = true;
-
   try {
     const payload = {
       units: state.quantity,
@@ -1394,20 +1387,13 @@ async function checkOut() {
       csvUrl: state.bandcampCSVUrl || '',
       csvCount: state.bandcampMode === 'csv' ? state.bandcampURLs.length : 0,
     };
-
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-
     const data = await res.json();
-
-    if (!res.ok || data.error) {
-      throw new Error(data.error || `Server error: ${res.status}`);
-    }
-
-    // Redirect directly to Shopify checkout in the same tab
+    if (!res.ok || data.error) throw new Error(data.error || `Server error: ${res.status}`);
     if (data.checkoutUrl) {
       window.location.href = data.checkoutUrl;
     } else {
@@ -1421,17 +1407,9 @@ async function checkOut() {
   }
 }
 
-// ─── Reset ───────────────────────────────────────────────────────────────────
+// ── Reset ───────────────────────────────────────────────────────────────────
 function resetBuilder() {
-  state = {
-    frontArt: null,
-    sleeveType: 'none',
-    bandcampMode: 'csv',
-    bandcampURLs: [],
-    altURL: '',
-    quantity: 50,
-    currentStep: 0,
-  };
+  state = { frontArt: null, sleeveType: 'none', bandcampMode: 'csv', bandcampURLs: [], bandcampCSVUrl: '', altURL: '', quantity: 50, currentStep: 0, uploadingArt: false, uploadingCSV: false };
   document.getElementById('front-preview').style.display = 'none';
   document.getElementById('front-preview').src = '';
   document.getElementById('front-placeholder').style.display = 'block';
@@ -1441,9 +1419,8 @@ function resetBuilder() {
   document.getElementById('qty-input').value = 50;
   document.getElementById('alt-url-input').value = '';
   document.getElementById('alt-url-success').style.display = 'none';
-  document.getElementById('sleeve-wrap').style.display = 'none';
+  document.getElementById('sleeve-wrap').classList.remove('visible');
   document.getElementById('sleeve-info-box').style.display = 'none';
-  document.getElementById('success-shop-link').style.display = 'none';
   setSleeveType('none');
   setBandcampMode('csv');
   updateCardPreview();
