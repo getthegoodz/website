@@ -34,7 +34,17 @@
       --border: #e0e0e0;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    @media (max-width: 480px) {
+      body { overflow-x: hidden; }
+      .preview-panel { position: static !important; }
+      .preview-card { padding: 1.25rem; }
+      .card { width: 120px; height: 120px; }
+      .sleeve-wrap { width: 128px; height: 132px; }
+      .sleeve-box { width: 128px; height: 128px; }
+      .sleeve-card-peek { width: 100px; height: 100px; top: -12px; left: 12px; }
+      .sleeve-card-peek .card { width: 100px; height: 100px; }
+    }
 
     body {
       font-family: 'DM Sans', -apple-system, sans-serif;
@@ -118,6 +128,9 @@
       padding-right: 5%;
       padding-top: 2.5rem;
       padding-bottom: 4rem;
+    }
+    @media (max-width: 480px) {
+      .page-wrapper { padding-left: 4%; padding-right: 4%; }
     }
     .layout {
       max-width: 1100px;
@@ -255,25 +268,44 @@
     }
 
     /* Status badges */
-    .status-ok {
+    .status-ok,
+    .status-info {
       margin-top: 1rem;
       padding: 0.65rem 1rem;
+      border-radius: 0;
+      font-size: 0.8rem;
+      width: 100%;
+      transition: opacity 0.4s ease;
+    }
+    .status-ok {
       background: var(--green-bg);
       border: 1px solid var(--green-border);
-      border-radius: 0;
-      font-size: 0.8rem;
       color: var(--green-text);
-      width: 100%;
     }
     .status-info {
-      margin-top: 0.5rem;
-      padding: 0.65rem 1rem;
       background: var(--blue-bg);
       border: 1px solid var(--blue-border);
-      border-radius: 0;
-      font-size: 0.8rem;
       color: var(--blue-text);
-      width: 100%;
+    }
+    .status-ok.fading, .status-info.fading { opacity: 0; pointer-events: none; }
+
+    /* Transient notifications */
+    .transient-note {
+      animation: fadeInUp 0.3s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .transient-note.fade-out {
+      animation: fadeOutDown 0.4s ease forwards;
+    }
+    @keyframes fadeOutDown {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(4px); }
+    }
+    @media (max-width: 900px) {
+      .status-ok, .status-info { margin-top: 0.75rem; font-size: 0.75rem; }
     }
 
     /* ── CONFIG PANEL ── */
@@ -309,6 +341,20 @@
     }
     .step-segment.done,
     .step-segment.active { background: var(--brand-yellow); }
+
+    /* Mobile step indicator */
+    .mobile-step-label {
+      display: none;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+    }
+    @media (max-width: 900px) {
+      .step-bar { display: none; }
+      .mobile-step-label { display: block; margin-bottom: 0.5rem; }
+    }
 
     /* Section titles within steps */
     .step h2 {
@@ -412,7 +458,15 @@
       font-size: 0.8rem;
       color: var(--yellow-text);
       margin-bottom: 1.5rem;
+      transition: opacity 0.4s ease;
     }
+    .sleeve-info.fading { opacity: 0; }
+
+    /* Upload error - transient */
+    .upload-error {
+      transition: opacity 0.4s ease;
+    }
+    .upload-error.fade-out { opacity: 0; }
     .sleeve-info strong { font-weight: 700; }
 
     /* Mode toggle (CSV vs URL) */
@@ -456,13 +510,24 @@
     .csv-sub span { color: var(--brand-yellow); font-weight: 600; }
     .csv-optional { font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; }
     .csv-error { margin-top: 0.75rem; padding: 0.75rem; background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 0; color: var(--red-text); font-size: 0.85rem; }
-    .csv-success { margin-top: 1rem; padding: 1rem; background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 0; }
+    .csv-success {
+      margin-top: 1rem; padding: 1rem; background: var(--green-bg);
+      border: 1px solid var(--green-border); border-radius: 0;
+      transition: opacity 0.4s ease;
+    }
+    .csv-success.fade-out { opacity: 0; }
     .csv-success-title { font-weight: 700; color: var(--green-text); margin-bottom: 0.5rem; font-size: 0.9rem; }
     .csv-success-sub { font-size: 0.8rem; color: #15803d; }
     .csv-preview { margin-top: 0.5rem; }
     .csv-preview summary { font-size: 0.75rem; color: var(--green-text); cursor: pointer; }
     .csv-preview ul { margin: 0.5rem 0 0 1.25rem; padding: 0; font-size: 0.7rem; color: var(--green-text); word-break: break-all; }
-    .csv-warning { margin-top: 0.75rem; padding: 0.75rem 1rem; background: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: 0; font-size: 0.85rem; color: var(--yellow-text); }
+    .csv-warning {
+      margin-top: 0.75rem; padding: 0.75rem 1rem;
+      background: var(--yellow-bg); border: 1px solid var(--yellow-border);
+      border-radius: 0; font-size: 0.85rem; color: var(--yellow-text);
+      transition: opacity 0.4s ease;
+    }
+    .csv-warning.fade-out { opacity: 0; }
     .csv-warning strong { font-weight: 700; }
 
     /* Alt URL input */
@@ -540,8 +605,18 @@
     .pricing-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem; }
     .pricing-per { font-size: 0.85rem; color: var(--text-mid); }
     .pricing-tier { font-size: 0.7rem; color: var(--text-light); }
-    .pricing-total { font-size: 2rem; font-weight: 800; font-family: 'Poppins', sans-serif; color: #000; }
+    .pricing-total {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: 'Poppins', sans-serif;
+      color: #000;
+      white-space: nowrap;
+    }
     .pricing-total-label { font-size: 0.8rem; color: var(--text-mid); font-weight: 400; }
+    @media (max-width: 480px) {
+      .pricing-total { font-size: 1.6rem; }
+      .pricing-row { flex-wrap: wrap; gap: 0.25rem; }
+    }
 
     /* Summary */
     .summary-row {
@@ -562,6 +637,9 @@
     }
     .summary-row.warn { color: var(--red-text); background: var(--red-bg); border-color: var(--red-border); }
     .summary-rows { display: grid; gap: 0.5rem; margin-bottom: 1.25rem; }
+    @media (max-width: 480px) {
+      .summary-row { font-size: 0.8rem; padding: 0.7rem 0.85rem; }
+    }
     .summary-warning {
       margin-bottom: 1rem;
       padding: 0.85rem 1rem;
@@ -711,6 +789,7 @@
     <div class="preview-panel">
       <div class="preview-card">
         <div class="preview-label">Live Preview</div>
+        <span class="mobile-step-label" id="mobile-step-label"></span>
 
         <div id="card-wrap">
           <div class="card" id="card">
@@ -940,6 +1019,20 @@ function createLoadingEl(id) {
   return el;
 }
 
+function isMobile() { return window.innerWidth <= 900; }
+
+function makeTransient(el, durationMs) {
+  if (!el) return;
+  el.classList.add('transient-note');
+  setTimeout(() => {
+    el.classList.add('fade-out');
+    setTimeout(() => {
+      el.style.display = 'none';
+      el.classList.remove('fade-out', 'transient-note');
+    }, 400);
+  }, durationMs);
+}
+
 function showUploadError(elId, msg) {
   const el = document.getElementById(elId);
   el.classList.add('has-error');
@@ -951,6 +1044,7 @@ function showUploadError(elId, msg) {
     el.appendChild(errEl);
   }
   errEl.textContent = msg;
+  if (isMobile()) makeTransient(errEl, 4000);
 }
 
 function clearUploadError(elId) {
@@ -1205,7 +1299,12 @@ function showError(msg) {
 }
 
 function hideError() {
-  document.getElementById('csv-error').style.display = 'none';
+  const errEl = document.getElementById('csv-error');
+  if (isMobile() && errEl.style.display !== 'none') {
+    makeTransient(errEl, 4000);
+  } else {
+    errEl.style.display = 'none';
+  }
   document.getElementById('csv-zone').classList.remove('has-error');
 }
 
@@ -1215,7 +1314,10 @@ function showCSVSuccess(urls, csvUrl) {
     `<li style="margin-bottom:0.5rem">📄 <a href="${csvUrl}" target="_blank" style="color:#166534;font-size:0.75rem">View uploaded CSV</a></li>` +
     urls.slice(0, 5).map(u => `<li>${u}</li>`).join('') +
     (urls.length > 5 ? `<li style="color:#888">...and ${urls.length - 5} more</li>` : '');
-  document.getElementById('csv-success').style.display = 'block';
+  const successEl = document.getElementById('csv-success');
+  successEl.style.display = 'block';
+  successEl.classList.remove('fade-out');
+  if (isMobile()) makeTransient(successEl, 4000);
 }
 
 // ── Bandcamp mode toggle ─────────────────────────────────────────────────────
@@ -1237,7 +1339,9 @@ function handleAltURLChange() {
   const successEl = document.getElementById('alt-url-success');
   if (val && (val.startsWith('http://') || val.startsWith('https://'))) {
     successEl.style.display = 'block';
+    successEl.classList.remove('fade-out');
     successEl.querySelector('#alt-url-qty').textContent = state.quantity;
+    if (isMobile()) makeTransient(successEl, 4000);
   } else {
     successEl.style.display = 'none';
   }
@@ -1251,7 +1355,14 @@ function setSleeveType(type) {
   state.sleeveType = type;
   document.getElementById('opt-no-sleeve').classList.toggle('selected', type === 'none');
   document.getElementById('opt-with-sleeve').classList.toggle('selected', type === 'sleeve');
-  document.getElementById('sleeve-info-box').style.display = type === 'sleeve' ? 'block' : 'none';
+  const infoBox = document.getElementById('sleeve-info-box');
+  if (type === 'sleeve') {
+    infoBox.style.display = 'block';
+    infoBox.classList.remove('fade-out');
+    if (isMobile()) makeTransient(infoBox, 4000);
+  } else {
+    infoBox.style.display = 'none';
+  }
   const sleeveWrap = document.getElementById('sleeve-wrap');
   sleeveWrap.classList.toggle('visible', type === 'sleeve');
   updatePricing();
@@ -1295,14 +1406,22 @@ function updateCardPreview() {
 function updateStatusBar() {
   const artStatus = document.getElementById('status-art');
   const codesStatus = document.getElementById('status-codes');
-  artStatus.style.display = state.frontArt ? 'block' : 'none';
+  if (state.frontArt) {
+    artStatus.style.display = 'block';
+    artStatus.classList.remove('fade-out');
+    if (isMobile()) makeTransient(artStatus, 4000);
+  } else {
+    artStatus.style.display = 'none';
+  }
   const hasCodes = state.bandcampURLs.length > 0 || (state.bandcampMode === 'url' && state.altURL);
   if (hasCodes) {
     codesStatus.style.display = 'block';
+    codesStatus.classList.remove('fade-out');
     codesStatus.textContent =
       state.bandcampMode === 'csv'
         ? `✓ ${state.bandcampURLs.length} Bandcamp codes loaded`
         : '✓ URL saved — all Goodz will link to this URL';
+    if (isMobile()) makeTransient(codesStatus, 4000);
   } else {
     codesStatus.style.display = 'none';
   }
@@ -1322,6 +1441,8 @@ function renderStep(n) {
     el.classList.toggle('active', i === n);
     el.classList.toggle('done', i < n);
   });
+  const stepLabel = document.getElementById('mobile-step-label');
+  if (stepLabel) stepLabel.textContent = `Step ${n + 1} of 5`;
 }
 
 function updateStepButtons() {
@@ -1363,10 +1484,14 @@ function updateSummary() {
   const warnEl = document.getElementById('summary-warning');
   if (state.bandcampMode === 'csv' && state.bandcampURLs.length > 0 && state.bandcampURLs.length < state.quantity) {
     warnEl.style.display = 'block';
+    warnEl.classList.remove('fade-out');
     warnEl.textContent = `⚠️ You have ${state.bandcampURLs.length} codes for ${state.quantity} units. Add more codes or reduce quantity before placing.`;
+    if (isMobile()) makeTransient(warnEl, 4000);
   } else if (state.bandcampURLs.length === 0 && !state.altURL) {
     warnEl.style.display = 'block';
+    warnEl.classList.remove('fade-out');
     warnEl.textContent = '⚠️ Please upload Bandcamp codes or enter a URL before placing.';
+    if (isMobile()) makeTransient(warnEl, 4000);
   } else {
     warnEl.style.display = 'none';
   }
