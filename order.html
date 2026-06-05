@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customize - Custom Goodz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-warm.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #ffc852;
+      --black: #0e0c0a;
+      --cream: #efefe2;
+      --off-white: #e4e4d6;
+      --border: #cdc8b2;
+      --text: #1a1510;
+      --muted: #6b6354;
+      --profit-green: #2e7d4e;
+      --profit-tint: #edf5ee;
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--cream);
+      color: var(--text);
+    }
+
+    /* Order-flow stepper (mirrors artwork-upload page) */
+    .order-stepper {
+      background: var(--off-white);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+    }
+    .order-stepper .step-bar-wrapper { width: 100%; max-width: 380px; margin: 0 auto; }
+    .step-bar { display: flex; gap: 0.5rem; justify-content: space-between; }
+    .step-cell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      color: inherit;
+    }
+    .step-square {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1.5px solid #b8b0a0;
+      color: #b8b0a0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .step-cell.active .step-square {
+      border-color: var(--black);
+      color: var(--black);
+    }
+    .step-cell.done .step-square {
+      border-color: var(--black);
+      background: var(--black);
+      color: var(--off-white);
+    }
+    .step-cell-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #b0a898;
+      text-align: center;
+      transition: color 0.15s;
+    }
+    .step-cell.active .step-cell-label { color: var(--black); }
+    .step-cell.done .step-cell-label { color: var(--black); }
+    a.step-cell { cursor: pointer; }
+    a.step-cell:hover .step-square { transform: translateY(-1px); }
+
+    /* Intro header */
+    .order-intro { margin-bottom: 1.75rem; }
+    .order-intro-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--black);
+      margin: 0 0 0.85rem;
+    }
+
+    /* Single-column product layout (gallery removed; lives on custom.html) */
+    .product-layout {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Config column */
+    .config-col {
+      padding: 2.5rem 2.5rem 6rem 2.5rem;
+    }
+
+    .option-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.75rem 0;
+    }
+
+    /* Option sections */
+    .option-section { margin-bottom: 1.5rem; }
+    .option-section-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .badge-new {
+      font-size: 0.6rem;
+      font-weight: 800;
+      background: var(--black);
+      color: var(--yellow);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .option-cards {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .option-card {
+      flex: 1;
+      min-width: 100px;
+      padding: 0.85rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+      user-select: none;
+    }
+    .option-card:hover { border-color: var(--black); }
+    .option-card.selected {
+      border-color: var(--black);
+      background: var(--yellow);
+    }
+    .option-card-icon {
+      margin-bottom: 0.4rem;
+      color: var(--black);
+      opacity: 0.7;
+    }
+    .option-card.selected .option-card-icon { opacity: 1; }
+    .option-card-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 0.4rem;
+      border: 1px solid var(--border);
+    }
+    .option-card.selected .option-card-thumb { border-color: rgba(0,0,0,0.2); }
+    .option-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .option-card-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--black);
+      line-height: 1.2;
+      margin-bottom: 0.3rem;
+    }
+    .option-card-sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .option-card.selected .option-card-sub { color: rgba(14,12,10,0.65); }
+    .option-upcharge {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      display: block;
+      margin-top: 0.15rem;
+    }
+    .option-card.selected .option-upcharge { color: rgba(14,12,10,0.6); }
+
+    /* Music source cards: 3-per-row grid */
+    .option-cards.music-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+    @media (max-width: 700px) {
+      .option-cards.music-cards { grid-template-columns: 1fr; }
+    }
+    /* Streaming service: tight horizontal row of small platform glyphs */
+    .streaming-logos { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; }
+    .streaming-logos svg { flex-shrink: 0; }
+
+    /* Pricing grid */
+    .qty-section { margin-bottom: 0; }
+    .pricing-grid {
+      margin-top: 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .pricing-grid-row {
+      display: grid;
+      grid-template-columns: 1fr 96px 100px 124px;
+      border-bottom: 1px solid var(--border);
+    }
+    /* Est. profit is a speculative number — keep it unbolded even on the
+       selected row, so bold is reserved for the concrete real prices.
+       Differentiated from the cost columns with green + a tinted column
+       band so it reads as "your upside", not another price. */
+    .pricing-grid-row .pricing-profit { color: var(--profit-green); font-weight: 400; }
+    .pricing-grid-hdr:nth-child(4),
+    .pricing-grid-cell:nth-child(4) {
+      background: var(--profit-tint);
+      border-left: 1px solid #cbe3d0;
+      /* Extra left padding so large profit figures don't crowd the
+         Order Total column. (Reset on mobile below to avoid clipping.) */
+      padding-left: 1.5rem;
+    }
+    .pricing-grid-hdr:nth-child(4) { color: var(--profit-green); }
+
+    /* Contact-us row (3,000+): not a checkout tier — a mailto spanning the
+       price/total/profit columns. */
+    .pricing-grid-row.contact { cursor: default; }
+    .pricing-contact-cell {
+      grid-column: 2 / -1;
+      align-self: center;
+      justify-self: end;
+      padding: 0.9rem 1rem;
+      font-weight: 700;
+      color: var(--black);
+      text-decoration: none;
+    }
+    .pricing-contact-cell:hover { text-decoration: underline; }
+
+    /* Profit Calculator — surfaced as a labeled green tool, not a buried
+       footnote, so the live estimate reads as a feature. */
+    .profit-calc {
+      margin: 0.85rem 0 1.25rem;
+      background: var(--profit-tint);
+      border: 1px solid #bfe0c7;
+      border-left: 4px solid var(--profit-green);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+    }
+    .profit-calc-label {
+      display: block;
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--profit-green);
+      margin-bottom: 0.3rem;
+    }
+    .profit-calc-body {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .profit-calc #retail-input {
+      color: var(--profit-green);
+      border-bottom-color: var(--profit-green);
+    }
+
+    /* Inline editable retail price inside the estimate hint sentence. */
+    .retail-inline-wrap {
+      display: inline;
+      font-weight: 600;
+      color: var(--amber-ink);
+      font-style: normal;
+    }
+    #retail-input {
+      width: 2ch;
+      padding: 0;
+      margin: 0 0 0 0.05em;
+      border: none;
+      border-bottom: 1px dotted var(--amber-ink);
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 16px; /* prevent iOS auto-zoom */
+      font-weight: 600;
+      color: var(--amber-ink);
+      text-align: right;
+      font-style: normal;
+      /* Equal-width digits so the value fills the 2ch box exactly — a
+         narrow "1" was leaving a gap after the "$". */
+      font-variant-numeric: tabular-nums;
+    }
+    #retail-input:focus { border-bottom-style: solid; }
+    .pricing-estimate-hint {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-style: italic;
+      margin-top: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .pricing-grid-row:last-child { border-bottom: none; }
+    .pricing-grid-row.hdr { background: var(--off-white); }
+    .pricing-grid-row.data { cursor: pointer; transition: background 0.1s, box-shadow 0.1s; position: relative; }
+    .pricing-grid-row.data:hover { background: #f3efe4; }
+    .pricing-grid-row.data:hover .pricing-selected-dot { border-color: var(--black); }
+    .pricing-grid-row.data.selected { background: rgba(255,200,82,0.22); box-shadow: inset 3px 0 0 var(--black); }
+    .pricing-grid-row.data.selected .pricing-grid-cell { font-weight: 600; }
+    .pricing-grid-hdr {
+      padding: 0.7rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+    }
+    .pricing-grid-hdr.r { text-align: right; }
+    .pricing-grid-cell {
+      padding: 0.9rem 1rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .pricing-grid-cell.r { justify-content: flex-end; }
+    .recommended-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: #fff;
+      color: var(--amber-ink);
+      border: 1px solid var(--amber-ink);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+    }
+    .tier-discount-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--profit-green);
+      background: var(--profit-tint);
+      border: 1px solid #cbe3d0;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .pricing-selected-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #b8ad97;
+      background: transparent;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      position: relative;
+      transition: border-color 0.1s;
+    }
+    .pricing-grid-row.selected .pricing-selected-dot {
+      border-color: var(--black);
+    }
+    .pricing-grid-row.selected .pricing-selected-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--black);
+    }
+    .pricing-contact {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      text-align: left;
+    }
+    .pricing-contact a { color: var(--black); font-weight: 700; text-decoration: none; }
+    .pricing-contact a:hover { text-decoration: underline; }
+
+    /* Revenue note */
+    .pricing-revenue-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 0 0.85rem;
+    }
+
+    /* Testimonial */
+    .testimonial-slot {
+      margin: 1.75rem 0 0;
+      padding: 1rem 1.25rem;
+      border-left: 3px solid var(--yellow);
+      background: var(--off-white);
+      border-radius: 0 8px 8px 0;
+    }
+    .testimonial-quote {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.6;
+      font-style: italic;
+      margin-bottom: 0.4rem;
+    }
+    .testimonial-attr {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* CTA block */
+    .cta-block {
+      margin-top: 2rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .summary-list {
+      margin: 0 0 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+    }
+    .summary-row > span:first-child {
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .summary-row > span:last-child {
+      color: var(--text);
+      font-weight: 600;
+      text-align: right;
+    }
+    /* Upcharge amount appended to a summary choice, divided by a middot.
+       The $ amount matches the Unit price row's style (dark, bold) so
+       the costs read consistently down the Summary. */
+    .summary-sep {
+      color: var(--muted);
+      margin: 0 0.4rem;
+    }
+    .summary-upcharge {
+      color: var(--text);
+      font-weight: 700;
+    }
+    /* Unit price row — sits between the choices and the total to show
+       how the per-unit math composes before multiplying by quantity. */
+    .summary-row-unit > span:last-child {
+      font-weight: 700;
+    }
+    .summary-row-total {
+      padding-top: 0.85rem;
+    }
+    .summary-row-total > span:first-child,
+    .summary-row-total > span:last-child {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    /* Summary card */
+    .summary-section {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem 1rem;
+      margin-top: 1.75rem;
+    }
+    .summary-section .summary-list {
+      margin: 0;
+      border-top: none;
+    }
+    .summary-section .summary-row-total {
+      border-top: 2px solid var(--black);
+      border-bottom: none;
+      padding-top: 1rem;
+      margin-top: 0.25rem;
+    }
+    .summary-section .summary-row:has(+ .summary-row-total) {
+      border-bottom: none;
+    }
+    .summary-section .summary-row-total > span:first-child,
+    .summary-section .summary-row-total > span:last-child {
+      font-size: 1.2rem;
+    }
+    /* Step-flow buttons — same pattern as artwork-upload.html */
+    .btn-row { display: flex; justify-content: space-between; margin-top: 1.5rem; gap: 0.75rem; }
+    .step-btn {
+      padding: 0.7rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: 2px solid var(--black);
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.12s;
+    }
+    .step-btn-primary { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .step-btn-primary:hover { background: #e6b044; border-color: #e6b044; }
+    .step-btn-back { background: transparent; color: var(--black); }
+    .step-btn-back:hover { background: var(--off-white); }
+    @media (max-width: 480px) {
+      .btn-row { flex-direction: column-reverse; }
+      .btn-row .step-btn { width: 100%; text-align: center; padding: 0.9rem; }
+    }
+    .cta-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .order-stepper { padding: 0.7rem 1rem; }
+      .order-stepper .step-bar-wrapper { width: 100%; max-width: 320px; }
+      .config-col { padding: 1.5rem 1.5rem 6rem; min-width: 0; }
+      .order-intro-title { font-size: 1.4rem; }
+
+      /* Prevent pricing grid from overflowing narrow viewports */
+      .pricing-grid-row { grid-template-columns: minmax(0, 1fr) 70px 80px 84px; }
+      .pricing-grid-cell { padding: 0.75rem 0.55rem; font-size: 0.85rem; gap: 0.4rem; }
+      .pricing-grid-cell:nth-child(4) { padding-left: 0.55rem; }
+      .pricing-grid-hdr { padding: 0.55rem 0.55rem; font-size: 0.62rem; }
+      .recommended-badge { font-size: 0.55rem; padding: 0.15rem 0.35rem; }
+      .tier-discount-badge { font-size: 0.55rem; padding: 0.15rem 0.35rem; }
+    }
+
+    @media (max-width: 480px) {
+      .option-card { min-width: 80px; }
+      .config-col { padding: 1rem 1rem 6rem; }
+      .pricing-grid-row { grid-template-columns: minmax(0, 1fr) 58px 68px 72px; }
+      .pricing-grid-cell { padding: 0.7rem 0.45rem; font-size: 0.78rem; }
+      .pricing-grid-cell:nth-child(4) { padding-left: 0.45rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo" aria-label="Goodz home"><img src="logos/goodz-wordmark-white.svg" alt="Goodz" width="139" height="22"></a>
+  <ul class="nav-links">
+    <li><a href="/mixtape">Mixtape Goodz</a></li>
+    <li><a href="/custom">Custom Goodz</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/support">Support</a></li>  </ul>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector(&apos;.nav-links&apos;).classList.toggle(&apos;is-open&apos;)">☰</button>
+</nav>
+
+
+<!-- Order flow stepper. Cells beyond Customize get marked .done by the
+     script below if the user has reached them, and become clickable links
+     back into the artwork-upload steps. -->
+<div class="order-stepper">
+  <div class="step-bar-wrapper">
+    <div class="step-bar">
+      <span class="step-cell active">
+        <span class="step-square">1</span>
+        <span class="step-cell-label">Customize</span>
+      </span>
+      <span class="step-cell" data-step-global="1" data-step-slug="music">
+        <span class="step-square">2</span>
+        <span class="step-cell-label">Music</span>
+      </span>
+      <span class="step-cell" data-step-global="2" data-step-slug="artwork">
+        <span class="step-square">3</span>
+        <span class="step-cell-label">Artwork</span>
+      </span>
+      <span class="step-cell" data-step-global="3" data-step-slug="review">
+        <span class="step-square">4</span>
+        <span class="step-cell-label">Review</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function hydrateOrderStepper() {
+  let furthest = 0;
+  try { furthest = parseInt(sessionStorage.getItem('goodzFurthestStep') || '0', 10) || 0; } catch (e) {}
+  document.querySelectorAll('.order-stepper .step-cell[data-step-global]').forEach(cell => {
+    const g = parseInt(cell.dataset.stepGlobal, 10);
+    // "Reached" (furthest >= g): user has been to this step. Make it
+    // clickable so they can jump back into it.
+    // "Done"    (furthest >  g): user has moved PAST this step, which
+    // implies the step's required inputs were valid (Next button
+    // wasn't enabled otherwise). Only then show the filled dark square.
+    if (furthest >= g) {
+      const slug = cell.dataset.stepSlug;
+      cell.style.cursor = 'pointer';
+      cell.addEventListener('click', () => {
+        window.location.href = 'artwork-upload.html#' + slug;
+      });
+    }
+    if (furthest > g) {
+      cell.classList.add('done');
+    }
+  });
+})();
+</script>
+
+<main>
+  <div class="product-layout">
+
+    <!-- Right: Config -->
+    <div class="config-col">
+
+      <div class="order-intro">
+        <h1 class="order-intro-title">Customize your order</h1>
+      </div>
+
+      <!-- Option 0: Music source -->
+      <div class="option-section">
+        <div class="option-section-label">Music Source</div>
+        <div class="option-cards music-cards" data-option="music">
+          <div class="option-card selected" data-value="bandcamp_codes">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 7 L23 7 L19 19 L3 19 Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="option-card-title">Bandcamp codes</div>
+            <div class="option-card-sub">Pre-load your Goodz with unique album download codes. Fans get something physical with their code.</div>
+          </div>
+          <div class="option-card" data-value="streaming">
+            <div class="option-card-icon streaming-logos" aria-label="Bandcamp, SoundCloud, YouTube, Spotify, Apple Music, Amazon">
+              <svg width="16" height="16" viewBox="0 0 26 26" fill="none" aria-hidden="true" title="Bandcamp">
+                <path d="M7 7 L23 7 L19 19 L3 19 Z" fill="currentColor"/>
+              </svg>
+              <svg width="16" height="16" viewBox="0 0 26 26" fill="none" aria-hidden="true" title="SoundCloud">
+                <path d="M4 16 V20 M6.5 14 V20 M9 13 V20 M11.5 12 V20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M14 10 C 18 9 22 12 22 15 C 23 15 24 16.3 24 17.8 C 24 19.45 22.66 20 21 20 L 14 20 Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+              </svg>
+              <svg width="16" height="16" viewBox="0 0 26 26" fill="none" aria-hidden="true" title="YouTube">
+                <rect x="2" y="6" width="22" height="14" rx="3.5" stroke="currentColor" stroke-width="2"/>
+                <path d="M11 9.5 L17 13 L11 16.5 Z" fill="currentColor"/>
+              </svg>
+              <svg width="16" height="16" viewBox="0 0 26 26" fill="none" aria-hidden="true" title="Spotify">
+                <circle cx="13" cy="13" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M7.5 10 C 10 9 16 9 18.5 10.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <path d="M8 13 C 10.5 12 15.5 12 18 13.2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                <path d="M9 16 C 11 15.2 15 15.2 17 16" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              </svg>
+              <svg width="16" height="16" viewBox="0 0 26 26" fill="none" aria-hidden="true" title="Apple Music">
+                <path d="M11 18 C11 19.66 9.66 21 8 21 C6.34 21 5 19.66 5 18 C5 16.34 6.34 15 8 15 C8.7 15 9.36 15.24 9.9 15.63 V8 L20 6 V16 C20 17.66 18.66 19 17 19 C15.34 19 14 17.66 14 16 C14 14.34 15.34 13 17 13 C17.7 13 18.36 13.24 18.9 13.63" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+              </svg>
+              <svg width="16" height="16" viewBox="0 0 26 26" fill="none" aria-hidden="true" title="Amazon">
+                <text x="13" y="16" font-family="system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="16" text-anchor="middle" fill="currentColor">a</text>
+                <path d="M4 19.5 C 8 22.8 18 22.8 22 19.5" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+                <path d="M19.5 17.7 L22 19.5 L20 21.6" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="option-card-title">Streaming service</div>
+            <div class="option-card-sub">Any album or playlist on Spotify, SoundCloud, Bandcamp, YouTube, etc.</div>
+          </div>
+          <div class="option-card" data-value="url">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 8 H8 a5 5 0 0 0 0 10 H11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M15 8 H18 a5 5 0 0 1 0 10 H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M8 13 H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="option-card-title">Website</div>
+            <div class="option-card-sub">Your site, a drop page, a merch store, or anywhere else online.</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="option-divider">
+
+      <!-- Option: Back Design -->
+      <div class="option-section">
+        <div class="option-section-label">Back design</div>
+        <div class="option-cards" data-option="back">
+          <div class="option-card selected" data-value="standard">
+            <div class="option-card-thumb">
+              <img src="templates/Goodz_Standard_back.png" alt="Standard Goodz back">
+            </div>
+            <div class="option-card-title">Standard Design</div>
+          </div>
+          <div class="option-card" data-value="custom">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="22" height="22" rx="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M13 8v10M8 13h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="option-card-title">Upload Custom Design <span class="option-upcharge">$0.10/unit</span></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="option-divider">
+
+      <!-- Option: Keychain Hole -->
+      <div class="option-section">
+        <div class="option-section-label">Keychain hole</div>
+        <div class="option-cards" data-option="keychain">
+          <div class="option-card selected" data-value="none">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="22" height="22" rx="4" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="option-card-title">None</div>
+          </div>
+          <div class="option-card" data-value="top-left">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="22" height="22" rx="4" stroke="currentColor" stroke-width="2"/>
+                <circle cx="6" cy="6" r="2.5" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="option-card-title">Top Left <span class="option-upcharge">$0.15/unit</span></div>
+          </div>
+          <div class="option-card" data-value="top-right">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="22" height="22" rx="4" stroke="currentColor" stroke-width="2"/>
+                <circle cx="20" cy="6" r="2.5" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="option-card-title">Top Right <span class="option-upcharge">$0.15/unit</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option: Packaging (hidden for now, waiting to offer) -->
+      <div class="option-section" style="display:none">
+        <div class="option-section-label">Packaging</div>
+        <div class="option-cards" data-option="sleeve">
+          <div class="option-card selected" data-value="no-sleeve">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="22" height="22" rx="4" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="option-card-title">No Sleeve</div>
+          </div>
+          <div class="option-card" data-value="sleeve">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="1" width="24" height="24" rx="3" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4,2"/>
+                <rect x="4" y="4" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="option-card-title">With Sleeve <span class="option-upcharge">$0.20/unit</span></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="option-divider">
+
+      <!-- Pricing table -->
+      <div class="qty-section">
+        <div class="option-section-label">Quantity</div>
+        <p class="pricing-revenue-note">Choose your run size.</p>
+        <div class="pricing-grid" id="pricing-grid">
+          <div class="pricing-grid-row hdr">
+            <div class="pricing-grid-hdr">Quantity</div>
+            <div class="pricing-grid-hdr r">Price</div>
+            <div class="pricing-grid-hdr r">Order Total</div>
+            <div class="pricing-grid-hdr r">Est. profit</div>
+          </div>
+          <!-- Rows populated by JS -->
+        </div>
+        <div class="profit-calc">
+          <span class="profit-calc-label">Profit Calculator</span>
+          <p class="profit-calc-body">Sell your Goodz at $<span class="retail-inline-wrap"><input type="text" id="retail-input" value="12" maxlength="2" inputmode="numeric" pattern="[0-9]*" aria-label="Retail price per Goodz" oninput="handleRetailChange()" onclick="this.select()"></span> each and the <strong>Est. profit</strong> column shows your take across the run. Estimate only, won&rsquo;t affect your order.</p>
+        </div>
+        <p class="pricing-contact">Not ready for 50? <a href="/custom#try-one">Try a sample first &rarr;</a></p>
+      </div>
+
+      <!-- Summary — rows mirror the selection order on this page
+           (Music → Back → Keychain → Quantity), with the computed
+           Unit price and Order total at the end. -->
+      <div class="summary-section">
+        <div class="option-section-label">Summary</div>
+        <div class="summary-list">
+          <div class="summary-row"><span>Music</span><span id="summary-music"></span></div>
+          <div class="summary-row"><span>Back design</span><span id="summary-back"></span></div>
+          <div class="summary-row"><span>Keychain hole</span><span id="summary-keychain"></span></div>
+          <div class="summary-row" style="display:none"><span>Packaging</span><span id="summary-sleeve"></span></div>
+          <div class="summary-row"><span>Quantity</span><span id="summary-qty"></span></div>
+          <div class="summary-row summary-row-unit"><span>Unit price</span><span id="summary-unit"></span></div>
+          <div class="summary-row summary-row-total"><span>Order total</span><span id="summary-price"></span></div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-block">
+        <div class="btn-row">
+          <a href="/custom" class="step-btn step-btn-back">&larr; Back to Custom Goodz</a>
+          <button class="step-btn step-btn-primary" onclick="continueToUpload()">Next: Music &rarr;</button>
+        </div>
+      </div>
+
+    </div><!-- /config-col -->
+  </div><!-- /product-layout -->
+</main>
+
+<script>
+const TIERS = [
+  { qty: 50,   max: 99,   basePrice: 3.50 },
+  { qty: 100,  max: 199,  basePrice: 3.33, discount: 5 },
+  { qty: 200,  max: 499,  basePrice: 3.15, discount: 10 },
+  { qty: 500,  max: 749,  basePrice: 2.98, discount: 15 },
+  { qty: 750,  max: 999,  basePrice: 2.80, discount: 20 },
+  { qty: 1000, max: 1999, basePrice: 2.63, discount: 25 },
+  { qty: 2000, max: 2999, basePrice: 2.28, discount: 35 },
+  { qty: 3000, max: null, basePrice: null, contact: true },
+];
+
+const UPCHARGES = { sleeve: 0.20, keychain: 0.15, customBack: 0.10 };
+
+let state = {
+  music:        'bandcamp_codes',
+  sleeve:       'no-sleeve',
+  keychain:     'none',
+  back:         'standard',
+  tierIdx:      0,
+  retailPrice:  12,
+};
+
+const MUSIC_LABELS = {
+  bandcamp_codes: 'Bandcamp codes',
+  streaming:      'Streaming service',
+  url:            'Website',
+};
+
+// Map legacy values (sessionStorage from prior visits) to current keys
+const LEGACY_MUSIC_MAP = {
+  bandcamp: 'bandcamp_codes',
+  spotify:  'streaming',
+  apple:    'streaming',
+  amazon:   'streaming',
+  youtube:  'streaming',
+  other:    'url',
+};
+
+function totalUpcharge() {
+  let u = 0;
+  if (state.sleeve === 'sleeve')   u += UPCHARGES.sleeve;
+  if (state.keychain !== 'none')   u += UPCHARGES.keychain;
+  if (state.back === 'custom')     u += UPCHARGES.customBack;
+  return u;
+}
+
+function unitPrice(tier) {
+  return tier.basePrice + totalUpcharge();
+}
+
+function fmt(n) {
+  return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function renderTable() {
+  const grid = document.getElementById('pricing-grid');
+  const hdr = grid.querySelector('.hdr').outerHTML;
+  const retail = Number.isFinite(state.retailPrice) && state.retailPrice > 0 ? state.retailPrice : 12;
+  grid.innerHTML = hdr + TIERS.map((tier, i) => {
+    // 3,000+ has no fixed price — it's a contact-us row, not a checkout tier.
+    if (tier.contact) {
+      return `
+        <div class="pricing-grid-row contact">
+          <div class="pricing-grid-cell">
+            <span class="pricing-selected-dot" style="visibility:hidden"></span>
+            <span>${tier.qty.toLocaleString()}+</span>
+          </div>
+          <a class="pricing-contact-cell" href="mailto:info@getthegoodz.com?subject=Custom%20Goodz%20bulk%20order%20(3%2C000%2B)">Contact us &rarr;</a>
+        </div>`;
+    }
+    const price = unitPrice(tier);
+    const total = price * tier.qty;
+    const profit = (retail - price) * tier.qty;
+    const sel = i === state.tierIdx;
+    return `
+      <div class="pricing-grid-row data${sel ? ' selected' : ''}" onclick="selectTier(${i})">
+        <div class="pricing-grid-cell">
+          <span class="pricing-selected-dot"></span>
+          <span>${tier.qty.toLocaleString()}</span>
+          ${tier.recommended ? '<span class="recommended-badge">RECOMMENDED</span>' : ''}
+          ${tier.discount ? `<span class="tier-discount-badge">${tier.discount}% off</span>` : ''}
+        </div>
+        <div class="pricing-grid-cell r">${fmt(price)}</div>
+        <div class="pricing-grid-cell r">${fmt(total)}</div>
+        <div class="pricing-grid-cell r"><span class="pricing-profit">${profit > 0 ? fmt(profit) : '—'}</span></div>
+      </div>`;
+  }).join('');
+}
+
+function handleRetailChange() {
+  const input = document.getElementById('retail-input');
+  const val = parseFloat(input.value);
+  state.retailPrice = (Number.isFinite(val) && val >= 0) ? val : 12;
+  renderTable();
+}
+
+// Tiny GA event helper. No-ops cleanly until gtag is wired up on the page.
+function trackEvent(name, params) {
+  if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
+}
+let __suppressTracking = false;
+
+function selectTier(i) {
+  state.tierIdx = i;
+  renderTable();
+  updateSummary();
+  if (__suppressTracking) return;
+  const tier = TIERS[i];
+  trackEvent('tier_change', { quantity: tier && tier.qty, tier_index: i });
+}
+
+function selectOption(group, value) {
+  state[group] = value;
+  document.querySelectorAll(`[data-option="${group}"] .option-card`).forEach(c => {
+    c.classList.toggle('selected', c.dataset.value === value);
+  });
+
+  renderTable();
+  updateSummary();
+  updateFromPrice();
+  if (!__suppressTracking) trackEvent('option_change', { group, value });
+}
+
+function updateFromPrice() {
+  const el = document.getElementById('from-price');
+  if (!el) return;
+  const priced = TIERS.filter(t => t.basePrice != null);
+  const cheapest = priced[priced.length - 1];
+  el.textContent = fmt(unitPrice(cheapest)) + '/unit';
+}
+
+function summaryText() {
+  const tier = TIERS[state.tierIdx];
+  const parts = [
+    `${tier.qty.toLocaleString()}${tier.max ? '' : '+'} Goodz`,
+    state.sleeve === 'sleeve' ? 'With Sleeve' : 'No Sleeve',
+    state.keychain === 'none' ? 'No Keychain Hole' : `Keychain Hole (${state.keychain === 'top-left' ? 'Top Left' : 'Top Right'})`,
+    state.back === 'standard' ? 'Standard Back' : 'Custom Back',
+  ];
+  return parts.join(' • ');
+}
+
+// Build the right-hand cell of a summary row as a choice label with an
+// optional inline upcharge tag, divided by a middot, e.g.
+// "Top left • $0.15/unit", so the Summary itself is the breakdown.
+function summaryCell(label, upchargePerUnit) {
+  if (upchargePerUnit && upchargePerUnit > 0) {
+    return `${label}<span class="summary-sep">•</span><span class="summary-upcharge">${fmt(upchargePerUnit)}/unit</span>`;
+  }
+  return label;
+}
+
+function updateSummary() {
+  const tier = TIERS[state.tierIdx];
+  const price = unitPrice(tier);
+  const total = tier.max ? fmt(price * tier.qty) : 'Contact us';
+
+  document.getElementById('summary-qty').textContent =
+    `${tier.qty.toLocaleString()}${tier.max ? '' : '+'} Goodz`;
+  document.getElementById('summary-music').textContent = MUSIC_LABELS[state.music] || 'Other';
+  document.getElementById('summary-sleeve').innerHTML = summaryCell(
+    state.sleeve === 'sleeve' ? 'With sleeve' : 'No sleeve',
+    state.sleeve === 'sleeve' ? UPCHARGES.sleeve : 0
+  );
+  document.getElementById('summary-keychain').innerHTML = summaryCell(
+    state.keychain === 'none' ? 'None' :
+    state.keychain === 'top-left' ? 'Top left' : 'Top right',
+    state.keychain !== 'none' ? UPCHARGES.keychain : 0
+  );
+  document.getElementById('summary-back').innerHTML = summaryCell(
+    state.back === 'standard' ? 'Standard' : 'Custom',
+    state.back === 'custom' ? UPCHARGES.customBack : 0
+  );
+  document.getElementById('summary-unit').textContent = `${fmt(price)}/unit`;
+  document.getElementById('summary-price').textContent = total;
+}
+
+function continueToUpload() {
+  const tier = TIERS[state.tierIdx];
+  const price = unitPrice(tier);
+  sessionStorage.setItem('goodzOrderConfig', JSON.stringify({
+    quantity:         tier.qty,
+    tierMax:          tier.max,
+    music:            state.music,
+    musicLabel:       MUSIC_LABELS[state.music] || 'Other',
+    sleeve:           state.sleeve === 'sleeve',
+    keychainHole:     state.keychain,
+    backDesign:       state.back,
+    unitPrice:        price,
+    sleeveUpcharge:   state.sleeve === 'sleeve'  ? UPCHARGES.sleeve : 0,
+    keychainUpcharge: state.keychain !== 'none'  ? UPCHARGES.keychain : 0,
+    backUpcharge:     state.back === 'custom'    ? UPCHARGES.customBack : 0,
+    baseTotal:        tier.max ? +(price * tier.qty).toFixed(2) : null,
+    summaryText:      summaryText(),
+  }));
+  // Mark Music (global step 1) as reached so the artwork-upload page
+  // knows the user has progressed beyond Customize.
+  try {
+    const cur = parseInt(sessionStorage.getItem('goodzFurthestStep') || '0', 10);
+    if (cur < 1) sessionStorage.setItem('goodzFurthestStep', '1');
+  } catch (e) {}
+  trackEvent('continue_clicked', {
+    from_step: 'customize',
+    quantity: tier.qty,
+    music: state.music,
+  });
+  // Force the Music step. The button literally says "Next: Music" — without
+  // an explicit hash, the artwork-upload page would auto-resume to whatever
+  // step the user had previously reached, which contradicts the button.
+  window.location.href = 'artwork-upload.html#music';
+}
+
+// Wire option card clicks
+document.querySelectorAll('.option-cards').forEach(group => {
+  const opt = group.dataset.option;
+  group.querySelectorAll('.option-card').forEach(card => {
+    card.addEventListener('click', () => selectOption(opt, card.dataset.value));
+  });
+});
+
+renderTable();
+updateSummary();
+updateFromPrice();
+
+// Restore previous selections when returning here via "Edit options"
+(function restoreFromOrderConfig() {
+  let raw;
+  try { raw = sessionStorage.getItem('goodzOrderConfig'); } catch (e) { return; }
+  if (!raw) return;
+  let cfg;
+  try { cfg = JSON.parse(raw); } catch (e) { return; }
+  if (!cfg) return;
+
+  __suppressTracking = true;
+  const musicKey = cfg.music && (MUSIC_LABELS[cfg.music] ? cfg.music : LEGACY_MUSIC_MAP[cfg.music]);
+  if (musicKey) selectOption('music', musicKey);
+  if (cfg.backDesign === 'standard' || cfg.backDesign === 'custom') selectOption('back', cfg.backDesign);
+  if (cfg.keychainHole) selectOption('keychain', cfg.keychainHole);
+  if (typeof cfg.sleeve === 'boolean') selectOption('sleeve', cfg.sleeve ? 'sleeve' : 'no-sleeve');
+  if (typeof cfg.quantity === 'number') {
+    const idx = TIERS.findIndex(t => t.qty === cfg.quantity && !t.contact);
+    if (idx >= 0) selectTier(idx);
+  }
+  __suppressTracking = false;
+})();
+
+trackEvent('step_view', { step: 'customize' });
+
+</script>
+</body>
+</html>

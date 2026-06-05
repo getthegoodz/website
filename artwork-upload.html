@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Your Artwork - Goodz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-warm.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #ffc852;
+      --yellow-light: #fff4d6;
+      --black: #0e0c0a;
+      --cream: #efefe2;
+      --off-white: #e4e4d6;
+      --border: #cdc8b2;
+      --text: #1a1510;
+      --muted: #6b6354;
+      --green-bg: #f0fdf4; --green-border: #bbf7d0; --green-text: #166534;
+      --blue-bg: #eff6ff;  --blue-border: #bfdbfe;  --blue-text: #1e40af;
+      --red-bg: #fef2f2;   --red-border: #fecaca;   --red-text: #dc2626;
+      --warn-bg: #fffbeb;  --warn-border: #fde68a;  --warn-text: #92400e;
+    }
+
+    html, body { overflow-x: hidden; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+    /* Sticky top band: page-header + order-strip travel together so the
+       live order summary stays visible as the user scrolls. Previously
+       only .page-header was sticky and the strip below it scrolled out
+       of view behind the header — invisible on mobile after any scroll. */
+    .sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--off-white);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header {
+      background: var(--off-white);
+      padding: 0.85rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+    }
+    .page-header .step-bar-wrapper {
+      width: 320px;
+      margin: 0;
+      justify-self: center;
+    }
+    .back-link {
+      justify-self: start;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .back-link:hover { color: var(--black); text-decoration: underline; }
+    @media (max-width: 768px) {
+      .page-header { grid-template-columns: auto 1fr; padding: 0.6rem 1rem; }
+      .page-header .step-bar-wrapper { width: auto; justify-self: stretch; }
+    }
+
+    /* Single-column layout */
+    .layout {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .page-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--black);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Upload area (card + side thumbnails) */
+    .upload-area {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-wrap { position: relative; flex: 0 1 320px; }
+    /* The card represents the full artwork bleed (70mm x 70mm).
+       Outer corners are minimal so it reads as a bleed rectangle;
+       the trim shape (with the actual goodz corner radius) is drawn
+       as an overlay inside. No outer border, the trim/bleed overlay
+       and the in-card CTA carry the affordance. */
+    .card {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #fff;
+      border: none;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .card:hover, .card.drag-over { background: var(--yellow-light); }
+    .card.has-art { background: #fff; cursor: pointer; }
+    .card.has-art:hover { background: #fff; }
+    .card-art { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Overlay: trim outline (matching goodz corner radius) and safe area,
+       with the bleed region dimmed so cropped-off content is visible.
+       Always rendered so it sets expectations even before upload. */
+    .card-overlay-guides {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .card-overlay-bleed { fill: #000; fill-opacity: 0.32; transition: fill-opacity 0.15s; }
+    .card.has-art .card-overlay-bleed { fill-opacity: 0.42; }
+    .card-overlay-trim { fill: none; stroke: rgba(0, 0, 0, 0.82); stroke-width: 0.45; }
+    .card-overlay-safe { fill: none; stroke: rgba(0, 0, 0, 0.6);  stroke-width: 0.3; stroke-dasharray: 0.9 0.7; }
+
+    /* Legend: print-term explanations + dimensions for each */
+    .overlay-legend {
+      margin: 1rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .overlay-legend-toggle {
+      display: flex;
+      justify-content: flex-start;
+    }
+    .overlay-legend-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .overlay-legend-mark {
+      width: 26px;
+      flex-shrink: 0;
+      display: inline-block;
+      margin-top: 0.3rem;
+    }
+    .overlay-legend-text { flex: 1; min-width: 0; }
+    .overlay-legend-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.1rem;
+    }
+    .overlay-legend-title {
+      font-weight: 700;
+      color: var(--text);
+    }
+    .overlay-legend-dim {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .overlay-legend-desc {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+    .overlay-legend-bleed {
+      height: 14px;
+      background: rgba(0, 0, 0, 0.32);
+      border-radius: 2px;
+    }
+    .card-placeholder {
+      text-align: center;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .upload-btn {
+      display: none;
+      padding: 0.75rem 1.5rem;
+      background: var(--yellow);
+      color: var(--black);
+      border: 2px solid var(--yellow);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      pointer-events: none;
+    }
+    .upload-hint {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+    .upload-hint-desktop { display: none; }
+    .upload-hint-mobile { display: block; font-weight: 700; color: var(--black); }
+    @media (min-width: 769px) {
+      .upload-btn { display: inline-block; }
+      .upload-hint-desktop { display: block; }
+      .upload-hint-mobile { display: none; }
+    }
+    .card .img-delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-meta {
+      margin: 0.75rem 0 0;
+      text-align: left;
+    }
+    .card-meta .file-name {
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+    }
+    .card-meta .size-warning {
+      margin-top: 0.5rem;
+      padding: 0.55rem 0.75rem;
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: 6px;
+      font-size: 0.78rem;
+      color: var(--warn-text);
+      display: none;
+      text-align: left;
+    }
+    .zone-guide {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: contain; pointer-events: none; z-index: 10; opacity: 0.6;
+    }
+
+    /* Side thumbnails (Front / Back selector) */
+    .thumbs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .thumb {
+      width: 70px;
+      height: 70px;
+      border-radius: 6px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      position: relative;
+      cursor: pointer;
+      padding: 0;
+      overflow: hidden;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .thumb:hover { border-color: var(--black); }
+    .thumb.thumb-active { border-color: var(--black); border-width: 2px; }
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .thumb-empty-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--off-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .thumb-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(255, 255, 255, 0.72);
+      pointer-events: none;
+    }
+    @media (max-width: 480px) {
+      .upload-area { gap: 0.4rem; }
+      .thumb { width: 56px; height: 56px; }
+      .thumb-label { font-size: 0.62rem; }
+    }
+
+    /* Card view content (front vs back) */
+    .card-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-content img.card-art-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Back view (standard): render the back image at trim size (65mm of 70mm
+       = 92.86%) with the card's white canvas showing in the bleed region, so
+       flipping between front and back keeps the visible "actual goodz"
+       footprint consistent with the trim overlay on the front. */
+    #card-content-back { background: #fff; }
+    /* When custom back is required but not yet uploaded, hide the standard-back
+       placeholder image and show an empty upload prompt instead. Mirrors the
+       front pattern. */
+    #card-content-back.needs-custom-back .back-image-frame { display: none; }
+    #card-content-back .back-placeholder { display: none; }
+    #card-content-back.needs-custom-back .back-placeholder { display: flex; }
+    .back-placeholder {
+      position: absolute;
+      inset: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      z-index: 3;
+      background: #fff;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    /* Back thumb stays locked until the front is uploaded so users
+       can't preview the back before the required front art is in. */
+    .thumb[disabled] { cursor: not-allowed; opacity: 0.45; }
+    .thumb[disabled]:hover { border-color: var(--border); }
+    .back-image-frame {
+      position: absolute;
+      top: 3.57%;
+      left: 3.57%;
+      width: 92.86%;
+      height: 92.86%;
+      border-radius: 9.23%;
+      overflow: hidden;
+    }
+    .back-image-frame img.card-art-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Back view (custom uploaded): full-bleed art with the same overlay as the
+       front. The standard frame is hidden in this state. */
+    #card-content-back.has-custom-back { background: transparent; }
+    #card-content-back.has-custom-back .back-image-frame { display: none; }
+    .back-custom-art { display: none; }
+    .back-overlay { display: none; }
+    #card-content-back.has-custom-back .back-custom-art { display: block; }
+    #card-content-back.has-custom-back .back-overlay { display: block; }
+    /* Custom back is always present when its overlay shows, so darken the
+       bleed dim the same way the front does when art is loaded. */
+    .back-overlay .card-overlay-bleed { fill-opacity: 0.42; }
+    /* Card action row, sits below the preview, keeps the artwork pristine */
+    .card-actions {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 0.85rem;
+      margin-top: 0.6rem;
+      min-height: 1.4rem;
+      flex-wrap: wrap;
+    }
+    .card-action {
+      background: none;
+      border: none;
+      padding: 0.2rem 0.1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .card-action:hover { color: var(--black); }
+    .card-action-primary {
+      background: var(--yellow);
+      color: var(--black);
+      border: 2px solid var(--yellow);
+      border-radius: 6px;
+      padding: 0.5rem 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .card-action-primary:hover { background: #e6b044; border-color: #e6b044; color: var(--black); }
+    /* Cost suffix inside a card-action button ("Replace with custom design ($0.10/unit)") */
+    .card-action-meta { color: var(--muted); font-weight: 400; text-decoration: none; }
+    .card-action:hover .card-action-meta { color: var(--text); }
+    /* Standard-back caption shown when viewing the back side and no custom is uploaded */
+    .back-default-included { color: var(--amber-ink, var(--black)); font-weight: 600; }
+
+    /* Keychain hole overlay
+       Spec: 70mm × 70mm canvas, hole center 8.5mm from top + side, 3mm diameter
+       → center at 8.5/70 = 12.143% in from edges, diameter 3/70 = 4.286%. */
+    .keychain-dot {
+      position: absolute;
+      width: 4.286%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--black);
+      border: 2px solid #fff;
+      z-index: 20;
+      display: none;
+    }
+    .keychain-dot.top-left  { top: 12.143%; left:  12.143%; transform: translate(-50%, -50%); display: block; }
+    .keychain-dot.top-right { top: 12.143%; right: 12.143%; transform: translate(50%, -50%);  display: block; }
+
+    /* Segmented unit toggle */
+    .unit-toggle-group {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .unit-toggle-btn {
+      padding: 0.32rem 0.95rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .unit-toggle-btn + .unit-toggle-btn { border-left: 1px solid var(--border); }
+    .unit-toggle-btn.active {
+      background: var(--black);
+      color: var(--cream);
+    }
+    .unit-toggle-btn:hover:not(.active) { background: var(--off-white); color: var(--black); }
+
+    /* Artwork specs (mirrors order page guidelines) */
+    .artwork-specs {
+      margin: 2.5rem 0 0;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .artwork-specs-heading {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.85rem;
+      text-align: left;
+    }
+    .specs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+    .specs-list-item {
+      position: relative;
+      padding-left: 0.95rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .specs-list-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.5rem;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .specs-list-item strong { color: var(--text); font-weight: 700; }
+    .specs-templates {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    .specs-template-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.7rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.12s, box-shadow 0.12s;
+      min-width: 72px;
+      text-align: center;
+      background: #fff;
+    }
+    .specs-template-tile:hover { border-color: var(--black); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .specs-template-ext {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.25rem 0.45rem;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+    .specs-template-ext.ai { background: #E46F2A; color: #fff; }
+    .specs-template-ext.pdf { background: #DC2626; color: #fff; }
+    .specs-template-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+
+    /* Sleeve preview (kept compact, restyled to fit new palette) */
+    .sleeve-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1.25rem;
+    }
+    .sleeve-box {
+      width: 162px; height: 162px; border-radius: 4px; background: var(--off-white);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: flex-start; padding-top: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative;
+      border: 1px solid var(--border);
+    }
+    .sleeve-card-peek {
+      width: 146px; height: 146px; border-radius: 10px 10px 0 0;
+      overflow: hidden;
+    }
+    .sleeve-label { font-size: 0.5rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* Status badges */
+    .status-badge {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      margin-top: 0.5rem;
+    }
+    .status-badge.ok   { background: rgba(255,200,82,0.15); border: 1px solid rgba(255,200,82,0.45); color: var(--black); }
+    .status-badge.info { background: var(--off-white);       border: 1px solid var(--border);         color: var(--text); }
+    .status-badge.warn { background: var(--warn-bg);         border: 1px solid var(--warn-border);    color: var(--warn-text); }
+
+    /* Step bar — numbered squares with labels */
+    .step-bar-wrapper { margin: 0; width: 100%; max-width: 380px; }
+    .step-bar { display: flex; gap: 0.5rem; justify-content: space-between; }
+    .step-cell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      color: inherit;
+    }
+    .step-square {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1.5px solid #b8b0a0;
+      color: #b8b0a0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .step-cell.active .step-square {
+      border-color: var(--black);
+      color: var(--black);
+    }
+    .step-cell.done .step-square {
+      border-color: var(--black);
+      background: var(--black);
+      color: var(--cream, #efefe2);
+    }
+    .step-cell-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #b0a898;
+      text-align: center;
+      transition: color 0.15s;
+    }
+    .step-cell.active .step-cell-label { color: var(--black); }
+    .step-cell.done .step-cell-label { color: var(--black); }
+    a.step-cell { cursor: pointer; }
+    a.step-cell:hover .step-square { transform: translateY(-1px); }
+    /* Spans become clickable once user has reached that step */
+    .step-cell.done { cursor: pointer; }
+    .step-cell.done:hover .step-square { transform: translateY(-1px); }
+    @media (max-width: 700px) {
+      .back-link { display: none; }
+      .page-header { grid-template-columns: 1fr; }
+      .page-header .step-bar-wrapper { width: 100%; max-width: 380px; justify-self: center; }
+    }
+
+    /* Step headings */
+    .step h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.55rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 0.3rem;
+    }
+    .step-sub { font-size: 1rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+
+    /* Steps */
+    .step { display: none; }
+    .step.active { display: block; }
+
+    /* Upload zones */
+    .upload-grid { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .upload-box { flex: 1; min-width: 180px; }
+    .upload-box-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem; display: block;
+    }
+    .drop-zone {
+      width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; background: #fff; transition: all 0.15s;
+      overflow: hidden; position: relative; flex-direction: column; text-align: center;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--black); background: var(--yellow-light); }
+    .drop-zone.has-image { border-style: solid; border-color: var(--border); }
+    .dz-content { padding: 1rem; }
+    .dz-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+    .dz-req { background: var(--black); color: var(--cream); font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.04em; padding: 0.25rem 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; }
+    .dz-text { font-size: 0.88rem; color: var(--muted); line-height: 1.55; }
+    .dz-text span { color: var(--black); font-weight: 700; }
+    .drop-zone img.preview-img { width: 100%; height: 100%; object-fit: cover; }
+    .img-delete-btn {
+      position: absolute; top: 8px; right: 8px; width: 24px; height: 24px;
+      border-radius: 50%; background: rgba(0,0,0,0.55); border: none;
+      color: #fff; font-size: 14px; cursor: pointer; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .file-name { margin-top: 0.4rem; font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-input { display: none; }
+
+    .size-warning {
+      margin-top: 0.5rem;
+      padding: 0.6rem 0.75rem;
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: 7px;
+      font-size: 0.78rem;
+      color: var(--warn-text);
+      display: none;
+    }
+
+    .template-shortcut {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    .template-shortcut a { color: var(--black); font-weight: 700; text-decoration: none; }
+    .template-shortcut a:hover { text-decoration: underline; }
+
+    /* Music step */
+    .music-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.85rem; }
+    .music-desc a { color: var(--black); font-weight: 700; text-decoration: underline; }
+
+    .csv-zone {
+      border: 1.5px dashed var(--border); border-radius: 12px; padding: 1.75rem 1.5rem;
+      text-align: center; cursor: pointer; background: #fff; transition: all 0.15s;
+    }
+    .csv-zone:hover, .csv-zone.drag-over { border-color: var(--black); background: var(--yellow-light); }
+    .csv-zone.has-error { border-color: var(--red-border); background: var(--red-bg); }
+    .csv-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .csv-title { font-weight: 700; font-family: 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 0.2rem; }
+    .csv-sub { font-size: 0.9rem; color: var(--muted); }
+    .csv-sub span { color: var(--black); font-weight: 700; }
+
+    .csv-error  { margin-top: 0.75rem; padding: 0.75rem; background: var(--red-bg);  border: 1px solid var(--red-border);  border-radius: 8px; color: var(--red-text);  font-size: 0.82rem; }
+    .csv-success { margin-top: 0.75rem; padding: 0.85rem; background: rgba(255,200,82,0.12); border: 1px solid rgba(255,200,82,0.4); border-radius: 8px; }
+    .csv-success-title { font-weight: 600; color: var(--black); margin-bottom: 0.3rem; font-size: 0.88rem; }
+    .csv-success-sub { font-size: 0.88rem; color: var(--muted); }
+    .csv-preview summary { font-size: 0.72rem; color: var(--muted); cursor: pointer; margin-top: 0.4rem; }
+    .csv-preview ul { margin: 0.4rem 0 0 1.25rem; font-size: 0.68rem; color: var(--muted); word-break: break-all; }
+
+    .url-input {
+      display: block;
+      width: 100%; min-width: 0; max-width: 100%;
+      padding: 0.75rem 1rem; border-radius: 8px;
+      border: 1.5px solid var(--border);
+      /* iOS Safari auto-zooms on any input with font-size < 16px, which makes
+         the page render wider than the viewport and look "deformed" after the
+         user taps and pastes. Keeping the rendered font at 16px stops that. */
+      font-size: 16px;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s; background: #fff;
+    }
+    .url-input:focus { outline: none; border-color: var(--black); }
+    .url-hint { margin-top: 0.4rem; font-size: 0.88rem; color: var(--muted); }
+
+    .csv-filled-zone {
+      border: 1.5px solid rgba(255,200,82,0.4); border-radius: 12px;
+      padding: 1rem 1.25rem; background: rgba(255,200,82,0.12);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .csv-filled-text strong { font-weight: 600; color: var(--black); font-size: 0.88rem; display: block; }
+    .csv-filled-text span { font-size: 0.78rem; color: var(--muted); }
+    .csv-reset { margin-top: 0.5rem; font-size: 0.75rem; color: #888; text-align: center; cursor: pointer; }
+    .csv-reset:hover { color: var(--black); }
+    .csv-warning {
+      margin-top: 0.75rem; padding: 0.75rem 1rem; background: var(--warn-bg);
+      border: 1px solid var(--warn-border); border-radius: 8px;
+      font-size: 0.82rem; color: var(--warn-text);
+    }
+    .csv-warning.is-match { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+    .csv-warning.is-short { background: var(--red-bg);   border-color: var(--red-border);   color: var(--red-text); }
+    .csv-warning a { color: inherit; text-decoration: underline; }
+    .csv-target { margin-top: 0.4rem; font-size: 0.78rem; color: var(--muted); }
+    .csv-target strong { color: var(--black); font-weight: 700; }
+
+    /* Review step */
+    .summary-rows {
+      border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden; margin-bottom: 1.5rem;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.8rem 1rem; background: #fafaf7;
+      border-bottom: 1px solid var(--border); font-size: 0.9rem;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row-label { color: var(--muted); font-size: 0.92rem; }
+    .summary-row-value { font-weight: 600; font-size: 0.95rem; text-align: right; max-width: 60%; word-break: break-all; }
+    .summary-row.total-row {
+      background: var(--yellow); border-color: var(--yellow);
+      font-size: 1.05rem; font-weight: 800;
+    }
+    .summary-row.total-row .summary-row-label { color: var(--black); font-size: 1rem; }
+    .summary-row.missing { background: var(--red-bg); border-bottom-color: var(--red-border); }
+    .summary-row.missing .summary-row-value { color: var(--red-text); }
+    .summary-warning {
+      margin-bottom: 1rem; padding: 0.85rem 1rem; background: var(--red-bg);
+      border: 1px solid var(--red-border); border-radius: 8px;
+      color: var(--red-text); font-size: 0.84rem;
+    }
+
+    /* Buttons */
+    .btn-row { display: flex; justify-content: space-between; margin-top: 1.5rem; gap: 0.75rem; }
+    .btn { padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; cursor: pointer; border: 2px solid var(--black); font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
+    .btn-back { background: transparent; color: var(--black); }
+    .btn-back:hover { background: var(--off-white); }
+    .btn-primary { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .btn-primary:hover:not(:disabled) { background: #e6b044; border-color: #e6b044; }
+    .btn-primary:disabled { background: #cdc8b2; border-color: #cdc8b2; color: #9a8e7e; cursor: not-allowed; }
+    /* Front/back artwork preview on the Review step */
+    .review-art-preview {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .review-art-cards { display: flex; gap: 0.75rem; }
+    .review-art-card { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+    .review-art-card img {
+      width: 88px; height: 88px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      object-fit: cover;
+      display: block;
+      background: var(--off-white);
+    }
+    .review-art-card figcaption {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .review-art-edit {
+      margin-left: auto;
+      background: none;
+      border: none;
+      padding: 0.2rem 0;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--black);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .review-art-edit:hover { color: var(--amber-ink); }
+    @media (max-width: 600px) {
+      .review-art-preview { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .review-art-edit { margin-left: 0; }
+    }
+
+    /* Spinner */
+    .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 5px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Success */
+    .order-success { text-align: center; padding: 3rem 1.5rem; }
+    .order-success-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .order-success h2 { font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .order-success p { color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+    .order-success-detail { display: inline-block; padding: 0.75rem 1.5rem; background: var(--off-white); border: 1px solid var(--border); border-radius: 8px; font-size: 0.88rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      /* Tight top padding so the page title sits close to the sticky
+         band; large gap there was reading as disconnect on mobile. */
+      .layout { padding: 0.75rem 1rem 3rem; }
+      .page-title { font-size: 1.35rem; margin-bottom: 1rem; }
+      .btn-row { flex-direction: column-reverse; }
+      .btn-row .btn { width: 100%; text-align: center; padding: 0.9rem; }
+      .upload-grid { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo" aria-label="Goodz home"><img src="logos/goodz-wordmark-white.svg" alt="Goodz" width="139" height="22"></a>
+  <ul class="nav-links">
+    <li><a href="/mixtape">Mixtape Goodz</a></li>
+    <li><a href="/custom">Custom Goodz</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/support">Support</a></li>  </ul>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector(&apos;.nav-links&apos;).classList.toggle(&apos;is-open&apos;)">☰</button>
+</nav>
+
+<!-- Sticky top band: live order strip (order context) sits ABOVE the
+     stepper so the stepper stays adjacent to the step title below.
+     Both travel together as one pinned band. -->
+<div class="sticky-top">
+
+<!-- Slim live order strip — same component on every step. -->
+<div class="order-strip" id="order-strip">
+  <div class="order-strip-row">
+    <div class="order-strip-info">
+      <span class="order-strip-eyebrow">You're ordering</span>
+      <span class="order-strip-product">
+        <strong id="strip-product">Custom Goodz</strong>
+        <span class="order-strip-sep">•</span>
+        <span id="strip-qty">50 units</span>
+        <span class="order-strip-sep">•</span>
+        <span id="strip-unit">$3.44/unit</span>
+        <span class="order-strip-sep">•</span>
+        <span id="strip-total">$172 total</span>
+        <span class="order-strip-includes" id="strip-includes" style="display:none">includes custom back</span>
+      </span>
+    </div>
+    <button type="button" class="order-strip-toggle" id="order-strip-toggle" aria-expanded="false" aria-controls="order-strip-details" onclick="toggleOrderStripDetails()">
+      Details <span class="order-strip-arrow" aria-hidden="true">▾</span>
+    </button>
+  </div>
+  <dl class="order-strip-details" id="order-strip-details" hidden></dl>
+</div>
+
+<!-- Page header (stepper) -->
+<header class="page-header">
+  <button type="button" id="back-link" class="back-link" onclick="goBackOneStep()">&larr; Back to Customize</button>
+  <div class="step-bar-wrapper" id="step-bar-wrapper">
+    <div class="step-bar">
+      <a href="/order" class="step-cell done" title="Edit your selections">
+        <span class="step-square">1</span>
+        <span class="step-cell-label">Customize</span>
+      </a>
+      <span class="step-cell active" data-step="0" onclick="handleStepClick(0)">
+        <span class="step-square">2</span>
+        <span class="step-cell-label">Music</span>
+      </span>
+      <span class="step-cell" data-step="1" onclick="handleStepClick(1)">
+        <span class="step-square">3</span>
+        <span class="step-cell-label">Artwork</span>
+      </span>
+      <span class="step-cell" data-step="2" onclick="handleStepClick(2)">
+        <span class="step-square">4</span>
+        <span class="step-cell-label">Review</span>
+      </span>
+    </div>
+  </div>
+  <div></div>
+</header>
+</div><!-- /.sticky-top -->
+
+<main class="layout">
+
+  <!-- STEP 0: Music -->
+  <div class="step active" id="step-0">
+    <h2>Link Your Music</h2>
+    <p class="step-sub">Choose how fans will hear your music when they tap their Goodz.</p>
+
+    <!-- Bandcamp codes mode -->
+    <div id="csv-area">
+      <p class="music-desc">Upload the CSV of download codes from Bandcamp. Each Goodz gets one redemption link. <a href="https://get.bandcamp.help/hc/en-us/articles/23020666567191-Track-album-code-tutorial" target="_blank" rel="noreferrer">How to get codes &rarr;</a></p>
+
+      <div id="csv-upload-zone">
+        <div class="csv-zone" id="csv-zone" onclick="document.getElementById('input-csv').click()">
+          <div id="csv-zone-inner">
+            <div class="csv-icon">&#128203;</div>
+            <div class="csv-title">Upload Bandcamp CSV</div>
+            <div class="csv-sub">Drop file or <span>click to browse</span></div>
+            <div class="csv-target" id="csv-target"></div>
+          </div>
+          <input type="file" id="input-csv" class="file-input" accept=".csv">
+        </div>
+        <div id="csv-error" class="csv-error" style="display:none"></div>
+      </div>
+
+      <div id="csv-filled-area" style="display:none">
+        <div class="csv-filled-zone">
+          <span style="font-size:1.4rem">&#10003;</span>
+          <div class="csv-filled-text">
+            <strong id="csv-filled-count"></strong>
+            <span>Bandcamp codes loaded</span>
+          </div>
+        </div>
+        <div class="csv-reset" onclick="resetCSV()">&#8635; Upload a different file</div>
+      </div>
+
+      <div id="csv-success-detail" class="csv-success" style="display:none">
+        <div class="csv-success-title" id="csv-success-title"></div>
+        <div class="csv-success-sub">Each Goodz gets one download link.</div>
+        <details class="csv-preview"><summary>Preview first 5 URLs</summary><ul id="csv-url-list"></ul></details>
+      </div>
+      <div id="csv-warning" class="csv-warning" style="display:none"></div>
+    </div>
+
+    <!-- URL mode (everything else) -->
+    <div id="url-area" style="display:none">
+      <p class="music-desc">All Goodz will link to this URL. Works with Bandcamp albums, Spotify, YouTube, SoundCloud, or any link.</p>
+      <input type="url" id="url-input" class="url-input" placeholder="https://yourband.bandcamp.com/album/..." oninput="handleURLInput()">
+      <div class="url-hint">Bandcamp, Spotify, YouTube, or any streaming URL.</div>
+      <div id="url-success" class="csv-success" style="display:none;margin-top:0.75rem">
+        <div class="csv-success-title">&#10003; URL saved</div>
+        <div class="csv-success-sub">All Goodz will link to this URL.</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="window.location.href='order.html'">&larr; Back to Customize</button>
+      <button class="btn btn-primary" id="btn-step0" onclick="goToStep(1)" disabled>Next: Artwork &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: Upload artwork -->
+  <div class="step" id="step-1">
+    <h2>Upload Your Artwork</h2>
+
+    <div class="upload-area">
+      <div class="card-wrap" id="card-wrap">
+        <div class="card" id="card">
+          <!-- Front view: upload zone OR uploaded art -->
+          <div class="card-content" id="card-content-front">
+            <div class="card-placeholder" id="card-placeholder">
+              <button type="button" class="upload-btn">Choose file</button>
+              <p class="upload-hint upload-hint-desktop">or drag and drop here</p>
+              <p class="upload-hint upload-hint-mobile">Tap to upload artwork</p>
+            </div>
+            <img id="card-art" class="card-art card-art-image" style="display:none" src="" alt="Your artwork">
+            <svg class="card-overlay-guides" viewBox="0 0 70 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <mask id="bleed-mask-front" maskUnits="userSpaceOnUse">
+                  <rect width="70" height="70" fill="white"/>
+                  <rect x="2.5" y="2.5" width="65" height="65" rx="6" ry="6" fill="black"/>
+                </mask>
+              </defs>
+              <rect class="card-overlay-bleed" width="70" height="70" mask="url(#bleed-mask-front)"/>
+              <rect class="card-overlay-trim" x="2.5" y="2.5" width="65" height="65" rx="6" ry="6"/>
+              <rect class="card-overlay-safe" x="4" y="4" width="62" height="62" rx="4.5" ry="4.5"/>
+            </svg>
+          </div>
+
+          <!-- Back view: standard back image sits in a trim-sized frame on a
+               white canvas. Once a custom back is uploaded, the .has-custom-back
+               class swaps in a full-bleed image plus the same bleed/trim/safe
+               overlay used on the front. -->
+          <div class="card-content" id="card-content-back" style="display:none">
+            <div class="back-image-frame">
+              <img id="back-image" class="card-art card-art-image" src="templates/Goodz_Standard_back.png" alt="Standard Goodz back">
+            </div>
+            <div class="back-placeholder" id="back-placeholder">
+              <button type="button" class="upload-btn" onclick="addCustomBack()">Choose file</button>
+              <p class="upload-hint upload-hint-desktop">or drag and drop here</p>
+              <p class="upload-hint upload-hint-mobile">Tap to upload back artwork</p>
+            </div>
+            <img id="back-art" class="card-art card-art-image back-custom-art" src="" alt="Your back artwork">
+            <svg class="card-overlay-guides back-overlay" viewBox="0 0 70 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <mask id="bleed-mask-back" maskUnits="userSpaceOnUse">
+                  <rect width="70" height="70" fill="white"/>
+                  <rect x="2.5" y="2.5" width="65" height="65" rx="6" ry="6" fill="black"/>
+                </mask>
+              </defs>
+              <rect class="card-overlay-bleed" width="70" height="70" mask="url(#bleed-mask-back)"/>
+              <rect class="card-overlay-trim" x="2.5" y="2.5" width="65" height="65" rx="6" ry="6"/>
+              <rect class="card-overlay-safe" x="4" y="4" width="62" height="62" rx="4.5" ry="4.5"/>
+            </svg>
+          </div>
+
+          <img id="zone-guide" class="zone-guide" src="templates/Goodz_Standard_back.png" style="display:none" alt="">
+          <div class="keychain-dot" id="keychain-dot"></div>
+        </div>
+      </div>
+
+      <div class="thumbs">
+        <button type="button" class="thumb thumb-active" id="thumb-front" onclick="setView('front')" aria-label="View front">
+          <div class="thumb-empty-bg" id="thumb-front-empty"></div>
+          <img id="thumb-front-img" src="" alt="" style="display:none">
+          <span class="thumb-label">Front</span>
+        </button>
+        <button type="button" class="thumb" id="thumb-back" onclick="setView('back')" aria-label="View back">
+          <img id="thumb-back-img" src="templates/Goodz_Standard_back.png" alt="">
+          <span class="thumb-label">Back</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card-meta">
+      <div class="file-name" id="front-filename"></div>
+      <div class="file-name" id="back-filename" style="display:none"></div>
+      <div class="file-name back-default-caption" id="back-default-caption" style="display:none">Standard back &bull; <span class="back-default-included">included</span></div>
+      <div class="size-warning" id="front-size-warn">
+        &#9888; Image may be too small for 300 DPI print quality. We recommend at least 827&times;827px (<span data-mm-value data-mm="70">2.76"</span>).
+      </div>
+      <div class="size-warning" id="back-size-warn">
+        &#9888; Back image may be too small for 300 DPI print quality. We recommend at least 827&times;827px.
+      </div>
+    </div>
+
+    <div class="card-actions" id="card-actions">
+      <button type="button" class="card-action" id="action-front-replace" style="display:none" onclick="document.getElementById('input-front').click()">Replace</button>
+      <button type="button" class="card-action" id="action-front-remove" style="display:none" onclick="clearFront(event)">Remove</button>
+      <button type="button" class="card-action" id="action-add-custom-back" style="display:none" onclick="addCustomBack()">Replace with custom design <span class="card-action-meta">($0.10/unit)</span></button>
+      <button type="button" class="card-action" id="action-back-replace" style="display:none" onclick="addCustomBack()">Replace</button>
+      <button type="button" class="card-action" id="action-use-standard" style="display:none" onclick="useStandardBack()">Use standard back</button>
+    </div>
+
+    <div class="overlay-legend" aria-label="Print spec key">
+      <div class="overlay-legend-toggle">
+        <div class="unit-toggle-group" id="unit-toggle">
+          <button type="button" class="unit-toggle-btn active" data-unit="in">in</button>
+          <button type="button" class="unit-toggle-btn" data-unit="mm">mm</button>
+        </div>
+      </div>
+
+      <div class="overlay-legend-item">
+        <span class="overlay-legend-mark overlay-legend-bleed"></span>
+        <div class="overlay-legend-text">
+          <div class="overlay-legend-title-row">
+            <span class="overlay-legend-title">Canvas (with bleed)</span>
+            <span class="overlay-legend-dim"><span data-mm-value data-mm="70">2.76"</span> &times; <span data-mm-value data-mm="70">2.76"</span></span>
+          </div>
+          <div class="overlay-legend-desc">Full artwork file. The outer <span data-mm-value data-mm="2.5">0.10"</span> is bleed and gets cut off when the tile is trimmed.</div>
+        </div>
+      </div>
+
+      <div class="overlay-legend-item">
+        <svg class="overlay-legend-mark" width="26" height="6" viewBox="0 0 26 6" aria-hidden="true">
+          <line x1="0" y1="3" x2="26" y2="3" stroke="rgba(0,0,0,0.82)" stroke-width="1.5"/>
+        </svg>
+        <div class="overlay-legend-text">
+          <div class="overlay-legend-title-row">
+            <span class="overlay-legend-title">Trim</span>
+            <span class="overlay-legend-dim"><span data-mm-value data-mm="65">2.56"</span> &times; <span data-mm-value data-mm="65">2.56"</span>, <span data-mm-value data-mm="6">0.24"</span> corners</span>
+          </div>
+          <div class="overlay-legend-desc">Cut edge of the goodz.</div>
+        </div>
+      </div>
+
+      <div class="overlay-legend-item">
+        <svg class="overlay-legend-mark" width="26" height="6" viewBox="0 0 26 6" aria-hidden="true">
+          <line x1="0" y1="3" x2="26" y2="3" stroke="rgba(0,0,0,0.65)" stroke-width="1.2" stroke-dasharray="3,2"/>
+        </svg>
+        <div class="overlay-legend-text">
+          <div class="overlay-legend-title-row">
+            <span class="overlay-legend-title">Safe-area line</span>
+            <span class="overlay-legend-dim"><span data-mm-value data-mm="1.5">0.06"</span> inside trim</span>
+          </div>
+          <div class="overlay-legend-desc">Keep important elements inside this line.</div>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" id="input-front" class="file-input" accept=".png,.jpg,.jpeg,.tiff,.tif,.pdf">
+    <input type="file" id="input-back"  class="file-input" accept=".png,.jpg,.jpeg,.tiff,.tif,.pdf">
+
+    <!-- Sleeve preview (hidden unless sleeve selected) -->
+    <div id="sleeve-wrap" class="sleeve-wrap" style="display:none">
+      <div class="sleeve-box">
+        <div class="sleeve-card-peek">
+          <div style="width:146px;height:146px;background:#fff;border-radius:10px 10px 0 0;overflow:hidden;position:relative;border:1px solid var(--border)">
+            <img id="sleeve-art" style="display:none;width:100%;height:100%;object-fit:cover;clip-path:inset(0 0 82% 0)" src="" alt="">
+          </div>
+        </div>
+        <div class="sleeve-label">Goodz</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goToStep(0)">&larr; Back to Music</button>
+      <button class="btn btn-primary" id="btn-step1" onclick="goToStep(2)" disabled>Next: Review &rarr;</button>
+    </div>
+
+    <!-- Print specs reference -->
+    <section class="artwork-specs" aria-label="Print specs">
+      <div class="artwork-specs-heading">Artwork specs</div>
+      <div class="specs-list">
+        <div class="specs-list-item"><strong>300 DPI</strong> minimum resolution</div>
+        <div class="specs-list-item"><strong>20 MB</strong> max file size</div>
+        <div class="specs-list-item"><strong>PNG, JPEG, TIFF, PDF</strong> file format</div>
+        <div class="specs-list-item"><strong><span data-mm-value data-mm="70">2.76"</span> &times; <span data-mm-value data-mm="70">2.76"</span> canvas</strong> with <strong><span data-mm-value data-mm="2.5">0.10"</span> bleed</strong> on all sides. Keep important elements <strong><span data-mm-value data-mm="1.5">0.06"</span> inside</strong> the trim edge.</div>
+      </div>
+      <div class="specs-templates">
+        <a href="templates/Goodz_Template_Front.ai" class="specs-template-tile" download title="Download Illustrator template">
+          <span class="specs-template-ext ai">ai</span>
+          <span class="specs-template-label">Illustrator</span>
+        </a>
+        <a href="templates/GoodzArtTemplate.pdf" class="specs-template-tile" download title="Download PDF template">
+          <span class="specs-template-ext pdf">pdf</span>
+          <span class="specs-template-label">PDF</span>
+        </a>
+      </div>
+    </section>
+  </div>
+
+    <!-- STEP 2: Review -->
+    <div class="step" id="step-2">
+      <h2>Review Your Order</h2>
+      <p class="step-sub">Double-check everything before heading to checkout.</p>
+
+      <div class="review-art-preview" id="review-art-preview" style="display:none">
+        <div class="review-art-cards">
+          <figure class="review-art-card">
+            <img id="review-front-img" src="" alt="Your front artwork">
+            <figcaption>Front</figcaption>
+          </figure>
+          <figure class="review-art-card">
+            <img id="review-back-img" src="" alt="Your back artwork">
+            <figcaption>Back</figcaption>
+          </figure>
+        </div>
+        <button type="button" class="review-art-edit" onclick="goToStep(1)">Edit artwork &rarr;</button>
+      </div>
+
+      <div class="summary-rows" id="summary-rows"></div>
+      <div id="summary-warning" class="summary-warning" style="display:none"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goToStep(1)">&larr; Back to Artwork</button>
+        <button class="btn btn-primary" id="btn-order" onclick="placeOrder()" disabled>Proceed to Checkout &rarr;</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="step" id="step-success">
+      <div class="order-success">
+        <div class="order-success-icon">&#127881;</div>
+        <h2>Order Placed.</h2>
+        <p>We'll send a digital proof in 1-2 days for your sign-off. Most artists have their Goodz in hand within approximately 4 weeks. We'll email you at every step.</p>
+        <div class="order-success-detail" id="success-detail"></div>
+        <button class="btn btn-primary" onclick="window.location.href='order.html'">Start a New Order</button>
+      </div>
+    </div>
+
+</main><!-- /layout -->
+
+<script>
+const API_BASE        = '';
+const CLOUDINARY_CLOUD  = 'dg6kjrhid';
+const CLOUDINARY_PRESET = 'goodz_uploads';
+const CUSTOM_BACK_UPCHARGE = 0.10; // per unit, when upgrading from standard back here
+
+// ---- Load config from sessionStorage ----
+let orderConfig = null;
+try {
+  const raw = sessionStorage.getItem('goodzOrderConfig');
+  if (raw) orderConfig = JSON.parse(raw);
+} catch(e) {}
+
+if (orderConfig) {
+  // Show sleeve preview
+  if (orderConfig.sleeve) document.getElementById('sleeve-wrap').style.display = 'flex';
+  // Show keychain dot
+  const dot = document.getElementById('keychain-dot');
+  if (orderConfig.keychainHole === 'top-left')  { dot.className = 'keychain-dot top-left'; }
+  if (orderConfig.keychainHole === 'top-right') { dot.className = 'keychain-dot top-right'; }
+}
+
+// ---- App state ----
+let state = {
+  frontArt:      null,   // Cloudinary URL or data URL
+  frontArtName:  '',
+  backArt:       null,
+  backArtName:   '',
+  frontTooSmall: false,
+  backTooSmall:  false,
+  uploadingFront: false,
+  uploadingBack:  false,
+  csvUrls:       [],
+  csvDuplicates: 0,
+  csvCloudUrl:   null,
+  uploadingCSV:  false,
+  altURL:        '',
+  musicMode:     'csv',
+  currentStep:   0,
+  viewMode:      'front',                                              // 'front' | 'back'
+  customBackChosen: !!(orderConfig && orderConfig.backDesign === 'custom'),
+};
+
+// ---- Persistence: artwork-upload state survives navigation back to
+// Customize so the user resumes with their work intact.
+function saveArtworkState() {
+  try {
+    sessionStorage.setItem('goodzArtworkState', JSON.stringify({
+      altURL: state.altURL,
+      musicMode: state.musicMode,
+      // Only persist already-uploaded URLs, never data URLs (too big).
+      frontArt: (state.frontArt && /^https?:/.test(state.frontArt)) ? state.frontArt : null,
+      frontArtName: state.frontArtName || '',
+      backArt:  (state.backArt  && /^https?:/.test(state.backArt))  ? state.backArt  : null,
+      backArtName: state.backArtName || '',
+      csvUrls: state.csvUrls,
+      csvCloudUrl: state.csvCloudUrl,
+      csvDuplicates: state.csvDuplicates,
+      customBackChosen: state.customBackChosen,
+    }));
+  } catch (e) {}
+}
+(function loadArtworkState() {
+  try {
+    const raw = sessionStorage.getItem('goodzArtworkState');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (typeof s.altURL === 'string')     state.altURL = s.altURL;
+    if (typeof s.musicMode === 'string')  state.musicMode = s.musicMode;
+    if (typeof s.frontArt === 'string')   state.frontArt = s.frontArt;
+    if (typeof s.frontArtName === 'string') state.frontArtName = s.frontArtName;
+    if (typeof s.backArt === 'string')    state.backArt  = s.backArt;
+    if (typeof s.backArtName === 'string') state.backArtName = s.backArtName;
+    if (Array.isArray(s.csvUrls))         state.csvUrls = s.csvUrls;
+    if (typeof s.csvCloudUrl === 'string') state.csvCloudUrl = s.csvCloudUrl;
+    if (typeof s.csvDuplicates === 'number') state.csvDuplicates = s.csvDuplicates;
+    if (typeof s.customBackChosen === 'boolean' && s.customBackChosen) state.customBackChosen = true;
+  } catch (e) {}
+})();
+
+// ---- Furthest reached step (global numbering): 0=Customize, 1=Music, 2=Artwork, 3=Review
+function getFurthestStep() {
+  return parseInt(sessionStorage.getItem('goodzFurthestStep') || '0', 10);
+}
+function bumpFurthestStep(global) {
+  if (global > getFurthestStep()) sessionStorage.setItem('goodzFurthestStep', String(global));
+}
+function furthestInternal() {
+  return Math.max(0, getFurthestStep() - 1);
+}
+
+// ---- Cloudinary upload ----
+function uploadToCloudinary(blob, filename, resourceType) {
+  const fd = new FormData();
+  fd.append('file', blob, filename);
+  fd.append('upload_preset', CLOUDINARY_PRESET);
+  fd.append('folder', 'goodz');
+  return fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`, {
+    method: 'POST', body: fd,
+  }).then(r => r.json()).then(d => {
+    if (d.error) throw new Error(d.error.message);
+    return d.secure_url;
+  });
+}
+
+// ---- Image size warning (scoped to the currently visible side) ----
+function checkImageSize(dataUrl, side) {
+  const img = new Image();
+  img.onload = () => {
+    const tooSmall = img.naturalWidth < 800 || img.naturalHeight < 800;
+    if (side === 'front') state.frontTooSmall = tooSmall;
+    else                   state.backTooSmall  = tooSmall;
+    renderSizeWarnings();
+  };
+  img.src = dataUrl;
+}
+
+function renderSizeWarnings() {
+  const isFront = state.viewMode === 'front';
+  document.getElementById('front-size-warn').style.display = (isFront && state.frontTooSmall) ? 'block' : 'none';
+  document.getElementById('back-size-warn').style.display  = (!isFront && state.backTooSmall)  ? 'block' : 'none';
+}
+
+// ---- Sub-step cue + back placeholder for the artwork step ----
+function renderArtworkSubsteps() {
+  // Empty back placeholder ("tap to upload") shows only when a custom back
+  // is required but hasn't been uploaded yet.
+  const required = !!state.customBackChosen;
+  document.getElementById('card-content-back').classList.toggle(
+    'needs-custom-back',
+    required && !state.backArt
+  );
+  // Gate the back thumbnail until front art is uploaded — front is the
+  // required first step; back (standard or custom) is meaningless without it.
+  const backThumb = document.getElementById('thumb-back');
+  if (backThumb) {
+    if (state.frontArt) backThumb.removeAttribute('disabled');
+    else backThumb.setAttribute('disabled', 'disabled');
+  }
+}
+
+// ---- Front art ----
+const ARTWORK_EXTS = ['.png', '.jpg', '.jpeg', '.tiff', '.tif', '.pdf'];
+function isArtworkFile(name) {
+  const lower = name.toLowerCase();
+  return ARTWORK_EXTS.some(ext => lower.endsWith(ext));
+}
+
+function handleFrontFile(file) {
+  if (!isArtworkFile(file.name)) {
+    alert('Please upload a PNG, JPEG, TIFF, or PDF file.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    state.frontArt = dataUrl;
+    state.frontArtName = file.name;
+    showFrontPreview(dataUrl, file.name);
+    checkImageSize(dataUrl, 'front');
+    renderArtworkSubsteps();
+    updateStepButtons();
+    updateStatusBadges();
+
+    // Upload to Cloudinary (non-blocking)
+    state.uploadingFront = true;
+    updateStepButtons();
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      canvas.toBlob(blob => {
+        if (!blob) { state.uploadingFront = false; return; }
+        uploadToCloudinary(blob, `front_${Date.now()}.png`, 'image')
+          .then(url => { state.frontArt = url; saveArtworkState(); })
+          .catch(() => {})
+          .finally(() => { state.uploadingFront = false; updateStepButtons(); });
+      }, 'image/png');
+    };
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateCardState() {
+  const hasContent = state.viewMode === 'back' || !!state.frontArt;
+  document.getElementById('card').classList.toggle('has-art', hasContent);
+}
+
+function renderCardActions() {
+  const isFront = state.viewMode === 'front';
+  const isMandatory = !!(orderConfig && orderConfig.backDesign === 'custom');
+  const set = (id, on) => { const el = document.getElementById(id); if (el) el.style.display = on ? 'inline-block' : 'none'; };
+  set('action-front-replace',   isFront && !!state.frontArt);
+  set('action-front-remove',    isFront && !!state.frontArt);
+  // When custom back is mandatory + missing, the empty back placeholder handles
+  // the upload prompt, so suppress the redundant action button.
+  set('action-add-custom-back', !isFront && !state.backArt && !state.customBackChosen);
+  set('action-back-replace',    !isFront && !!state.backArt);
+  set('action-use-standard',    !isFront && !!state.backArt && !isMandatory);
+  // Meta line: front filename, back filename, or "Standard back • included"
+  // — only one is visible at a time, matched to view + state.
+  const front = document.getElementById('front-filename');
+  const backName = document.getElementById('back-filename');
+  const backDefault = document.getElementById('back-default-caption');
+  if (front)       front.style.display       = isFront ? 'block' : 'none';
+  if (backName)    backName.style.display    = (!isFront && !!state.backArt) ? 'block' : 'none';
+  if (backDefault) backDefault.style.display = (!isFront && !state.backArt && !state.customBackChosen) ? 'block' : 'none';
+}
+
+// ---- Pricing helpers (dynamic custom-back upcharge) ----
+function isUpgradedToCustomBack() {
+  return state.customBackChosen && (!orderConfig || orderConfig.backDesign !== 'custom');
+}
+
+function effectiveUnitPrice() {
+  const cfg = orderConfig || {};
+  let unit = cfg.unitPrice || 0;
+  if (isUpgradedToCustomBack()) unit += CUSTOM_BACK_UPCHARGE;
+  return unit;
+}
+
+function effectiveTotal() {
+  const cfg = orderConfig || {};
+  return effectiveUnitPrice() * (cfg.quantity || 0);
+}
+
+function fmtMoney(n) {
+  return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// Renders the slim live order strip below the page header. The strip
+// replaces the old standalone upcharge notice — pricing is now visible
+// at all times and live-updates when the user upgrades to a custom back.
+function renderOrderStrip() {
+  const cfg = orderConfig || {};
+  const stripEl = document.getElementById('order-strip');
+  if (!cfg.quantity || !cfg.unitPrice) {
+    if (stripEl) stripEl.style.display = 'none';
+    return;
+  }
+  if (stripEl) stripEl.style.display = '';
+  const unit = effectiveUnitPrice();
+  const total = effectiveTotal();
+  document.getElementById('strip-qty').textContent =
+    `${cfg.quantity.toLocaleString()}${cfg.tierMax ? '' : '+'} units`;
+  document.getElementById('strip-unit').textContent = `${fmtMoney(unit)}/unit`;
+  // CSS adds the "Total: " prefix (both desktop and mobile). The
+  // .has-amount class gates it so the 3,000+ "Contact us" tier isn't
+  // prefixed.
+  const totalEl = document.getElementById('strip-total');
+  if (total != null) {
+    totalEl.classList.add('has-amount');
+    totalEl.textContent = fmtMoney(total);
+  } else {
+    totalEl.classList.remove('has-amount');
+    totalEl.textContent = 'Contact us';
+  }
+  const usingCustomBack = !!state.customBackChosen;
+  const includesEl = document.getElementById('strip-includes');
+  includesEl.style.display = usingCustomBack ? '' : 'none';
+  includesEl.textContent = 'includes custom back';
+
+  const dl = document.getElementById('order-strip-details');
+  const musicLabel = cfg.musicLabel || 'Other';
+  const keyLabel = (cfg.keychainHole === 'top-left' || cfg.keychainHole === 'top-right')
+    ? `${cfg.keychainHole === 'top-left' ? 'Top left' : 'Top right'} (${fmtMoney(0.15)}/unit)`
+    : 'None';
+  const backLabel = usingCustomBack
+    ? `Custom (${fmtMoney(CUSTOM_BACK_UPCHARGE)}/unit)`
+    : 'Standard';
+  const rows = [
+    ['Music source', musicLabel],
+    ['Back design',  backLabel],
+    ['Keychain hole', keyLabel],
+  ];
+  dl.innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+}
+
+function toggleOrderStripDetails() {
+  const dl = document.getElementById('order-strip-details');
+  const btn = document.getElementById('order-strip-toggle');
+  const open = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+  dl.hidden = open;
+}
+
+function showFrontPreview(src, name) {
+  document.getElementById('card-art').src = src;
+  document.getElementById('card-art').style.display = 'block';
+  document.getElementById('card-placeholder').style.display = 'none';
+  document.getElementById('zone-guide').style.display = 'none';
+  document.getElementById('front-filename').textContent = name || '';
+  const tImg = document.getElementById('thumb-front-img');
+  tImg.src = src;
+  tImg.style.display = 'block';
+  document.getElementById('thumb-front-empty').style.display = 'none';
+  if (orderConfig && orderConfig.sleeve) {
+    const sa = document.getElementById('sleeve-art');
+    sa.src = src; sa.style.display = 'block';
+  }
+  updateCardState();
+  renderCardActions();
+}
+
+function clearFront(e) {
+  if (e) e.stopPropagation();
+  state.frontArt = null;
+  state.frontArtName = '';
+  state.frontTooSmall = false;
+  saveArtworkState();
+  document.getElementById('card-art').style.display = 'none';
+  document.getElementById('card-art').src = '';
+  document.getElementById('card-placeholder').style.display = 'flex';
+  document.getElementById('front-filename').textContent = '';
+  renderSizeWarnings();
+  const tImg = document.getElementById('thumb-front-img');
+  tImg.style.display = 'none';
+  tImg.src = '';
+  document.getElementById('thumb-front-empty').style.display = 'flex';
+  const sa = document.getElementById('sleeve-art');
+  if (sa) { sa.style.display = 'none'; sa.src = ''; }
+  document.getElementById('input-front').value = '';
+  updateCardState();
+  renderCardActions();
+  renderArtworkSubsteps();
+  updateStepButtons();
+  updateStatusBadges();
+}
+
+// ---- Back art ----
+function handleBackFile(file) {
+  if (!isArtworkFile(file.name)) {
+    alert('Please upload a PNG, JPEG, TIFF, or PDF file.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    state.backArt = dataUrl;
+    state.backArtName = file.name;
+    showBackPreview(dataUrl, file.name);
+    checkImageSize(dataUrl, 'back');
+    renderArtworkSubsteps();
+    updateStepButtons();
+    updateStatusBadges();
+
+    state.uploadingBack = true;
+    updateStepButtons();
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      canvas.toBlob(blob => {
+        if (!blob) { state.uploadingBack = false; return; }
+        uploadToCloudinary(blob, `back_${Date.now()}.png`, 'image')
+          .then(url => { state.backArt = url; saveArtworkState(); })
+          .catch(() => {})
+          .finally(() => { state.uploadingBack = false; updateStepButtons(); });
+      }, 'image/png');
+    };
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showBackPreview(src, name) {
+  document.getElementById('back-art').src = src;
+  document.getElementById('card-content-back').classList.add('has-custom-back');
+  document.getElementById('thumb-back-img').src = src;
+  document.getElementById('back-filename').textContent = name || '';
+  state.customBackChosen = true;
+  renderOrderStrip();
+  renderCardActions();
+}
+
+function clearBack(e) {
+  if (e) e.stopPropagation();
+  state.backArt = null;
+  state.backArtName = '';
+  state.backTooSmall = false;
+  state.customBackChosen = !!(orderConfig && orderConfig.backDesign === 'custom');
+  saveArtworkState();
+  document.getElementById('back-art').src = '';
+  document.getElementById('card-content-back').classList.remove('has-custom-back');
+  document.getElementById('thumb-back-img').src = 'templates/Goodz_Standard_back.png';
+  document.getElementById('back-filename').textContent = '';
+  renderSizeWarnings();
+  document.getElementById('input-back').value = '';
+  renderOrderStrip();
+  renderCardActions();
+  renderArtworkSubsteps();
+  updateStepButtons();
+  updateStatusBadges();
+}
+
+// ---- Front/back view toggle and custom back logic ----
+function setView(mode) {
+  state.viewMode = mode;
+  document.getElementById('thumb-front').classList.toggle('thumb-active', mode === 'front');
+  document.getElementById('thumb-back').classList.toggle('thumb-active', mode === 'back');
+  document.getElementById('card-content-front').style.display = mode === 'front' ? '' : 'none';
+  document.getElementById('card-content-back').style.display  = mode === 'back'  ? '' : 'none';
+  updateKeychainDot();
+  updateCardState();
+  renderCardActions();
+  renderSizeWarnings();
+  renderArtworkSubsteps();
+}
+
+// Mirror the keychain dot horizontally when viewing the back: a hole on the
+// front-left corner is on the back-right corner, and vice versa.
+function updateKeychainDot() {
+  const dot = document.getElementById('keychain-dot');
+  if (!dot) return;
+  const configured = orderConfig && orderConfig.keychainHole;
+  if (configured !== 'top-left' && configured !== 'top-right') {
+    dot.className = 'keychain-dot';
+    return;
+  }
+  const side = state.viewMode === 'back'
+    ? (configured === 'top-left' ? 'top-right' : 'top-left')
+    : configured;
+  dot.className = 'keychain-dot ' + side;
+}
+
+function addCustomBack() {
+  document.getElementById('input-back').click();
+}
+
+function useStandardBack() {
+  clearBack();
+}
+
+// ---- Drag and drop ----
+function setupDrop(zoneId, handler) {
+  const el = document.getElementById(zoneId);
+  if (!el) return;
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+  el.addEventListener('drop', e => {
+    e.preventDefault(); el.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) handler(e.dataTransfer.files[0]);
+  });
+}
+
+function setupFileInput(inputId, handler) {
+  const el = document.getElementById(inputId);
+  if (el) el.addEventListener('change', e => { if (e.target.files[0]) handler(e.target.files[0]); });
+}
+
+// ---- CSV ----
+function handleCSVFile(file) {
+  if (!file.name.endsWith('.csv')) {
+    showCSVError('Please upload a .csv file from Bandcamp.');
+    trackEvent('csv_upload_result', { result: 'bad_extension', filename: file.name });
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const { urls, duplicates } = parseCSVUrls(e.target.result);
+    if (!urls.length) {
+      showCSVError('No URLs found. Make sure the CSV has http/https links.');
+      trackEvent('csv_upload_result', { result: 'no_urls', received: 0 });
+      return;
+    }
+    hideCSVError();
+    state.csvUrls = urls;
+    state.csvDuplicates = duplicates;
+    saveArtworkState();
+    showCSVFilled(urls);
+    updateStepButtons();
+    updateStatusBadges();
+    updateCSVWarning();
+
+    const expected = orderConfig ? orderConfig.quantity : 0;
+    const received = urls.length;
+    const result = !expected ? 'no_qty'
+                 : received === expected ? 'match'
+                 : received < expected ? 'short'
+                 : 'over';
+    trackEvent('csv_upload_result', { result, expected, received, duplicates });
+
+    // Upload CSV to Cloudinary
+    state.uploadingCSV = true;
+    updateStepButtons();
+    const blob = new Blob([e.target.result], { type: 'text/csv' });
+    uploadToCloudinary(blob, file.name, 'raw')
+      .then(url => { state.csvCloudUrl = url; saveArtworkState(); })
+      .catch(() => {})
+      .finally(() => { state.uploadingCSV = false; updateStepButtons(); });
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVUrls(text) {
+  // No uniqueness check — keep every URL (duplicates included). We don't
+  // dedupe or validate codes here; that's reconciled after checkout.
+  const urls = [];
+  for (const line of text.trim().split('\n')) {
+    for (const cell of line.split(',')) {
+      const t = cell.trim().replace(/^["']|["']$/g, '');
+      if (t.startsWith('http://') || t.startsWith('https://')) {
+        urls.push(t);
+      }
+    }
+  }
+  return { urls, duplicates: 0 };
+}
+
+function showCSVFilled(urls) {
+  document.getElementById('csv-upload-zone').style.display = 'none';
+  document.getElementById('csv-filled-area').style.display = 'block';
+  document.getElementById('csv-filled-count').textContent = `${urls.length} codes loaded`;
+  document.getElementById('csv-success-detail').style.display = 'block';
+  document.getElementById('csv-success-title').textContent = `${urls.length} Bandcamp URLs`;
+  document.getElementById('csv-url-list').innerHTML =
+    urls.slice(0,5).map(u => `<li>${u}</li>`).join('') +
+    (urls.length > 5 ? `<li style="color:#999">...and ${urls.length-5} more</li>` : '');
+}
+
+function resetCSV() {
+  state.csvUrls = []; state.csvCloudUrl = null; state.csvDuplicates = 0;
+  saveArtworkState();
+  document.getElementById('csv-upload-zone').style.display = 'block';
+  document.getElementById('csv-filled-area').style.display = 'none';
+  document.getElementById('csv-success-detail').style.display = 'none';
+  const warnEl = document.getElementById('csv-warning');
+  warnEl.classList.remove('is-match', 'is-short', 'is-over');
+  warnEl.style.display = 'none';
+  document.getElementById('input-csv').value = '';
+  updateStepButtons(); updateStatusBadges();
+}
+
+function showCSVError(msg) {
+  const el = document.getElementById('csv-error');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('csv-zone').classList.add('has-error');
+}
+function hideCSVError() {
+  document.getElementById('csv-error').style.display = 'none';
+  document.getElementById('csv-zone').classList.remove('has-error');
+}
+
+function updateCSVWarning() {
+  const warnEl = document.getElementById('csv-warning');
+  if (!warnEl) return;
+  warnEl.classList.remove('is-match', 'is-short', 'is-over');
+  const count = state.csvUrls.length;
+  if (count === 0) { warnEl.style.display = 'none'; return; }
+  // Neutral confirmation only — no count-match requirement. Codes are
+  // reconciled with the customer after checkout if anything's missing.
+  warnEl.innerHTML = `&#10003; <strong>${count}</strong> code${count === 1 ? '' : 's'} loaded. We'll follow up after checkout if we need anything else.`;
+  warnEl.classList.add('is-match');
+  warnEl.style.display = 'block';
+}
+
+// ---- URL mode ----
+function handleURLInput() {
+  const val = document.getElementById('url-input').value.trim();
+  state.altURL = val;
+  const ok = val.startsWith('http://') || val.startsWith('https://');
+  document.getElementById('url-success').style.display = ok ? 'block' : 'none';
+  saveArtworkState();
+  updateStepButtons();
+  updateStatusBadges();
+}
+
+function setMode(mode) {
+  state.musicMode = mode;
+  document.getElementById('csv-area').style.display = mode === 'csv' ? 'block' : 'none';
+  document.getElementById('url-area').style.display = mode === 'url' ? 'block' : 'none';
+  saveArtworkState();
+  updateStepButtons();
+}
+
+// Music source is now picked upstream on order.html as one of:
+//   'bandcamp_codes' → CSV upload mode
+//   'streaming'      → single URL (placeholder hints at a streaming link)
+//   'url'            → single URL (placeholder is generic)
+function applyMusicSource(source) {
+  state.musicSource = source;
+  const urlInput = document.getElementById('url-input');
+  if (urlInput) {
+    urlInput.placeholder = source === 'streaming'
+      ? 'https://open.spotify.com/album/...  •  any streaming link'
+      : 'https://...';
+  }
+  setMode(source === 'bandcamp_codes' ? 'csv' : 'url');
+}
+
+// ---- Step navigation ----
+// Map internal step index to URL slug + analytics label
+const STEP_NAMES = ['music', 'artwork', 'review'];
+
+// Tiny GA event helper. No-ops cleanly until gtag is wired up on the page.
+function trackEvent(name, params) {
+  if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
+}
+
+function goToStep(n) {
+  state.currentStep = n;
+  bumpFurthestStep(n + 1); // global step: 1=Music, 2=Artwork, 3=Review
+  document.querySelectorAll('.step').forEach((el, i) => el.classList.toggle('active', i === n));
+  // Stepper cells: mark active for current, done for any previously-reached
+  // step that isn't current. Lets users see what they've already done.
+  const fi = furthestInternal();
+  document.querySelectorAll('.step-cell[data-step]').forEach(el => {
+    const i = +el.dataset.step;
+    el.classList.toggle('active', i === n);
+    el.classList.toggle('done', i !== n && i <= fi);
+  });
+  if (n === 2) renderSummary();
+  updateBackLink();
+  const slug = STEP_NAMES[n];
+  if (slug) {
+    const newHash = '#' + slug;
+    if (location.hash !== newHash) history.replaceState(null, '', newHash);
+    trackEvent('step_view', { step: slug });
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Back link: from step 0 → previous page (Customize); from step >0 →
+// previous internal step. Label tracks the destination.
+const STEP_LABELS = ['Music', 'Artwork', 'Review'];
+function updateBackLink() {
+  const el = document.getElementById('back-link');
+  if (!el) return;
+  const prev = state.currentStep === 0 ? 'Customize' : STEP_LABELS[state.currentStep - 1];
+  el.innerHTML = '&larr; Back to ' + prev;
+}
+
+function goBackOneStep() {
+  if (state.currentStep === 0) window.location.href = 'order.html';
+  else goToStep(state.currentStep - 1);
+}
+
+function handleStepClick(n) {
+  // Allow jumping to any step the user has reached at least once — back or forward.
+  if (n <= furthestInternal()) goToStep(n);
+}
+
+// ---- Button state ----
+function needsBack() { return state.customBackChosen; }
+
+function hasMusic() {
+  if (state.musicMode === 'csv') {
+    // No-friction: any uploaded CSV lets them proceed. We don't require the
+    // code count to match units — codes are reconciled after checkout.
+    return state.csvUrls.length > 0;
+  }
+  return state.altURL.startsWith('http://') || state.altURL.startsWith('https://');
+}
+
+function updateStepButtons() {
+  const frontReady = !!state.frontArt && !state.uploadingFront;
+  const backReady = !needsBack() || (!!state.backArt && !state.uploadingBack);
+
+  document.getElementById('btn-step0').disabled = !hasMusic() || state.uploadingCSV;
+  document.getElementById('btn-step1').disabled = !(frontReady && backReady);
+
+  const orderReady = frontReady && backReady && hasMusic() && !state.uploadingCSV;
+  const orderBtn = document.getElementById('btn-order');
+  orderBtn.disabled = !orderReady;
+  if (state.uploadingCSV) orderBtn.textContent = 'Uploading CSV...';
+  else if (state.uploadingFront || state.uploadingBack) orderBtn.textContent = 'Uploading artwork...';
+  else orderBtn.textContent = 'Proceed to Checkout →';
+
+  updateCSVWarning();
+}
+
+// ---- Status badges (now derived from card state, not separate elements) ----
+function updateStatusBadges() { /* no-op: card itself shows status */ }
+
+// ---- Review summary ----
+function fmt(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+function renderSummary() {
+  const cfg = orderConfig || {};
+  const rows = [];
+
+  // Artwork thumbnails — front (uploaded) and back (custom upload or standard template)
+  const preview = document.getElementById('review-art-preview');
+  const frontImg = document.getElementById('review-front-img');
+  const backImg = document.getElementById('review-back-img');
+  if (preview && state.frontArt) {
+    if (frontImg) frontImg.src = state.frontArt;
+    if (backImg) backImg.src = state.backArt || 'templates/Goodz_Standard_back.png';
+    preview.style.display = 'flex';
+  } else if (preview) {
+    preview.style.display = 'none';
+  }
+
+  rows.push({ label: 'Front artwork',   value: state.frontArt ? 'Uploaded ✓' : 'Missing ✗', missing: !state.frontArt });
+  if (needsBack()) {
+    const backLabel = isUpgradedToCustomBack()
+      ? `Custom back (${fmtMoney(CUSTOM_BACK_UPCHARGE)}/unit)`
+      : 'Back artwork';
+    rows.push({ label: backLabel, value: state.backArt ? 'Uploaded ✓' : 'Missing ✗', missing: !state.backArt });
+  } else {
+    rows.push({ label: 'Back design', value: 'Standard Goodz Back' });
+  }
+  rows.push({ label: 'Keychain hole', value: cfg.keychainHole === 'none' || !cfg.keychainHole ? 'None' : `${cfg.keychainHole === 'top-left' ? 'Top Left' : 'Top Right'} ($0.15/unit)` });
+  rows.push({ label: 'Music',
+    value: state.musicMode === 'csv'
+      ? (state.csvUrls.length ? `${state.csvUrls.length} Bandcamp codes` : 'Missing ✗')
+      : (state.altURL || 'Missing ✗'),
+    missing: !hasMusic(),
+  });
+  rows.push({ label: 'Quantity',     value: cfg.quantity ? `${cfg.quantity.toLocaleString()} units` : '-' });
+  rows.push({ label: 'Price per unit', value: cfg.unitPrice ? fmt(effectiveUnitPrice()) : '-' });
+  if (cfg.quantity && cfg.unitPrice) {
+    rows.push({ label: 'Order Total', value: fmt(effectiveTotal()), total: true });
+  }
+
+  document.getElementById('summary-rows').innerHTML = rows.map(r => `
+    <div class="summary-row${r.total ? ' total-row' : ''}${r.missing ? ' missing' : ''}">
+      <span class="summary-row-label">${r.label}</span>
+      <span class="summary-row-value">${r.value}</span>
+    </div>`).join('');
+
+  const warnEl = document.getElementById('summary-warning');
+  const issues = [];
+  if (!state.frontArt) issues.push('front artwork');
+  if (needsBack() && !state.backArt) issues.push('back artwork');
+  // No code-count friction: a music link (CSV uploaded or URL entered) is
+  // all that's required; we reconcile Bandcamp codes after checkout.
+  if (!hasMusic()) issues.push('music link');
+  if (issues.length) {
+    warnEl.style.display = 'block';
+    warnEl.textContent = `Still needed: ${issues.join(', ')}.`;
+  } else {
+    warnEl.style.display = 'none';
+  }
+
+  updateStepButtons();
+}
+
+// ---- Place order ----
+function placeOrder() {
+  const btn = document.getElementById('btn-order');
+  btn.textContent = 'Preparing your order...';
+  btn.disabled = true;
+  const cfg = orderConfig || {};
+  trackEvent('proceed_to_checkout_clicked', {
+    quantity: cfg.quantity || 0,
+    music_type: state.musicMode,
+    custom_back: !!state.customBackChosen,
+  });
+
+  const payload = {
+    units:        cfg.quantity || 50,
+    sleeve:       cfg.sleeve ? 'yes' : 'no',
+    keychainHole: cfg.keychainHole || 'none',
+    backDesign:   state.customBackChosen ? 'custom' : 'standard',
+    albumArtUrl:  state.frontArt || '',
+    backArtUrl:   state.backArt  || '',
+    musicType:    state.musicMode,
+  };
+
+  if (state.musicMode === 'csv' && state.csvUrls.length) {
+    payload.csvUrl   = state.csvCloudUrl || state.csvUrls.join('\n');
+    payload.csvCount = state.csvUrls.length;
+  } else if (state.musicMode === 'url' && state.altURL) {
+    payload.musicUrl = state.altURL;
+  }
+
+  fetch(`${API_BASE}/api/custom-goodz-order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  .then(r => { if (!r.ok) throw new Error('Order failed'); return r.json(); })
+  .then(data => {
+    if (data.checkoutUrl) { window.location.href = data.checkoutUrl; }
+    else throw new Error('No checkout URL');
+  })
+  .catch(() => {
+    btn.textContent = 'Proceed to Checkout →';
+    btn.disabled = false;
+    const w = document.getElementById('summary-warning');
+    w.style.display = 'block';
+    w.textContent = 'Could not connect to checkout. Please try again or contact info@getthegoodz.com.';
+    trackEvent('checkout_error', { context: 'place_order' });
+  });
+}
+
+// ---- Unit toggle (segmented in / mm) ----
+function fmtIn(mm) {
+  const inches = mm / 25.4;
+  return inches.toFixed(2) + '"';
+}
+function fmtMm(mm) {
+  return (Math.round(mm * 10) / 10) + ' mm';
+}
+function applyUnits(unit) {
+  document.querySelectorAll('[data-mm-value]').forEach(el => {
+    const mm = parseFloat(el.dataset.mm);
+    el.textContent = unit === 'in' ? fmtIn(mm) : fmtMm(mm);
+  });
+}
+let currentUnit = 'in';
+document.querySelectorAll('.unit-toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentUnit = btn.dataset.unit;
+    document.querySelectorAll('.unit-toggle-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.unit === currentUnit)
+    );
+    applyUnits(currentUnit);
+  });
+});
+applyUnits(currentUnit);
+
+// ---- Init ----
+setupDrop('card', file => {
+  // Drag-drop feeds the visible side: front, or back when a custom back is
+  // needed but not yet uploaded.
+  if (state.viewMode === 'front') handleFrontFile(file);
+  else if (state.customBackChosen && !state.backArt) handleBackFile(file);
+});
+document.getElementById('card').addEventListener('click', (e) => {
+  // Don't hijack clicks on action buttons inside the card area
+  if (e.target.closest('button, a, label, input')) return;
+  if (state.viewMode === 'front') {
+    document.getElementById('input-front').click();
+  } else if (state.customBackChosen && !state.backArt) {
+    document.getElementById('input-back').click();
+  }
+});
+renderCardActions();
+setupFileInput('input-front', handleFrontFile);
+setupFileInput('input-back',  handleBackFile);
+
+// Apply the music source picked on order.html. Legacy values are normalized
+// so a stale sessionStorage from a previous visit still works.
+(function initMusicSource() {
+  const LEGACY = { bandcamp: 'bandcamp_codes', spotify: 'streaming', apple: 'streaming', amazon: 'streaming', youtube: 'streaming', other: 'url' };
+  const raw = (orderConfig && orderConfig.music) || 'bandcamp_codes';
+  const source = (raw === 'bandcamp_codes' || raw === 'streaming' || raw === 'url') ? raw : (LEGACY[raw] || 'bandcamp_codes');
+  applyMusicSource(source);
+})();
+
+// Show the qty target in the empty CSV drop zone
+(function initCsvTarget() {
+  const tgt = document.getElementById('csv-target');
+  if (!tgt) return;
+  const qty = orderConfig ? orderConfig.quantity : 0;
+  tgt.innerHTML = qty
+    ? `Need <strong>${qty}</strong> unique codes for <strong>${qty}</strong> units.`
+    : '';
+})();
+
+const csvZone = document.getElementById('csv-zone');
+if (csvZone) {
+  csvZone.addEventListener('dragover', e => { e.preventDefault(); csvZone.classList.add('drag-over'); });
+  csvZone.addEventListener('dragleave', () => csvZone.classList.remove('drag-over'));
+  csvZone.addEventListener('drop', e => { e.preventDefault(); csvZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleCSVFile(e.dataTransfer.files[0]); });
+}
+setupFileInput('input-csv', handleCSVFile);
+
+// Restore visible UI from persisted state (set up before any render calls).
+(function restoreArtworkUI() {
+  // URL input
+  const urlInput = document.getElementById('url-input');
+  if (urlInput && state.altURL) {
+    urlInput.value = state.altURL;
+    const ok = /^https?:\/\//.test(state.altURL);
+    document.getElementById('url-success').style.display = ok ? 'block' : 'none';
+  }
+  // Mode toggle (csv vs url)
+  if (state.musicMode) {
+    document.getElementById('csv-area').style.display = state.musicMode === 'csv' ? 'block' : 'none';
+    document.getElementById('url-area').style.display = state.musicMode === 'url' ? 'block' : 'none';
+  }
+  // CSV filled-state
+  if (state.csvUrls && state.csvUrls.length) {
+    showCSVFilled(state.csvUrls);
+  }
+  // Front artwork
+  if (state.frontArt) {
+    showFrontPreview(state.frontArt, state.frontArtName);
+  }
+  // Back artwork
+  if (state.backArt) {
+    showBackPreview(state.backArt, state.backArtName);
+  }
+})();
+
+updateCSVWarning();
+renderArtworkSubsteps();
+renderSizeWarnings();
+updateBackLink();
+updateStepButtons();
+updateStatusBadges();
+renderOrderStrip();
+
+// On load: explicit hash wins; otherwise resume on the furthest step the
+// user has reached so they don't have to step-through to get back.
+(function syncStepFromHash() {
+  const slug = (location.hash || '').replace(/^#/, '');
+  const idx = STEP_NAMES.indexOf(slug);
+  if (idx >= 0) {
+    goToStep(idx);
+  } else {
+    goToStep(furthestInternal());
+  }
+})();
+</script>
+</body>
+</html>
