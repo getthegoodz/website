@@ -860,7 +860,13 @@ footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem 2rem;
+  align-items: start;
+}
+.footer-col {
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .footer-links a { font-size: 0.78rem; color: #d0d0d0; transition: color 0.15s; }
