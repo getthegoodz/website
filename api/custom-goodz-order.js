@@ -1,34 +1,44 @@
-const domain = '56457c.myshopify.com';
-const storefrontToken = process.env.SHOPIFY_STOREFRONT_TOKEN || 'fa32d84d9672194e7338e4a1ca4b3ed1';
-const apiVersion = '2025-10';
+/**
+ * POST /api/custom-goodz-order
+ *
+ * Builds a Shopify cart for the Custom Goodz order flow and returns the
+ * checkout URL. Called from artwork-upload.html on "Proceed to Checkout".
+ *
+ * Pricing model: a single Custom Goodz variant priced at $3.44/unit. The
+ * Shopify "custom-goodz-pricing" Product Discount Function applies tier
+ * discounts based on cart line quantity (defined in
+ * ~/Projects/Goodz/custom-goodz/extensions/custom-goodz-pricing/src/run.ts).
+ * This file used to map quantity tiers to 7 different variant IDs; that
+ * pattern is gone.
+ *
+ * Required env vars:
+ *   SHOPIFY_STORE_DOMAIN              e.g. goodz-dev-store-1.myshopify.com
+ *   SHOPIFY_STOREFRONT_TOKEN          Storefront API access token for that store
+ *   SHOPIFY_CUSTOM_GOODZ_VARIANT_ID   Full GID of the single Custom Goodz variant
+ *
+ * Optional env vars:
+ *   SHOPIFY_API_VERSION   defaults to 2026-07
+ */
 
-// Variant map: quantity range -> variant ID
-const VARIANT_MAP = {
-  '50-99':    { variantId: 'gid://shopify/ProductVariant/51673297256744', price: 3.44 },
-  '100-199':  { variantId: 'gid://shopify/ProductVariant/51673309643048', price: 3.32 },
-  '200-499':  { variantId: 'gid://shopify/ProductVariant/51673310265640', price: 3.06 },
-  '500-999':  { variantId: 'gid://shopify/ProductVariant/51673311215912', price: 3.00 },
-  '1000-1999':{ variantId: 'gid://shopify/ProductVariant/51673311314216', price: 2.72 },
-  '2000-2999':{ variantId: 'gid://shopify/ProductVariant/51673311346984', price: 2.62 },
-  '3000+':    { variantId: 'gid://shopify/ProductVariant/51673311510824', price: 2.52 },
-};
-
-function getTier(units) {
-  if (units < 50)  return '50-99';
-  if (units < 100)  return '100-199';
-  if (units < 200)  return '200-499';
-  if (units < 500)  return '500-999';
-  if (units < 1000) return '1000-1999';
-  if (units < 2000) return '2000-2999';
-  return '3000+';
-}
+// .trim() guards against trailing newlines/whitespace in env var values
+// (e.g. when set via `echo "..." | vercel env add`).
+const STORE_DOMAIN = (process.env.SHOPIFY_STORE_DOMAIN || 'goodz-dev-store-1.myshopify.com').trim();
+const STOREFRONT_TOKEN = process.env.SHOPIFY_STOREFRONT_TOKEN?.trim();
+const VARIANT_ID = (
+  process.env.SHOPIFY_CUSTOM_GOODZ_VARIANT_ID ||
+  'gid://shopify/ProductVariant/45053177036897' // dev store default
+).trim();
+const API_VERSION = (process.env.SHOPIFY_API_VERSION || '2026-07').trim();
 
 async function shopifyGraphQL(query, variables = {}) {
-  const res = await fetch(`https://${domain}/api/${apiVersion}/graphql.json`, {
+  if (!STOREFRONT_TOKEN) {
+    throw new Error('SHOPIFY_STOREFRONT_TOKEN env var is not set');
+  }
+  const res = await fetch(`https://${STORE_DOMAIN}/api/${API_VERSION}/graphql.json`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': storefrontToken,
+      'X-Shopify-Storefront-Access-Token': STOREFRONT_TOKEN,
     },
     body: JSON.stringify({ query, variables }),
   });
@@ -38,8 +48,9 @@ async function shopifyGraphQL(query, variables = {}) {
 }
 
 module.exports = async (req, res) => {
-  // CORS headers for Vercel
-  res.setHeader('Access-Control-Allow-CORS', '*');
+  // CORS for the static frontend at getthegoodz.com / GitHub Pages preview.
+  // Tighten this if/when we lock down origins.
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -55,78 +66,71 @@ module.exports = async (req, res) => {
 
   try {
     const {
-      units,          // exact number of units (e.g. 76)
-      sleeve,         // 'yes' or 'no'
-      albumArtUrl,    // Cloudinary URL for uploaded album art
-      musicType,      // 'url' or 'csv'
-      musicUrl,       // if musicType === 'url': the URL
-      csvUrl,         // if musicType === 'csv': Cloudinary URL for uploaded CSV
-      csvCount,       // if musicType === 'csv': number of codes in the CSV
-      buyerEmail,     // optional, for cart email attribute
+      units,           // exact number of units (e.g. 137)
+      sleeve,          // 'yes' or 'no'
+      keychainHole,    // 'none' | 'top-left' | 'top-right'
+      backDesign,      // 'standard' | 'custom'
+      albumArtUrl,     // Cloudinary URL for front artwork
+      backArtUrl,      // Cloudinary URL for back artwork (if backDesign === 'custom')
+      musicType,       // 'url' or 'csv'
+      musicUrl,        // when musicType === 'url'
+      csvUrl,          // when musicType === 'csv'
+      csvCount,        // when musicType === 'csv': number of codes in the CSV
+      buyerEmail,      // optional, attaches to cart
     } = req.body || {};
 
-    if (!units || units < 1) {
+    const unitsInt = parseInt(units, 10);
+    if (!Number.isFinite(unitsInt) || unitsInt < 1) {
       res.status(400).json({ error: 'units is required and must be >= 1' });
       return;
     }
 
-    const tier = getTier(units);
-    const variant = VARIANT_MAP[tier];
+    // No CSV validation by design: we do NOT require a Bandcamp code CSV,
+    // nor that its count match the units ordered, nor that codes be unique.
+    // Removing this friction lets customers submit and pay immediately; we
+    // reconcile the actual codes with them after checkout. Whatever count
+    // was uploaded is still recorded on the order as _csv_code_count below.
 
-    // Build line item attributes
-    // sleeve: 'yes' | 'no' | 'card'
-    // 'card' = card only, no sleeve — same as 'no' for fulfillment, but tracked as 'card'
-    const isSleeve = sleeve === 'yes';
-    const isCardOnly = sleeve === 'card';
+    // Line attributes ride on the cart line and appear on the order line item
+    // in admin. Keys with a leading underscore are hidden from the customer
+    // during checkout (Shopify convention) and only visible to the merchant.
     const lineAttributes = [
-      { key: 'intended_units', value: String(units) },
-      { key: 'sleeve', value: isSleeve ? 'yes' : (isCardOnly ? 'card_only' : 'no') },
+      { key: 'sleeve', value: sleeve === 'yes' ? 'yes' : 'no' },
+      { key: 'keychainHole', value: keychainHole || 'none' },
+      { key: 'backDesign', value: backDesign || 'standard' },
+      { key: 'source', value: 'site-draft' },
     ];
     if (albumArtUrl) {
-      // Underscore prefix = admin-only, not shown to customer on checkout
-      const isDataUrl = albumArtUrl.startsWith('data:');
-      lineAttributes.push({ key: '_album_art_url', value: isDataUrl ? '[uploaded - see order]' : albumArtUrl });
+      lineAttributes.push({ key: '_album_art_url', value: albumArtUrl });
+    }
+    if (backArtUrl) {
+      lineAttributes.push({ key: '_back_art_url', value: backArtUrl });
     }
     if (musicType === 'url' && musicUrl) {
       lineAttributes.push({ key: 'music_url', value: musicUrl });
     } else if (musicType === 'csv' && csvUrl) {
-      // Underscore prefix = admin-only
       lineAttributes.push({ key: '_csv_url', value: csvUrl });
-      if (csvCount) lineAttributes.push({ key: '_csv_code_count', value: String(csvCount) });
+      if (csvCount != null) lineAttributes.push({ key: '_csv_code_count', value: String(csvCount) });
     }
-    lineAttributes.push({ key: 'source', value: 'custom-goodz-configurator' });
 
-    // Build cart attributes (mirrors line attributes for order visibility)
-    const cartAttributes = [
-      { key: 'intended_units', value: String(units) },
-      { key: 'sleeve', value: isSleeve ? 'yes' : (isCardOnly ? 'card_only' : 'no') },
-      { key: 'source', value: 'custom-goodz-configurator' },
-    ];
-    if (albumArtUrl) {
-      const isDataUrl = albumArtUrl.startsWith('data:');
-      cartAttributes.push({ key: '_album_art_url', value: isDataUrl ? '[uploaded - see order]' : albumArtUrl });
-    }
-    if (musicType === 'url' && musicUrl) {
-      cartAttributes.push({ key: 'music_url', value: musicUrl });
-    } else if (musicType === 'csv' && csvUrl) {
-      cartAttributes.push({ key: '_csv_url', value: csvUrl });
-      if (csvCount) cartAttributes.push({ key: '_csv_code_count', value: String(csvCount) });
-    }
+    // Cart-level attributes mirror the line-level ones for visibility in the
+    // order timeline; the Admin Block extension reads from line items.
+    const cartAttributes = lineAttributes.map((a) => ({ ...a }));
 
     const cartInput = {
-      lines: [{
-        quantity: parseInt(units, 10),
-        merchandiseId: variant.variantId,
-        attributes: lineAttributes,
-      }],
+      lines: [
+        {
+          merchandiseId: VARIANT_ID,
+          quantity: unitsInt,
+          attributes: lineAttributes,
+        },
+      ],
       attributes: cartAttributes,
     };
+    if (buyerEmail) cartInput.buyerIdentity = { email: buyerEmail };
 
-    if (buyerEmail) {
-      cartInput.email = buyerEmail;
-    }
-
-    const data = await shopifyGraphQL(`
+    const data = await shopifyGraphQL(
+      `
       mutation CartCreate($input: CartInput!) {
         cartCreate(input: $input) {
           cart {
@@ -134,18 +138,21 @@ module.exports = async (req, res) => {
             checkoutUrl
             totalQuantity
             cost {
+              subtotalAmount { amount currencyCode }
               totalAmount { amount currencyCode }
             }
           }
           userErrors { field message }
         }
       }
-    `, { input: cartInput });
+    `,
+      { input: cartInput },
+    );
 
     const { cart, userErrors } = data.cartCreate;
 
     if (userErrors && userErrors.length > 0) {
-      res.status(400).json({ error: userErrors[0].message });
+      res.status(400).json({ error: userErrors[0].message, userErrors });
       return;
     }
 
@@ -153,9 +160,9 @@ module.exports = async (req, res) => {
       checkoutUrl: cart.checkoutUrl,
       cartId: cart.id,
       totalQuantity: cart.totalQuantity,
+      subtotalAmount: cart.cost.subtotalAmount.amount,
       totalAmount: cart.cost.totalAmount.amount,
-      tier,
-      variantId: variant.variantId,
+      currencyCode: cart.cost.totalAmount.currencyCode,
     });
   } catch (err) {
     console.error('Checkout error:', err);
