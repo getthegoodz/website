@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mixtape Goodz - Goodz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-warm.css">
+  <style>
+    .usp-list { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.5rem; }
+    .usp-list li { display: flex; align-items: baseline; gap: 0.75rem; font-size: 0.92rem; color: var(--text-light); }
+    .usp-list li::before { content: "✦"; color: var(--amber-ink); flex-shrink: 0; font-size: 0.85rem; }
+
+    .occasion-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+    .occasion-tag {
+      border: var(--border);
+      padding: 0.4rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-light);
+      background: var(--white);
+    }
+
+    /* Compact "Tap with your phone to play" section (mirrors the home page) */
+    .video-section { background: var(--amber); border-bottom: var(--border); padding: 3rem 2rem; }
+    .video-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; }
+    .video-text h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); margin-bottom: 0.75rem; color: var(--black); }
+    .video-text p { color: var(--black); line-height: 1.7; max-width: 460px; font-size: 0.95rem; }
+    .video-frame { display: flex; justify-content: center; }
+    .video-frame video { width: 100%; max-width: 280px; aspect-ratio: 4/5; background: #000; border: var(--border); border-radius: 4px; object-fit: cover; }
+    @media (max-width: 900px) {
+      .video-inner { grid-template-columns: 1fr; gap: 1.75rem; }
+      .video-text { text-align: center; }
+      .video-text p { margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo" aria-label="Goodz home"><img src="logos/goodz-wordmark-white.svg" alt="Goodz" width="139" height="22"></a>
+  <ul class="nav-links">
+    <li><a href="/mixtape" class="is-current">Mixtape Goodz</a></li>
+    <li><a href="/custom">Custom Goodz</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/support">Support</a></li>  </ul>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector(&apos;.nav-links&apos;).classList.toggle(&apos;is-open&apos;)">☰</button>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="page-hero-text">
+      <p class="section-label on-dark">Mixtape Goodz</p>
+      <h1>Playlists<br>But Make Them Real</h1>
+      <p>Make your favorite streaming music something you can hand to a friend.</p>
+      <div class="hero-ctas">
+        <a href="https://shop.getthegoodz.com" class="btn btn-amber">Buy Now</a>
+        <a href="#how-it-works" class="btn btn-ghost">How it works</a>
+      </div>
+    </div>
+    <div class="page-hero-visual">
+      <img src="photos/mixtape-hero.webp" alt="A hand holding a fan of cassette-themed Mixtape Goodz cards in front of a phone showing a Spotify playlist titled 'I Miss You!!!'." loading="eager">
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL -->
+<div class="product-detail">
+  <div class="product-detail-img" style="aspect-ratio:1;overflow:hidden;max-height:none;">
+    <img src="photos/mixtape-product.webp" alt="Six cassette-themed Mixtape Goodz cards fanned out beside a black GOODZ mini milk crate on a wood surface." style="display:block;width:100%;height:100%;object-fit:cover;">
+  </div>
+  <div class="product-detail-text">
+    <h2 style="font-size:2rem;margin-bottom:0.75rem;">Mixtape Goodz</h2>
+    <div class="product-price" style="font-size:2rem;margin-bottom:1.5rem;">From $7.17</div>
+
+    <ul class="usp-list">
+      <li>Works with Bandcamp, Spotify, Apple Music, YouTube, SoundCloud, Amazon Music, or any URL</li>
+      <li>No new app required, opens from any smartphone</li>
+      <li>Update your playlist anytime, card stays current</li>
+      <li>2.56" × 2.56" (65×65mm) sustainable basswood, no plastic, no batteries</li>
+      <li>Fits in a wallet, purse, or greeting card</li>
+    </ul>
+
+    <a href="https://shop.getthegoodz.com" class="btn btn-amber" style="margin-bottom:0.75rem;">Buy Now →</a>
+    <p style="font-size:0.72rem;color:var(--text-lighter);">Free returns</p>
+  </div>
+</div>
+
+<!-- TAP WITH YOUR PHONE -->
+<section class="video-section">
+  <div class="video-inner">
+    <div class="video-text">
+      <h2>Tap with Your Phone to Play. That's It</h2>
+      <p>Tap your Goodz with any modern smartphone. The music you linked it to launches. No new app, no new account, no friction.</p>
+    </div>
+    <div class="video-frame">
+      <video src="photos/explainer.mp4" poster="photos/explainer-poster.webp" autoplay muted loop playsinline controls preload="metadata" aria-label="Explainer video showing a Goodz card being tapped with a phone, which opens a Miles Davis album on Spotify."></video>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="tap-section" id="how-it-works">
+  <div class="tap-inner">
+    <h2 style="font-size:2rem;margin-bottom:1.5rem;">Three steps</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <h3>Tap to Setup</h3>
+        <p>Any streaming service, just paste the link.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <h3>Tap to Play</h3>
+        <p>All subsequent taps take you to your playlist or album.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <h3>Tap to Change</h3>
+        <p>Ready for something new? Point your Goodz to your latest playlist at any time.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPAT BAR -->
+<div class="compat-bar dark">
+  <div class="works-with-inner">
+    <strong class="works-with-label">Works with</strong>
+    <div class="works-with-icons">
+      <div class="works-with-item" title="Bandcamp">
+        <svg width="32" height="32" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <path d="M7 7 L23 7 L19 19 L3 19 Z" fill="currentColor"/>
+        </svg>
+        <span>Bandcamp</span>
+      </div>
+      <div class="works-with-item" title="Spotify">
+        <svg width="32" height="32" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <circle cx="13" cy="13" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M7.5 10 C 10 9 16 9 18.5 10.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M8 13 C 10.5 12 15.5 12 18 13.2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <path d="M9 16 C 11 15.2 15 15.2 17 16" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span>Spotify</span>
+      </div>
+      <div class="works-with-item" title="Apple Music">
+        <svg width="32" height="32" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <path d="M11 18 C11 19.66 9.66 21 8 21 C6.34 21 5 19.66 5 18 C5 16.34 6.34 15 8 15 C8.7 15 9.36 15.24 9.9 15.63 V8 L20 6 V16 C20 17.66 18.66 19 17 19 C15.34 19 14 17.66 14 16 C14 14.34 15.34 13 17 13 C17.7 13 18.36 13.24 18.9 13.63" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <span>Apple Music</span>
+      </div>
+      <div class="works-with-item" title="YouTube">
+        <svg width="32" height="32" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="2" y="6" width="22" height="14" rx="3.5" stroke="currentColor" stroke-width="2"/>
+          <path d="M11 9.5 L17 13 L11 16.5 Z" fill="currentColor"/>
+        </svg>
+        <span>YouTube</span>
+      </div>
+      <div class="works-with-item" title="SoundCloud">
+        <svg width="32" height="32" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <path d="M4 16 V20 M6.5 14 V20 M9 13 V20 M11.5 12 V20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M14 10 C 18 9 22 12 22 15 C 23 15 24 16.3 24 17.8 C 24 19.45 22.66 20 21 20 L 14 20 Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+        </svg>
+        <span>SoundCloud</span>
+      </div>
+      <div class="works-with-item" title="Amazon Music">
+        <svg width="32" height="32" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <text x="13" y="16" font-family="system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="16" text-anchor="middle" fill="currentColor">a</text>
+          <path d="M4 19.5 C 8 22.8 18 22.8 22 19.5" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+          <path d="M19.5 17.7 L22 19.5 L20 21.6" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Amazon Music</span>
+      </div>
+      <div class="works-with-item" title="Any URL">
+        <svg width="32" height="32" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <path d="M11 8 H8 a5 5 0 0 0 0 10 H11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <path d="M15 8 H18 a5 5 0 0 1 0 10 H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <path d="M8 13 H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span>Any URL</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GIFT SPLIT -->
+<div class="split" style="background:var(--off-white);">
+  <div class="split-img">
+    <img src="photos/mixtape-split-gift.webp" alt="A cat's paw reaching toward a Mixtape Goodz card labeled 'A Mix for You!!!' held by a person's hand.">
+  </div>
+  <div class="split-text">
+    <p class="section-label">Give It</p>
+    <h2>Your Taste in Music Is a Gift</h2>
+    <p>With Goodz, make it a literal one.</p>
+    <div class="occasion-row">
+      <span class="occasion-tag">Birthdays</span>
+      <span class="occasion-tag">Anniversaries</span>
+      <span class="occasion-tag">Long distance</span>
+      <span class="occasion-tag">Just because</span>
+      <span class="occasion-tag">New relationship</span>
+      <span class="occasion-tag">Graduation</span>
+    </div>
+    <a href="https://shop.getthegoodz.com" class="btn btn-black" style="align-self:flex-start;margin-top:2rem;">Buy Now →</a>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq">
+  <h2>Mixtape Questions</h2>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">How does the recipient tap it? <span class="icon">+</span></button>
+    <div class="faq-a">iPhone: hold the top of the phone near the card, a notification appears at the top of the screen, tap it and the music opens. Android: hold the back of the phone and it opens automatically. No app needed on either device.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">Can I update the music after it ships? <span class="icon">+</span></button>
+    <div class="faq-a">Yes. Update the playlist on Spotify or Apple Music anytime, the Goodz always opens the current version. The card never needs to change.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">What if they use a different streaming service? <span class="icon">+</span></button>
+    <div class="faq-a">The Goodz opens whatever link you put on it. YouTube Music links work for anyone without an account, great for maximum compatibility.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">How do I find my playlist link? <span class="icon">+</span></button>
+    <div class="faq-a">Spotify: open playlist → three dots → Share → Copy link. Apple Music: open playlist → three dots → Share Playlist → Copy. We have guides for all platforms on our <a href="/support" style="font-weight:700;text-decoration:underline;">Support page</a>.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">What if it doesn't work on their phone? <span class="icon">+</span></button>
+    <div class="faq-a">Works on iPhone 7+ and virtually all Android phones made after 2015. If an iPhone user has trouble, check Settings → General → NFC is enabled. Our support team is here if anything goes wrong.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">Are Goodz durable? <span class="icon">+</span></button>
+    <div class="faq-a">Yes. Goodz are made from solid basswood, not cardboard, with your artwork UV-printed and sealed into the surface so it won't peel or fade. The NFC chip is embedded inside the wood, so there's nothing to scratch off or wear out. Made to last.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">Are Goodz sustainable? <span class="icon">+</span></button>
+    <div class="faq-a">Yes. Goodz are made from basswood, a fast-growing renewable wood, with no plastic and no batteries. The chip is a tiny passive NFC tag that needs no power. A keepsake fans hold onto, not disposable merch.</div>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <div class="footer-logo"><img src="logos/goodz-wordmark-white.svg" alt="Goodz" width="152" height="24"></div>
+    <div class="footer-tagline">Music you can hold</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="/mixtape">Mixtape Goodz</a></li>
+    <li><a href="/custom">Custom Goodz</a></li>
+    <li><a href="/about">About</a></li>    <li><a href="/support">Support</a></li>
+    <li><a href="/contact">Contact</a></li>
+    <li><a href="/privacy-policy">Privacy Policy</a></li>
+    <li><a href="/terms-of-service">Terms of Service</a></li>
+  </ul>
+  <div class="footer-right">
+    <div class="footer-social">
+      <a href="https://www.instagram.com/getthegoodz" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://www.facebook.com/getthegoodz" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.9.25-1.5 1.55-1.5h1.65V4.4c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.46-4.05 4.15v2.07H7.7v3h2.5V21h3.3z"/></svg>
+      </a>
+    </div>
+    <div class="footer-copy">© 2026 Goodz. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+function toggleFaq(btn) { btn.parentElement.classList.toggle('open'); }
+</script>
+</body>
+</html>

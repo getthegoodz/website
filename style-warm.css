@@ -1,0 +1,222 @@
+/* ── WARM SKIN ── Overlay on style.css. Matches marketing-plan-beryl.vercel.app aesthetic.
+   Load AFTER style.css: <link rel="stylesheet" href="style.css">
+                         <link rel="stylesheet" href="style-warm.css">          */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* ── TOKENS ── */
+:root {
+  --amber:        #ffc852;
+  --amber-dark:   #e6b044;
+  --black:        #0e0c0a;
+  --black-border: #2a2520;
+  --white:        #efefe2;
+  --off-white:    #e4e4d6;
+  --text:         #1a1510;
+  --text-light:   #6b6354;
+  --text-lighter: #9a8e7e;
+  --border:       2px solid #2e2a1e;
+  --border-inner: 1px solid #cdc8b2;
+}
+
+/* ── BASE ── */
+body {
+  font-family: 'DM Sans', 'Inter', sans-serif;
+  background: var(--white);
+}
+
+/* ── NAV — frosted glass ── */
+.nav {
+  background: rgba(14, 12, 10, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 200, 82, 0.18);
+}
+
+/* ── BUTTONS ── */
+.btn { border-radius: 6px; }
+
+/* ── HERO ── */
+.hero         { background: var(--black); }
+.hero-text    { border-right-color: #2a2520; }
+.hero-visual  { background: #1a1510; border-left-color: #2a2520; }
+
+/* ── PAGE HERO (inner pages) ── */
+.page-hero { background: var(--black); }
+
+/* ── PROOF BAR ── */
+.proof-bar { background: var(--black); border-color: #2a2520; }
+
+/* ── PRODUCT GRID — separated rounded cards ── */
+.product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 2.5rem;
+  background: var(--off-white);
+  border-top: none;
+  border-bottom: none;
+}
+.product-card {
+  flex: 1 1 320px;
+  border: 1px solid var(--border-inner);
+  border-right: 1px solid var(--border-inner) !important;
+  border-bottom: none !important;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  background: var(--white);
+}
+
+/* ── HOW IT WORKS ── */
+/* Full-width section band: use the dark structural border so its edge
+   matches the dark-bordered sections it abuts (e.g. the video band),
+   rather than a tan line sitting beside their dark one. */
+.tap-section { background: var(--off-white); border-color: #2e2a1e; }
+.steps {
+  gap: 1rem;
+  border: none;
+  margin-top: 2rem;
+}
+.steps .step {
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* ── COMPAT BAR ── */
+.compat-bar {
+  background: var(--amber);
+  border-color: #2e2a1e;
+}
+
+/* ── CRED BAR ── */
+/* Full-width section band: dark structural border to match neighbours. */
+.cred-bar {
+  background: var(--off-white);
+  border-color: #2e2a1e;
+}
+
+/* ── SECTION LABELS — small Goodz-shaped square prefix ── */
+/* Hollow square outline sized in em so it scales with the label's font
+   (matches roughly the cap height of the text it precedes). Outline color
+   is deliberately darker than the muted text color so the bullet stays
+   visible on beige / cream surfaces. */
+.section-label { display: flex; align-items: baseline; gap: 1em; line-height: 1; }
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 1cap;
+  height: 1cap;
+  border-radius: 0.14em;
+  background: transparent;
+  border: 1.5px solid currentColor;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.section-label.on-dark::before { border-color: var(--amber); }
+
+/* ── SPLIT SECTIONS ── */
+/* Structural dividers stay the dark border (inherited from --border).
+   The old tan overrides here created a dark-line-next-to-tan-line double
+   border at the panel seam and section edges — see the reverse split,
+   where the text panel's dark right border met the image panel's tan
+   left border. */
+.split.dark {
+  background: var(--black);
+  border-color: #2a2520;
+}
+.split.dark .split-img  { border-right-color: #2a2520; }
+.split.dark .split-text { border-left-color: #2a2520; }
+/* Let the text panel's right border be the single seam; the image
+   panel doesn't draw its own (which previously doubled up in tan). */
+.split.reverse .split-img { border-left: none; }
+
+/* ── REVENUE STRIP ── */
+/* No top/bottom rule: the amber box already contrasts enough with the
+   sections above and below, so the border just looked like clutter. */
+.revenue-strip { border-top: none; border-bottom: none; }
+
+/* ── SAMPLE BOX ── */
+.sample-box {
+  border-radius: 14px;
+  background: var(--off-white);
+  border-color: #cdc8b2;
+}
+
+/* ── PRICING TABLE ── */
+.pricing-table {
+  border-radius: 14px;
+  overflow: hidden;
+  border-color: #cdc8b2;
+}
+.pricing-row { border-color: #cdc8b2; }
+.pricing-row.header { background: var(--black); border-color: #2a2520; }
+
+/* ── BANDCAMP SECTION ── */
+.bandcamp-section { background: var(--black); border-color: #2a2520; }
+.bandcamp-features li::before { color: var(--amber); }
+
+/* ── AUDIENCE / USE-CASE GRID ── */
+.audience-grid {
+  border-radius: 16px;
+  overflow: hidden;
+  border-color: #cdc8b2;
+}
+.audience-card { border-right-color: #cdc8b2; }
+.audience-label { border-top-color: #cdc8b2; }
+
+/* ── CTA BAND ── */
+.cta-band {
+  background: var(--black);
+  border-color: #2a2520;
+}
+
+/* ── FAQ ── */
+.faq-item {
+  border-top-color: #cdc8b2;
+  border-radius: 0;
+}
+.faq-item:last-child { border-bottom-color: #cdc8b2; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--black);
+  border-top-color: #2a2520;
+}
+
+/* ── PROOF BAR ITEMS ── */
+.proof-bar {
+  border-top-color: #2a2520;
+  border-bottom-color: #2a2520;
+}
+
+/* ── SPLIT ANALYTICS (custom page) ── */
+.split.reverse { background: var(--off-white); }
+
+/* ── RESPONSIVE overrides ── */
+@media (max-width: 900px) {
+  .product-grid {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  .product-card {
+    flex: 1 1 auto;
+    border-bottom: 1px solid var(--border-inner) !important;
+  }
+}
+
+/* ── COLLAPSE DOUBLED SECTION DIVIDERS ──
+   Full-bleed bands each draw a 2px border-top AND border-bottom. Where two
+   bands sit directly adjacent, the upper one's bottom and the lower one's top
+   stack into a 4px double line. Drop the LOWER band's top border at each such
+   seam so the divider is a single 2px line carried by the upper band's bottom.
+   (video-section and tap-section already omit their top border for this reason;
+   these rules extend the same fix to compat-bar / cred-bar / cta-band.)
+   Seams covered: index compat→cta; custom video→compat, tap→cred,
+   product-detail→cta; mixtape tap→compat. */
+.compat-bar + .cta-band,
+.product-detail + .cta-band,
+.video-section + .compat-bar,
+.tap-section + .compat-bar,
+.tap-section + .cred-bar {
+  border-top: none;
+}
