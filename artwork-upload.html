@@ -1839,14 +1839,41 @@ function trackEvent(name, params) {
   if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
   if (window.dataLayer) window.dataLayer.push({ event: name, ...(params || {}) });
 }
-// Fires the dl_-prefixed event (matches the existing GTM triggers,
-// originally set up for an Elevar-style dataLayer) AND the GA4-standard
-// name in case any GTM triggers move to standard naming later.
-function trackEcommerce(name, ecommerce) {
+// Pushes an ecommerce event in BOTH schemas so existing GTM tags
+// (which read Elevar/UA Enhanced Ecommerce paths like
+// ecommerce.detail.products[0].price) work alongside any future
+// GA4-standard tags (which read ecommerce.items[0].price).
+function trackEcommerce(actionName, simple) {
   if (!window.dataLayer) return;
+  var it = simple.item || {};
+  var uaProduct = {
+    id:       it.id,
+    name:     it.name,
+    brand:    'Goodz',
+    category: it.category || 'Custom',
+    price:    (it.price || 0).toFixed(2),
+    quantity: String(it.quantity || 1),
+  };
+  var ga4Item = {
+    item_id:       it.id,
+    item_name:     it.name,
+    item_brand:    'Goodz',
+    item_category: it.category || 'Custom',
+    price:         +(it.price || 0).toFixed(2),
+    quantity:      it.quantity || 1,
+  };
+  var ecommerce = {
+    currency:     simple.currency || 'USD',
+    currencyCode: simple.currency || 'USD',
+    value:        +(simple.value || 0).toFixed(2),
+    items:        [ga4Item],
+    detail:   { products: [uaProduct] },
+    add:      { products: [uaProduct] },
+    checkout: { actionField: { step: 1 }, products: [uaProduct] },
+  };
   window.dataLayer.push({ ecommerce: null });
-  window.dataLayer.push({ event: 'dl_' + name, ecommerce });
-  window.dataLayer.push({ event: name, ecommerce });
+  window.dataLayer.push({ event: 'dl_' + actionName, ecommerce: ecommerce });
+  window.dataLayer.push({ event: actionName,         ecommerce: ecommerce });
 }
 
 function goToStep(n) {
@@ -1999,23 +2026,14 @@ function placeOrder() {
     music_type: state.musicMode,
     custom_back: !!state.customBackChosen,
   });
-  // GA4 ecommerce: begin_checkout fires here, the moment they commit
-  // to the cart. Use the same item shape as add_to_cart in order.html.
+  // begin_checkout fires here, the moment they commit to the cart.
   const checkoutQty   = cfg.quantity || 50;
-  const checkoutPrice = +(cfg.unitPrice || 3.50).toFixed(2);
-  const checkoutValue = cfg.baseTotal != null
-    ? +cfg.baseTotal.toFixed(2)
-    : +(checkoutPrice * checkoutQty).toFixed(2);
+  const checkoutPrice = cfg.unitPrice || 3.50;
+  const checkoutValue = cfg.baseTotal != null ? cfg.baseTotal : checkoutPrice * checkoutQty;
   trackEcommerce('begin_checkout', {
     currency: 'USD',
     value: checkoutValue,
-    items: [{
-      item_id: 'custom-goodz',
-      item_name: 'Custom Goodz',
-      item_category: 'Custom',
-      price: checkoutPrice,
-      quantity: checkoutQty,
-    }],
+    item: { id: 'custom-goodz', name: 'Custom Goodz', price: checkoutPrice, quantity: checkoutQty },
   });
 
   const payload = {

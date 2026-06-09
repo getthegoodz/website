@@ -990,26 +990,30 @@ document.addEventListener('click', (e) => {
 })();
 </script>
 
-<!-- GA4 ecommerce: Custom Goodz landing page view_item.
-     Fires both the dl_view_item event (matches existing GTM triggers,
-     originally Elevar-style) and the standard view_item (forward-compat). -->
+<!-- Custom Goodz landing page view_item.
+     Pushes both UA Enhanced Ecommerce paths (which the existing
+     Elevar-style GTM tags read from) AND GA4-standard items[] paths.
+     Fires under dl_view_item (matches existing triggers) and view_item
+     (forward-compat for any standard-named triggers added later). -->
 <script>
 (function() {
   if (!window.dataLayer) return;
+  var uaProduct = {
+    id: 'custom-goodz', name: 'Custom Goodz', brand: 'Goodz',
+    category: 'Custom', price: '3.50', quantity: '50',
+  };
+  var ga4Item = {
+    item_id: 'custom-goodz', item_name: 'Custom Goodz', item_brand: 'Goodz',
+    item_category: 'Custom', price: 3.50, quantity: 50,
+  };
   var ecommerce = {
-    currency: 'USD',
-    value: 175,
-    items: [{
-      item_id: 'custom-goodz',
-      item_name: 'Custom Goodz',
-      item_category: 'Custom',
-      price: 3.50,
-      quantity: 50,
-    }],
+    currency: 'USD', currencyCode: 'USD', value: 175,
+    items: [ga4Item],
+    detail: { products: [uaProduct] },
   };
   window.dataLayer.push({ ecommerce: null });
   window.dataLayer.push({ event: 'dl_view_item', ecommerce: ecommerce });
-  window.dataLayer.push({ event: 'view_item', ecommerce: ecommerce });
+  window.dataLayer.push({ event: 'view_item',    ecommerce: ecommerce });
 })();
 </script>
 </body>

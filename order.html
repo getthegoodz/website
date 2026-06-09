@@ -946,14 +946,49 @@ function trackEvent(name, params) {
   if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
   if (window.dataLayer) window.dataLayer.push({ event: name, ...(params || {}) });
 }
-// Fires the dl_-prefixed event (matches the existing GTM triggers,
-// originally set up for an Elevar-style dataLayer) AND the GA4-standard
-// name in case any GTM triggers move to standard naming later.
-function trackEcommerce(name, ecommerce) {
+// Pushes an ecommerce event in BOTH schemas so existing GTM tags
+// (which read Elevar/UA Enhanced Ecommerce paths like
+// ecommerce.detail.products[0].price) work alongside any future
+// GA4-standard tags (which read ecommerce.items[0].price).
+//
+// Pass simple { currency, value, item: {id, name, price, quantity} }
+// and this expands it into both formats and fires under both event
+// names (dl_-prefix matches the existing triggers; the unprefixed name
+// is for forward compatibility).
+function trackEcommerce(actionName, simple) {
   if (!window.dataLayer) return;
+  var it = simple.item || {};
+  var uaProduct = {
+    id:       it.id,
+    name:     it.name,
+    brand:    'Goodz',
+    category: it.category || 'Custom',
+    price:    (it.price || 0).toFixed(2),
+    quantity: String(it.quantity || 1),
+  };
+  var ga4Item = {
+    item_id:       it.id,
+    item_name:     it.name,
+    item_brand:    'Goodz',
+    item_category: it.category || 'Custom',
+    price:         +(it.price || 0).toFixed(2),
+    quantity:      it.quantity || 1,
+  };
+  var ecommerce = {
+    currency:     simple.currency || 'USD',
+    currencyCode: simple.currency || 'USD',
+    value:        +(simple.value || 0).toFixed(2),
+    items:        [ga4Item],
+    // UA Enhanced Ecommerce paths the existing tags read from.
+    // Mirror the product under every action key so the tag's variable
+    // resolves regardless of which path it points at.
+    detail:   { products: [uaProduct] },
+    add:      { products: [uaProduct] },
+    checkout: { actionField: { step: 1 }, products: [uaProduct] },
+  };
   window.dataLayer.push({ ecommerce: null });
-  window.dataLayer.push({ event: 'dl_' + name, ecommerce });
-  window.dataLayer.push({ event: name, ecommerce });
+  window.dataLayer.push({ event: 'dl_' + actionName, ecommerce: ecommerce });
+  window.dataLayer.push({ event: actionName,         ecommerce: ecommerce });
 }
 let __suppressTracking = false;
 
@@ -964,19 +999,13 @@ function selectTier(i) {
   if (__suppressTracking) return;
   const tier = TIERS[i];
   trackEvent('tier_change', { quantity: tier && tier.qty, tier_index: i });
-  // GA4 ecommerce: treat tier selection as add_to_cart intent
+  // Treat tier selection as add_to_cart intent
   if (tier && !tier.contact) {
     const price = unitPrice(tier);
     trackEcommerce('add_to_cart', {
       currency: 'USD',
-      value: +(price * tier.qty).toFixed(2),
-      items: [{
-        item_id: 'custom-goodz',
-        item_name: 'Custom Goodz',
-        item_category: 'Custom',
-        price: +price.toFixed(2),
-        quantity: tier.qty,
-      }],
+      value: price * tier.qty,
+      item: { id: 'custom-goodz', name: 'Custom Goodz', price: price, quantity: tier.qty },
     });
   }
 }
@@ -1117,21 +1146,15 @@ updateFromPrice();
 })();
 
 trackEvent('step_view', { step: 'customize' });
-// Page-load GA4 view_item (Custom Goodz product enters the funnel)
+// Page-load view_item (Custom Goodz enters the funnel)
 (function() {
   const tier = TIERS[state.tierIdx] || TIERS[0];
   if (!tier || tier.contact) return;
   const price = unitPrice(tier);
   trackEcommerce('view_item', {
     currency: 'USD',
-    value: +(price * tier.qty).toFixed(2),
-    items: [{
-      item_id: 'custom-goodz',
-      item_name: 'Custom Goodz',
-      item_category: 'Custom',
-      price: +price.toFixed(2),
-      quantity: tier.qty,
-    }],
+    value: price * tier.qty,
+    item: { id: 'custom-goodz', name: 'Custom Goodz', price: price, quantity: tier.qty },
   });
 })();
 
