@@ -1839,9 +1839,13 @@ function trackEvent(name, params) {
   if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
   if (window.dataLayer) window.dataLayer.push({ event: name, ...(params || {}) });
 }
+// Fires the dl_-prefixed event (matches the existing GTM triggers,
+// originally set up for an Elevar-style dataLayer) AND the GA4-standard
+// name in case any GTM triggers move to standard naming later.
 function trackEcommerce(name, ecommerce) {
   if (!window.dataLayer) return;
   window.dataLayer.push({ ecommerce: null });
+  window.dataLayer.push({ event: 'dl_' + name, ecommerce });
   window.dataLayer.push({ event: name, ecommerce });
 }
 
