@@ -1832,9 +1832,17 @@ function applyMusicSource(source) {
 // Map internal step index to URL slug + analytics label
 const STEP_NAMES = ['music', 'artwork', 'review'];
 
-// Tiny GA event helper. No-ops cleanly until gtag is wired up on the page.
+// Event helpers. trackEvent() fires both the legacy gtag (no-op until
+// gtag is loaded) and a dataLayer push so GTM can listen. trackEcommerce()
+// is for GA4 standard ecommerce events (begin_checkout, etc).
 function trackEvent(name, params) {
   if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
+  if (window.dataLayer) window.dataLayer.push({ event: name, ...(params || {}) });
+}
+function trackEcommerce(name, ecommerce) {
+  if (!window.dataLayer) return;
+  window.dataLayer.push({ ecommerce: null });
+  window.dataLayer.push({ event: name, ecommerce });
 }
 
 function goToStep(n) {
@@ -1986,6 +1994,24 @@ function placeOrder() {
     quantity: cfg.quantity || 0,
     music_type: state.musicMode,
     custom_back: !!state.customBackChosen,
+  });
+  // GA4 ecommerce: begin_checkout fires here, the moment they commit
+  // to the cart. Use the same item shape as add_to_cart in order.html.
+  const checkoutQty   = cfg.quantity || 50;
+  const checkoutPrice = +(cfg.unitPrice || 3.50).toFixed(2);
+  const checkoutValue = cfg.baseTotal != null
+    ? +cfg.baseTotal.toFixed(2)
+    : +(checkoutPrice * checkoutQty).toFixed(2);
+  trackEcommerce('begin_checkout', {
+    currency: 'USD',
+    value: checkoutValue,
+    items: [{
+      item_id: 'custom-goodz',
+      item_name: 'Custom Goodz',
+      item_category: 'Custom',
+      price: checkoutPrice,
+      quantity: checkoutQty,
+    }],
   });
 
   const payload = {

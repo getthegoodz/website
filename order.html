@@ -939,9 +939,17 @@ function handleRetailChange() {
   renderTable();
 }
 
-// Tiny GA event helper. No-ops cleanly until gtag is wired up on the page.
+// Event helpers. trackEvent() fires both the legacy gtag (no-op until
+// gtag is loaded) and a dataLayer push so GTM can listen. trackEcommerce()
+// is for GA4 standard ecommerce events (view_item, add_to_cart, etc).
 function trackEvent(name, params) {
   if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
+  if (window.dataLayer) window.dataLayer.push({ event: name, ...(params || {}) });
+}
+function trackEcommerce(name, ecommerce) {
+  if (!window.dataLayer) return;
+  window.dataLayer.push({ ecommerce: null }); // GA4 best practice: clear before push
+  window.dataLayer.push({ event: name, ecommerce });
 }
 let __suppressTracking = false;
 
@@ -952,6 +960,21 @@ function selectTier(i) {
   if (__suppressTracking) return;
   const tier = TIERS[i];
   trackEvent('tier_change', { quantity: tier && tier.qty, tier_index: i });
+  // GA4 ecommerce: treat tier selection as add_to_cart intent
+  if (tier && !tier.contact) {
+    const price = unitPrice(tier);
+    trackEcommerce('add_to_cart', {
+      currency: 'USD',
+      value: +(price * tier.qty).toFixed(2),
+      items: [{
+        item_id: 'custom-goodz',
+        item_name: 'Custom Goodz',
+        item_category: 'Custom',
+        price: +price.toFixed(2),
+        quantity: tier.qty,
+      }],
+    });
+  }
 }
 
 function selectOption(group, value) {
@@ -1090,6 +1113,23 @@ updateFromPrice();
 })();
 
 trackEvent('step_view', { step: 'customize' });
+// Page-load GA4 view_item (Custom Goodz product enters the funnel)
+(function() {
+  const tier = TIERS[state.tierIdx] || TIERS[0];
+  if (!tier || tier.contact) return;
+  const price = unitPrice(tier);
+  trackEcommerce('view_item', {
+    currency: 'USD',
+    value: +(price * tier.qty).toFixed(2),
+    items: [{
+      item_id: 'custom-goodz',
+      item_name: 'Custom Goodz',
+      item_category: 'Custom',
+      price: +price.toFixed(2),
+      quantity: tier.qty,
+    }],
+  });
+})();
 
 </script>
 </body>

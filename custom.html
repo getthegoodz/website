@@ -989,5 +989,27 @@ document.addEventListener('click', (e) => {
   }
 })();
 </script>
+
+<!-- GA4 ecommerce: Custom Goodz landing page view_item -->
+<script>
+(function() {
+  if (!window.dataLayer) return;
+  window.dataLayer.push({ ecommerce: null });
+  window.dataLayer.push({
+    event: 'view_item',
+    ecommerce: {
+      currency: 'USD',
+      value: 175,
+      items: [{
+        item_id: 'custom-goodz',
+        item_name: 'Custom Goodz',
+        item_category: 'Custom',
+        price: 3.50,
+        quantity: 50,
+      }],
+    },
+  });
+})();
+</script>
 </body>
 </html>
