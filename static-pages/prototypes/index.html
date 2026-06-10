@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tapped Goodz — Prototypes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;padding:3rem 1.5rem 5rem;line-height:1.6}
+    .wrap{max-width:640px;margin:0 auto}
+    .eyebrow{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#1DB954;font-weight:700;margin-bottom:.5rem}
+    h1{font-family:'Poppins',sans-serif;font-weight:800;font-size:1.8rem;margin-bottom:.5rem}
+    .sub{color:rgba(255,255,255,.6);font-size:.95rem;margin-bottom:2.5rem}
+    .card{display:block;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:1.5rem;margin-bottom:1rem;text-decoration:none;color:#fff;transition:border-color .15s,background .15s}
+    .card:hover{border-color:#1DB954;background:rgba(29,185,84,.06)}
+    .card h2{font-family:'Poppins',sans-serif;font-weight:600;font-size:1.15rem;margin-bottom:.3rem}
+    .card p{color:rgba(255,255,255,.55);font-size:.88rem}
+    .tag{display:inline-block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#1DB954;border:1px solid rgba(29,185,84,.4);border-radius:999px;padding:.15rem .6rem;margin-top:.8rem}
+    .demos{margin-top:.9rem;display:flex;flex-wrap:wrap;gap:.5rem}
+    .demo{font-size:.78rem;color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:.3rem .8rem;text-decoration:none;transition:border-color .15s}
+    .demo:hover{border-color:#1DB954;color:#fff}
+    .note{margin-top:3rem;font-size:.8rem;color:rgba(255,255,255,.4);border-top:1px solid rgba(255,255,255,.1);padding-top:1.5rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Goodz · internal</div>
+    <h1>Tapped Goodz Prototypes</h1>
+    <p class="sub">Exploring a richer landing experience when you tap a Mixtape Goodz card. Not linked from production. Each prototype reads a <code>?playlist_url=</code> param, same as the live <code>/tapped</code> page.</p>
+
+    <div class="card-group">
+      <a class="card" href="/static-pages/prototypes/tapped-spotify-reveal?playlist_url=https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M&code=demo">
+        <h2>A · Album-Art Reveal</h2>
+        <p>Full-bleed cover art blurs into focus on load, circular artwork, Spotify play button, and an embedded web player. Spotify oEmbed, no auth.</p>
+        <div class="tag">Spotify · built</div>
+        <div class="demos">
+          <span style="font-size:.78rem;color:rgba(255,255,255,.4)">Try a playlist:</span>
+          <a class="demo" href="/static-pages/prototypes/tapped-spotify-reveal?playlist_url=https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M&code=demo">Today's Top Hits</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-spotify-reveal?playlist_url=https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd&code=demo">RapCaviar</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-spotify-reveal?playlist_url=https://open.spotify.com/playlist/37i9dQZF1DWXRqgorJj26U&code=demo">Rock Classics</a>
+        </div>
+      </a>
+    </div>
+
+    <p class="note">More directions in the brainstorm: First-Track Teaser, Now-Playing Dock, Lyrics-First, The Curator, Ambient Visualizer. We'll add them here as we build them.</p>
+  </div>
+</body>
+</html>
