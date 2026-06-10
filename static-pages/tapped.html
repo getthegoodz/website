@@ -20,7 +20,7 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{ --accent:#FEC850; --ink:#0a0a0a; --amber:#E8A820; --white:#fff; --black:#111; --border:2px solid #111; }
-    html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:#fff;overflow-x:hidden}
+    html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:#fff;overflow-x:hidden;overflow-anchor:none}
     body{min-height:100vh;display:flex;flex-direction:column}
 
     /* blurred art backdrop (tier 1) */
@@ -28,7 +28,7 @@
     #bg.on{opacity:1}
     #overlay{position:fixed;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15),rgba(0,0,0,.55) 45%,rgba(0,0,0,.9));pointer-events:none}
 
-    #wordmark{position:relative;z-index:10;display:flex;justify-content:center;padding-top:1.5rem;opacity:0;transition:opacity .5s}
+    #wordmark{position:sticky;top:0;z-index:20;display:flex;justify-content:center;padding-top:1.5rem;padding-bottom:.6rem;opacity:0;transition:opacity .5s}
     #wordmark.on{opacity:.95}
     #wordmark img{height:22px;width:auto;display:block;filter:drop-shadow(0 1px 6px rgba(0,0,0,.5))}
 
