@@ -111,8 +111,10 @@
       // tier-specific layout
       if (d.tier === 1 && d.embedUrl){
         art.classList.add('round');
-        var cfg = EMBED[d.provider] || {h:352};
-        var style = cfg.ratio ? 'aspect-ratio:'+cfg.ratio : 'height:'+cfg.h+'px';
+        var cfg = EMBED[d.provider] || {};
+        var style = d.embedHeight ? 'height:'+d.embedHeight+'px'
+          : cfg.ratio ? 'aspect-ratio:'+cfg.ratio
+          : 'height:'+(cfg.h||352)+'px';
         embed.innerHTML = '<iframe src="'+d.embedUrl+'" style="'+style+'" ' +
           'allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" ' +
           'loading="lazy"></iframe>';

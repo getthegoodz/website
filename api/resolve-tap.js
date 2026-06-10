@@ -74,30 +74,53 @@ async function fetchJson(url) {
   } catch { return null; } finally { t.done(); }
 }
 
-// Pull og:/twitter: meta from an arbitrary page (only the first ~120KB).
-async function fetchOg(url) {
+// Fetch a page's HTML (first ~200KB) with a browser-ish UA.
+async function fetchHtml(url) {
   const t = withTimeout(FETCH_TIMEOUT_MS);
   try {
     const r = await fetch(url, { signal: t.signal, headers: { 'User-Agent': UA } });
-    if (!r.ok) return {};
-    const html = (await r.text()).slice(0, 120000);
-    const meta = (prop) => {
-      const re = new RegExp(
-        '<meta[^>]+(?:property|name)=["\']' + prop +
-          '["\'][^>]+content=["\']([^"\']+)["\']', 'i');
-      const m = html.match(re) ||
-        html.match(new RegExp(
-          '<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']' +
-            prop + '["\']', 'i'));
-      return m ? decodeEntities(m[1]) : '';
-    };
-    return {
-      image: meta('og:image') || meta('twitter:image'),
-      title: meta('og:title') || meta('twitter:title'),
-      siteName: meta('og:site_name'),
-      description: meta('og:description'),
-    };
-  } catch { return {}; } finally { t.done(); }
+    if (!r.ok) return '';
+    return (await r.text()).slice(0, 200000);
+  } catch { return ''; } finally { t.done(); }
+}
+
+// Parse og:/twitter: meta from raw HTML.
+function parseOg(html) {
+  const meta = (prop) => {
+    const re = new RegExp(
+      '<meta[^>]+(?:property|name)=["\']' + prop +
+        '["\'][^>]+content=["\']([^"\']+)["\']', 'i');
+    const m = html.match(re) ||
+      html.match(new RegExp(
+        '<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']' +
+          prop + '["\']', 'i'));
+    return m ? decodeEntities(m[1]) : '';
+  };
+  return {
+    image: meta('og:image') || meta('twitter:image'),
+    title: meta('og:title') || meta('twitter:title'),
+    siteName: meta('og:site_name'),
+    description: meta('og:description'),
+  };
+}
+
+async function fetchOg(url) { return parseOg(await fetchHtml(url)); }
+
+// Bandcamp has no oEmbed; the release id lives in the bc-page-properties meta.
+// Build an EmbeddedPlayer iframe URL from it (album shows a tracklist).
+function extractBandcampEmbed(html) {
+  const m = html.match(/bc-page-properties"\s+content="([^"]+)"/i);
+  if (!m) return null;
+  let props;
+  try { props = JSON.parse(decodeEntities(m[1])); } catch { return null; }
+  if (!props.item_id) return null;
+  const kind = props.item_type === 't' ? 'track' : 'album';
+  return {
+    embedUrl: 'https://bandcamp.com/EmbeddedPlayer/' + kind + '=' + props.item_id +
+      '/size=large/bgcol=0a0a0a/linkcol=ffffff/tracklist=' +
+      (kind === 'album' ? 'true' : 'false') + '/transparent=true/',
+    embedHeight: kind === 'album' ? 470 : 120,
+  };
 }
 
 function decodeEntities(s) {
@@ -138,6 +161,7 @@ function base(provider, tier, openUrl, extra) {
     artist: '',
     artworkUrl: '',
     embedUrl: '',
+    embedHeight: 0,
     openUrl,
     ...extra,
   };
@@ -222,11 +246,32 @@ async function resolveTier2(provider, u) {
   });
 }
 
+// Bandcamp album/track stream link → inline player + art (tier 1).
+// (The separate download-code Bandcamp flow is a different page, not this.)
+async function resolveBandcamp(u) {
+  const html = await fetchHtml(u.href);
+  const og = parseOg(html);
+  const emb = extractBandcampEmbed(html);
+  return base('bandcamp', emb ? 1 : 2, u.href, {
+    title: og.title || '',
+    artworkUrl: og.image || '',
+    embedUrl: emb ? emb.embedUrl : '',
+    embedHeight: emb ? emb.embedHeight : 0,
+  });
+}
+
 async function resolveGeneric(u) {
-  const og = await fetchOg(u.href);
+  const html = await fetchHtml(u.href);
+  const og = parseOg(html);
   // A custom-domain Bandcamp page identifies via og:site_name.
   if ((og.siteName || '').toLowerCase() === 'bandcamp') {
-    return base('bandcamp', 2, u.href, { title: og.title || '', artworkUrl: og.image || '' });
+    const emb = extractBandcampEmbed(html);
+    return base('bandcamp', emb ? 1 : 2, u.href, {
+      title: og.title || '',
+      artworkUrl: og.image || '',
+      embedUrl: emb ? emb.embedUrl : '',
+      embedHeight: emb ? emb.embedHeight : 0,
+    });
   }
   const hasArt = Boolean(og.image);
   return base('generic', hasArt ? 2 : 3, u.href, {
@@ -255,10 +300,10 @@ module.exports = async (req, res) => {
       case 'deezer':     out = await resolveDeezer(u); break;
       case 'tidal':      out = await resolveTidal(u); break;
       case 'apple':      out = await resolveApple(u); break;
+      case 'bandcamp':   out = await resolveBandcamp(u); break;
       case 'qobuz':
       case 'amazon':
-      case 'pandora':
-      case 'bandcamp':   out = await resolveTier2(provider, u); break;
+      case 'pandora':    out = await resolveTier2(provider, u); break;
       default:           out = await resolveGeneric(u); break;
     }
     return send(res, 200, out);
