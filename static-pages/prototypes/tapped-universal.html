@@ -80,7 +80,7 @@
   <main id="wrap">
     <div id="art"></div>
     <div id="titles">
-      <div id="eyebrow">You tapped a Goodz</div>
+      <div id="eyebrow">You tapped in</div>
       <div id="title">Loading…</div>
       <div id="artist"></div>
     </div>
@@ -167,11 +167,11 @@
         embed.innerHTML = '<iframe src="'+d.embedUrl+'" style="'+style+'" ' +
           'allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" ' +
           'loading="lazy"></iframe>';
-        cta.textContent = 'Open in ' + d.providerName;
+        cta.textContent = d.provider === 'generic' ? 'Open the link' : 'Open in ' + d.providerName;
         showEmbed();
       } else if (d.tier === 2){
         // art + open button, no inline player
-        cta.textContent = 'Open in ' + d.providerName;
+        cta.textContent = d.provider === 'generic' ? 'Open the link' : 'Open in ' + d.providerName;
         if (!d.artworkUrl) art.style.display = 'none';
       } else {
         // tier 3 default: branded, never a dead end
