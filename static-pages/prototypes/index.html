@@ -32,6 +32,22 @@
     <p class="sub">Exploring a richer landing experience when you tap a Mixtape Goodz card. Not linked from production. Each prototype reads a <code>?playlist_url=</code> param, same as the live <code>/tapped</code> page.</p>
 
     <div class="card-group">
+      <a class="card" href="/static-pages/prototypes/tapped-universal?playlist_url=https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M&code=demo">
+        <h2>B · Universal (provider-aware)</h2>
+        <p>Server resolver (<code>/api/resolve-tap</code>) detects the link's provider and serves a tiered experience: full player + art for Spotify/Apple/YouTube/SoundCloud/Deezer/Tidal, branded "open" card for others, branded default for any website. Never a dead end.</p>
+        <div class="tag">tiered · built</div>
+        <div class="demos">
+          <span style="font-size:.78rem;color:rgba(255,255,255,.4)">Try a provider:</span>
+          <a class="demo" href="/static-pages/prototypes/tapped-universal?playlist_url=https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M&code=demo">Spotify</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-universal?playlist_url=https://music.apple.com/us/album/abbey-road/1441164426&code=demo">Apple Music</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-universal?playlist_url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&code=demo">YouTube</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-universal?playlist_url=https://soundcloud.com/forss/flickermood&code=demo">SoundCloud</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-universal?playlist_url=https://www.deezer.com/album/302127&code=demo">Deezer</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-universal?playlist_url=https://tidal.com/browse/album/77640617&code=demo">Tidal</a>
+          <a class="demo" href="/static-pages/prototypes/tapped-universal?playlist_url=https://pitchfork.com&code=demo">A website</a>
+        </div>
+      </a>
+
       <a class="card" href="/static-pages/prototypes/tapped-spotify-reveal?playlist_url=https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M&code=demo">
         <h2>A · Album-Art Reveal</h2>
         <p>Full-bleed cover art blurs into focus on load, circular artwork, Spotify play button, and an embedded web player. Spotify oEmbed, no auth.</p>

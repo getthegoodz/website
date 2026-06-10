@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>You Tapped a Goodz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Exo:wght@700;900&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FEC850'/><text x='50' y='72' font-size='65' font-family='Arial Black' font-weight='900' fill='%23191414' text-anchor='middle'>G</text></svg>">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{ --accent:#FEC850; --ink:#0a0a0a; }
+    html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:#fff;overflow-x:hidden}
+    body{min-height:100%}
+
+    /* blurred art backdrop (tier 1) */
+    #bg{position:fixed;inset:0;background-size:cover;background-position:center;transform:scale(1.1);filter:blur(28px) brightness(.45);opacity:0;transition:opacity .8s ease}
+    #bg.on{opacity:1}
+    #overlay{position:fixed;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15),rgba(0,0,0,.55) 45%,rgba(0,0,0,.9));pointer-events:none}
+
+    #wordmark{position:fixed;top:1.25rem;left:50%;transform:translateX(-50%);z-index:20;font-family:'Exo',sans-serif;font-weight:900;letter-spacing:.3em;font-size:1rem;text-transform:uppercase;opacity:0;transition:opacity .5s}
+    #wordmark.on{opacity:.92}
+
+    #wrap{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5rem 1.5rem 3rem;gap:1.25rem}
+
+    #art{width:min(240px,64vw);aspect-ratio:1;border-radius:14px;background-size:cover;background-position:center;background-color:#1a1a1a;box-shadow:0 18px 60px rgba(0,0,0,.6);opacity:0;transform:scale(.85);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
+    #art.on{opacity:1;transform:scale(1)}
+    #art.round{border-radius:50%}
+
+    #titles{opacity:0;transform:translateY(12px);transition:opacity .6s ease .15s,transform .6s ease .15s;max-width:380px}
+    #titles.on{opacity:1;transform:none}
+    #title{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(1.3rem,5vw,1.9rem);line-height:1.18;text-shadow:0 2px 18px rgba(0,0,0,.6)}
+    #artist{margin-top:.35rem;color:rgba(255,255,255,.72);font-size:1rem}
+    #eyebrow{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:.5rem;font-weight:700}
+
+    #embed{width:100%;max-width:480px;opacity:0;transition:opacity .6s ease .3s}
+    #embed.on{opacity:1}
+    #embed iframe{width:100%;border:0;border-radius:12px;display:block}
+
+    #cta{display:inline-flex;align-items:center;gap:.55rem;background:var(--accent);color:var(--ink);font-weight:700;font-size:1rem;padding:.9rem 2rem;border-radius:999px;text-decoration:none;box-shadow:0 6px 24px rgba(0,0,0,.35);opacity:0;transform:translateY(10px);transition:opacity .6s ease .35s,transform .6s ease .35s,filter .15s}
+    #cta.on{opacity:1;transform:none}
+    #cta:hover{filter:brightness(1.06)}
+
+    #change{margin-top:.25rem;font-size:.78rem;color:rgba(255,255,255,.5);text-decoration:underline;text-underline-offset:3px;opacity:0;transition:opacity .6s ease .5s}
+    #change.on{opacity:1}
+    #change:hover{color:#fff}
+
+    #loading{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:#0a0a0a;transition:opacity .4s}
+    #loading.hidden{opacity:0;pointer-events:none}
+    .spin{width:46px;height:46px;border:3px solid rgba(255,255,255,.12);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite}
+    @keyframes sp{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div id="loading"><div class="spin"></div></div>
+  <div id="bg"></div>
+  <div id="overlay"></div>
+  <div id="wordmark">Goodz</div>
+
+  <main id="wrap">
+    <div id="art"></div>
+    <div id="titles">
+      <div id="eyebrow">You tapped a Goodz</div>
+      <div id="title">Loading…</div>
+      <div id="artist"></div>
+    </div>
+    <div id="embed"></div>
+    <a id="cta" href="#" target="_blank" rel="noopener">Listen</a>
+    <a id="change" href="/tapped-edit-url">Change the link on this Goodz</a>
+  </main>
+
+  <script>
+    function getParam(n){
+      var m = new RegExp('[?&]'+n+'=([^&#]*)').exec(location.search);
+      return m ? decodeURIComponent(m[1].replace(/\+/g,' ')) : '';
+    }
+    var targetUrl = getParam('playlist_url') || getParam('url');
+    var code = getParam('code');
+
+    var $ = function(id){ return document.getElementById(id); };
+    var loading=$('loading'), bg=$('bg'), wordmark=$('wordmark'), art=$('art'),
+        titles=$('titles'), title=$('title'), artist=$('artist'), eyebrow=$('eyebrow'),
+        embed=$('embed'), cta=$('cta'), change=$('change');
+
+    // per-provider embed height (px) or aspect ratio
+    var EMBED = {
+      spotify:{h:352}, apple:{h:450}, youtube:{ratio:'16/9'},
+      soundcloud:{h:166}, deezer:{h:300}, tidal:{h:120}
+    };
+
+    if (code || targetUrl) {
+      change.href = '/tapped-edit-url?code=' + encodeURIComponent(code) +
+        '&playlist_url=' + encodeURIComponent(targetUrl);
+    }
+
+    function reveal(d){
+      loading.classList.add('hidden');
+      document.documentElement.style.setProperty('--accent', d.accent || '#FEC850');
+      cta.href = d.openUrl || targetUrl || '#';
+
+      if (d.artworkUrl){
+        bg.style.backgroundImage = 'url("'+d.artworkUrl+'")';
+        art.style.backgroundImage = 'url("'+d.artworkUrl+'")';
+      }
+      title.textContent = d.title || titleFallback(d);
+      artist.textContent = d.artist || '';
+      artist.style.display = d.artist ? 'block' : 'none';
+
+      // tier-specific layout
+      if (d.tier === 1 && d.embedUrl){
+        art.classList.add('round');
+        var cfg = EMBED[d.provider] || {h:352};
+        var style = cfg.ratio ? 'aspect-ratio:'+cfg.ratio : 'height:'+cfg.h+'px';
+        embed.innerHTML = '<iframe src="'+d.embedUrl+'" style="'+style+'" ' +
+          'allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" ' +
+          'loading="lazy"></iframe>';
+        cta.textContent = 'Open in ' + d.providerName;
+        showEmbed();
+      } else if (d.tier === 2){
+        // art + open button, no inline player
+        cta.textContent = 'Open in ' + d.providerName;
+        if (!d.artworkUrl) art.style.display = 'none';
+      } else {
+        // tier 3 default: branded, never a dead end
+        art.classList.remove('round');
+        if (!d.artworkUrl) art.style.display = 'none';
+        if (!d.title) title.textContent = 'Your music is one tap away';
+        cta.textContent = 'Open the link';
+      }
+      runIn();
+    }
+
+    function titleFallback(d){
+      return d.provider && d.provider !== 'generic'
+        ? 'Saved on ' + d.providerName : 'Your Goodz';
+    }
+
+    function showEmbed(){ /* gated by runIn timing */ }
+
+    function runIn(){
+      setTimeout(function(){ wordmark.classList.add('on'); }, 60);
+      setTimeout(function(){ bg.classList.add('on'); }, 120);
+      setTimeout(function(){ art.classList.add('on'); }, 200);
+      setTimeout(function(){ titles.classList.add('on'); }, 420);
+      setTimeout(function(){ cta.classList.add('on'); change.classList.add('on'); }, 640);
+      setTimeout(function(){ embed.classList.add('on'); }, 760);
+    }
+
+    function fallback(){
+      reveal({ provider:'generic', providerName:'the link', accent:'#FEC850',
+        tier:3, openUrl: targetUrl });
+    }
+
+    if (!targetUrl){
+      reveal({ provider:'generic', providerName:'the link', accent:'#FEC850',
+        tier:3, title:'No link on this Goodz yet', openUrl:'#' });
+      cta.style.display = 'none';
+    } else {
+      var ctrl = new AbortController();
+      var to = setTimeout(function(){ ctrl.abort(); }, 9000);
+      fetch('/api/resolve-tap?url=' + encodeURIComponent(targetUrl), { signal: ctrl.signal })
+        .then(function(r){ if(!r.ok) throw new Error('bad'); return r.json(); })
+        .then(function(d){ clearTimeout(to); reveal(d); })
+        .catch(function(){ clearTimeout(to); fallback(); });
+    }
+  </script>
+</body>
+</html>
