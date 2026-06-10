@@ -11,7 +11,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FEC850'/><text x='50' y='72' font-size='65' font-family='Arial Black' font-weight='900' fill='%23191414' text-anchor='middle'>G</text></svg>">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{ --accent:#FEC850; --ink:#0a0a0a; }
+    :root{ --accent:#FEC850; --ink:#0a0a0a; --amber:#E8A820; --white:#fff; --black:#111; --border:2px solid #111; }
     html,body{height:100%;font-family:'DM Sans',sans-serif;background:#0a0a0a;color:#fff;overflow-x:hidden}
     body{min-height:100%}
 
@@ -20,8 +20,9 @@
     #bg.on{opacity:1}
     #overlay{position:fixed;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15),rgba(0,0,0,.55) 45%,rgba(0,0,0,.9));pointer-events:none}
 
-    #wordmark{position:fixed;top:1.25rem;left:50%;transform:translateX(-50%);z-index:20;font-family:'Exo',sans-serif;font-weight:900;letter-spacing:.3em;font-size:1rem;text-transform:uppercase;opacity:0;transition:opacity .5s}
-    #wordmark.on{opacity:.92}
+    #wordmark{position:fixed;top:1.25rem;left:50%;transform:translateX(-50%);z-index:20;opacity:0;transition:opacity .5s}
+    #wordmark.on{opacity:.95}
+    #wordmark img{height:22px;width:auto;display:block;filter:drop-shadow(0 1px 6px rgba(0,0,0,.5))}
 
     #wrap{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5rem 1.5rem 3rem;gap:1.25rem}
 
@@ -51,13 +52,30 @@
     #loading.hidden{opacity:0;pointer-events:none}
     .spin{width:46px;height:46px;border:3px solid rgba(255,255,255,.12);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite}
     @keyframes sp{to{transform:rotate(360deg)}}
+
+    /* Goodz site footer (matches getthegoodz.com) */
+    footer{position:relative;z-index:10;background:var(--black);color:var(--white);padding:3.5rem 2rem;display:grid;grid-template-columns:1fr 2fr 1fr;gap:3rem;border-top:var(--border);text-align:left}
+    .footer-logo{margin-bottom:.5rem}
+    .footer-logo img{height:24px;width:auto;display:block}
+    .footer-tagline{font-size:.78rem;color:#b0b0b0}
+    .footer-links{display:grid;grid-template-columns:1fr 1fr;gap:.5rem 2rem;align-items:start}
+    .footer-col{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+    .footer-links a{font-size:.78rem;color:#d0d0d0;text-decoration:none;transition:color .15s}
+    .footer-links a:hover{color:var(--white)}
+    .footer-right{text-align:right}
+    .footer-social{display:flex;gap:1rem;justify-content:flex-end;margin-bottom:1rem}
+    .footer-social a{display:inline-flex;align-items:center;justify-content:center;color:#d0d0d0;transition:color .15s}
+    .footer-social a:hover{color:var(--amber)}
+    .footer-social a svg{display:block}
+    .footer-copy{font-size:.68rem;color:#909090}
+    @media(max-width:640px){footer{grid-template-columns:1fr;gap:2rem}.footer-right{text-align:left}.footer-social{justify-content:flex-start}}
   </style>
 </head>
 <body>
   <div id="loading"><div class="spin"></div></div>
   <div id="bg"></div>
   <div id="overlay"></div>
-  <div id="wordmark">Goodz</div>
+  <div id="wordmark"><img src="/logos/goodz-wordmark-white.svg" alt="Goodz"></div>
 
   <main id="wrap">
     <div id="art"></div>
@@ -70,6 +88,37 @@
     <a id="cta" href="#" target="_blank" rel="noopener">Listen</a>
     <a id="change" href="/tapped-edit-url">Change the link on this Goodz</a>
   </main>
+
+  <footer>
+    <div>
+      <div class="footer-logo"><img src="/logos/goodz-wordmark-white.svg" alt="Goodz" width="152" height="24"></div>
+      <div class="footer-tagline">Music you can hold</div>
+    </div>
+    <div class="footer-links">
+      <ul class="footer-col">
+        <li><a href="/mixtape">Mixtape Goodz</a></li>
+        <li><a href="/custom">Custom Goodz</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+      <ul class="footer-col">
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/support">Support</a></li>
+        <li><a href="/terms-of-service">Terms of Service</a></li>
+        <li><a href="/privacy-policy">Privacy Policy</a></li>
+      </ul>
+    </div>
+    <div class="footer-right">
+      <div class="footer-social">
+        <a href="https://www.instagram.com/getthegoodz" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.facebook.com/getthegoodz" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.9.25-1.5 1.55-1.5h1.65V4.4c-.3-.04-1.3-.12-2.45-.12-2.4 0-4.05 1.46-4.05 4.15v2.07H7.7v3h2.5V21h3.3z"/></svg>
+        </a>
+      </div>
+      <div class="footer-copy">© 2026 Goodz. All rights reserved.</div>
+    </div>
+  </footer>
 
   <script>
     function getParam(n){
