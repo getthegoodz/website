@@ -152,9 +152,18 @@
         '&playlist_url=' + encodeURIComponent(targetUrl);
     }
 
+    function luma(hex){
+      hex = (hex || '').replace('#','');
+      if (hex.length === 3) hex = hex.split('').map(function(c){return c+c;}).join('');
+      var r = parseInt(hex.substr(0,2),16)||0, g = parseInt(hex.substr(2,2),16)||0, b = parseInt(hex.substr(4,2),16)||0;
+      return 0.299*r + 0.587*g + 0.114*b;
+    }
     function reveal(d){
       loading.classList.add('hidden');
-      document.documentElement.style.setProperty('--accent', d.accent || '#FEC850');
+      var accent = d.accent || '#FEC850';
+      document.documentElement.style.setProperty('--accent', accent);
+      // Contrast-aware CTA text: dark accents (e.g. Tidal #111) get light text.
+      cta.style.color = luma(accent) < 110 ? '#fff' : '#0a0a0a';
       cta.href = d.openUrl || targetUrl || '#';
 
       if (d.artworkUrl){
