@@ -2016,6 +2016,25 @@ function renderSummary() {
 }
 
 // ---- Place order ----
+// Cross-domain navigation to Shopify checkout. A scripted
+// window.location assignment is NOT decorated by GA4's auto-linker, so the
+// getthegoodz.com -> shop.getthegoodz.com hop loses the session and the
+// visit re-attributes to (direct). Dispatching a real anchor click lets the
+// auto-linker append the _gl param to the href before the browser navigates,
+// preserving source/medium across the domain. Falls back to a plain redirect
+// if anything throws (navigation still happens, just without _gl).
+function goToCheckout(url) {
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+  } catch (e) {
+    window.location.href = url;
+  }
+}
+
 function placeOrder() {
   const btn = document.getElementById('btn-order');
   btn.textContent = 'Preparing your order...';
@@ -2060,7 +2079,7 @@ function placeOrder() {
   })
   .then(r => { if (!r.ok) throw new Error('Order failed'); return r.json(); })
   .then(data => {
-    if (data.checkoutUrl) { window.location.href = data.checkoutUrl; }
+    if (data.checkoutUrl) { goToCheckout(data.checkoutUrl); }
     else throw new Error('No checkout URL');
   })
   .catch(() => {
