@@ -3,18 +3,6 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/static-pages-dev/index.html"
-    },
-    {
-      "source": "/about",
-      "destination": "/static-pages-dev/about.html"
-    },
-    {
-      "source": "/custom",
-      "destination": "/static-pages-dev/custom.html"
-    },
-    {
       "source": "/custom-goodz",
       "destination": "/custom-goodz/index.html"
     },
@@ -25,42 +13,6 @@
     {
       "source": "/api/custom-goodz-order",
       "destination": "/api/custom-goodz-order.js"
-    },
-    {
-      "source": "/artist-goodz",
-      "destination": "/static-pages-dev/artist-goodz.html"
-    },
-    {
-      "source": "/faq",
-      "destination": "/static-pages-dev/faq.html"
-    },
-    {
-      "source": "/support",
-      "destination": "/static-pages-dev/support.html"
-    },
-    {
-      "source": "/contact",
-      "destination": "/static-pages-dev/contact.html"
-    },
-    {
-      "source": "/privacy",
-      "destination": "/static-pages-dev/privacy.html"
-    },
-    {
-      "source": "/terms",
-      "destination": "/static-pages-dev/terms.html"
-    },
-    {
-      "source": "/privacy-policy",
-      "destination": "/static-pages-dev/privacy.html"
-    },
-    {
-      "source": "/terms-of-service",
-      "destination": "/static-pages-dev/terms.html"
-    },
-    {
-      "source": "/turnstile-proof",
-      "destination": "/static-pages-dev/turnstile-proof.html"
     },
     {
       "source": "/tapped-add-url",
