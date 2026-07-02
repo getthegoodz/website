@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Your Music Is Ready - Goodz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style-warm.css">
+  <style>
+    .bc-page { min-height: 100vh; display: flex; flex-direction: column; }
+    .bc-topbar { display: flex; justify-content: center; padding: 1.5rem 1rem 0.5rem; }
+    .bc-topbar img { height: 18px; width: auto; }
+    .bc-wrap { max-width: 480px; width: 100%; margin: 0 auto; padding: 1.5rem 1.5rem 4rem; flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .bc-eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber-ink); margin-bottom: 1.25rem; }
+    .bc-art { width: min(280px, 72vw); aspect-ratio: 1; object-fit: cover; border: 2px solid var(--black); box-shadow: 8px 8px 0 var(--amber); margin-bottom: 1.75rem; background: var(--off-white); }
+    .bc-title { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: clamp(1.5rem, 6vw, 2rem); letter-spacing: -0.01em; text-transform: uppercase; line-height: 1.15; margin-bottom: 0.3rem; }
+    .bc-artist { color: var(--text-light); font-size: 1.05rem; margin-bottom: 1.75rem; }
+    .bc-actions { display: flex; flex-direction: column; gap: 0.85rem; align-items: stretch; width: 100%; }
+    .bc-actions .btn { width: 100%; font-size: 0.95rem; padding: 1.1rem 2rem; }
+    .bc-reassure { font-size: 0.92rem; color: var(--text-light); line-height: 1.65; margin-top: 1.1rem; }
+    .bc-reassure strong { color: var(--text); }
+    .bc-divider { height: 1px; background: var(--border-inner); width: 100%; margin: 2rem 0 1.5rem; }
+    .bc-keep { font-size: 0.88rem; color: var(--text-light); line-height: 1.6; }
+    .bc-keep a { color: var(--text); font-weight: 600; }
+    .bc-keepit { margin-top: 1.1rem; width: 100%; text-align: left; border: var(--border-inner); border-radius: 6px; padding: 0 1rem; background: var(--off-white); }
+    .bc-keepit summary { cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text); padding: 0.85rem 0; list-style-position: inside; }
+    .bc-keepit p { font-size: 0.88rem; color: var(--text-light); line-height: 1.6; padding-bottom: 0.9rem; margin: 0; }
+    .bc-welcome { display: none; font-size: 0.95rem; font-weight: 600; color: var(--amber-ink); margin-bottom: 1rem; }
+    body.is-return .bc-welcome { display: block; }
+  </style>
+</head>
+<body>
+<div class="bc-page">
+
+<div class="bc-topbar">
+  <a href="/" aria-label="Goodz home"><img src="/logos/goodz-wordmark-black.svg" alt="Goodz"></a>
+</div>
+
+<main class="bc-wrap">
+  <div class="bc-eyebrow">You tapped a Goodz</div>
+  <div class="bc-welcome">Welcome back. Stream it again below, or re-download on Bandcamp.</div>
+
+  <img id="bc_art" class="bc-art" src="https://f4.bcbits.com/img/a0340472664_5.jpg" alt="Album artwork">
+
+  <h1 id="bc_title" class="bc-title">My First Track</h1>
+  <p id="bc_artist" class="bc-artist">by Goodz</p>
+
+  <div class="bc-actions">
+    <a id="bc_download" href="#" class="btn btn-amber">Download your music &rarr;</a>
+    <a id="bc_stream" href="#" target="_blank" class="btn btn-outline">Just stream it now</a>
+  </div>
+
+  <p id="bc_reassure" class="bc-reassure">This card holds a download code. The button takes you to <strong>Bandcamp</strong>, where your download is waiting. <strong>No account needed</strong>: pick a format (MP3 works everywhere) and download.</p>
+
+  <details id="bc_keepit" class="bc-keepit">
+    <summary>Want it on every device, forever?</summary>
+    <p>Redeem with a <strong>free Bandcamp account</strong> and the album lands in your collection: stream it in the Bandcamp app and re-download anytime. No account is fine too. Your download is yours to keep either way.</p>
+  </details>
+
+  <div class="bc-divider"></div>
+
+  <p class="bc-keep">Keep this card. Tap it anytime to come back here.<br>Curious how it works? <a href="/mixtape">Get the Goodz &rarr;</a></p>
+</main>
+
+<footer>
+  <div>
+    <div class="footer-logo"><img src="/logos/goodz-wordmark-white.svg" alt="Goodz" width="152" height="24"></div>
+    <div class="footer-tagline">Music you can hold</div>
+  </div>
+  <div class="footer-links">
+    <ul class="footer-col">
+      <li><a href="/mixtape">Mixtape Goodz</a></li>
+      <li><a href="/custom">Custom Goodz</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+    <ul class="footer-col">
+      <li><a href="/contact">Contact</a></li>
+      <li><a href="/support">Support</a></li>
+      <li><a href="/terms-of-service">Terms of Service</a></li>
+      <li><a href="/privacy-policy">Privacy Policy</a></li>
+    </ul>
+  </div>
+  <div class="footer-right">
+    <div class="footer-copy">&copy; 2026 Goodz. All rights reserved.</div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+// Prototype: in production these values are baked into the page per run at order
+// time (artist, title, art scraped from the Bandcamp og: tags), and only the
+// per-card yum code varies via query param.
+function getParam(name) {
+  var m = new RegExp('[?&]' + name + '=([^&#]*)').exec(location.search);
+  return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
+}
+var yum = getParam('yum');         // e.g. 3qzx-ekn2
+var sub = getParam('sub') || 'getthegoodz';  // bandcamp subdomain
+var albumPath = getParam('album') || '/track/my-first-track';
+
+var dl = document.getElementById('bc_download');
+var st = document.getElementById('bc_stream');
+st.href = 'https://' + sub + '.bandcamp.com' + albumPath;
+if (yum) {
+  dl.href = 'https://' + sub + '.bandcamp.com/yum?' + yum;
+} else {
+  dl.href = st.href; // no code in URL: fall back to the album page
+}
+
+var t = getParam('title'); if (t) document.getElementById('bc_title').textContent = t;
+var a = getParam('artist'); if (a) document.getElementById('bc_artist').textContent = 'by ' + a;
+var art = getParam('art'); if (art) document.getElementById('bc_art').src = art;
+
+// Re-tap awareness: per-DEVICE, per-card. We never learn the fan's Bandcamp
+// identity (the tap happens on our domain, not theirs), and one card can be
+// tapped by different people — so this is a soft device-side hint, not a
+// claim of "you redeemed this." On a return tap from the same phone we lead
+// with Stream (always works) and soften the download copy.
+try {
+  var key = 'goodz_tapped_' + (yum || albumPath);
+  if (localStorage.getItem(key)) {
+    document.body.classList.add('is-return');
+    var dlBtn = document.getElementById('bc_download');
+    var stBtn = document.getElementById('bc_stream');
+    dlBtn.classList.remove('btn-amber'); dlBtn.classList.add('btn-outline');
+    dlBtn.textContent = 'Re-download on Bandcamp →';
+    stBtn.classList.remove('btn-outline'); stBtn.classList.add('btn-amber');
+    stBtn.textContent = 'Stream it now';
+    // move Stream above Download on a return visit
+    stBtn.parentNode.insertBefore(stBtn, dlBtn);
+  }
+  localStorage.setItem(key, '1');
+} catch (e) { /* private mode: just show the default first-visit view */ }
+</script>
+</body>
+</html>
