@@ -29,11 +29,20 @@ form is also the deployment's `url` in the Vercel dashboard).
 
 ## Site layout
 
-- Root `*.html` — marketing pages, served via `cleanUrls` (`/about`, `/faq`, `/contact`, etc.).
-- `static-pages/` — NFC tapped flow (`tapped*.html`) and branded album/landing pages, routed by
-  `vercel.json` rewrites.
+- **Root `*.html` = the canonical, live marketing pages.** `/`, `/about`, `/custom`,
+  `/artist-goodz`, `/faq`, `/support`, `/contact`, `/privacy`, `/terms`, `/privacy-policy`,
+  `/terms-of-service`. Served via `cleanUrls`. **To change a live marketing page, edit the root
+  file.** (Verified 2026-07-02: production byte-matches these root files.)
+- `static-pages/` — NFC tapped flow (`tapped*.html`) and branded album/landing pages
+  (`/landing/*`, `/handles/*`, album slugs). **Live**, routed by `vercel.json` rewrites.
 - `api/*` — live serverless functions.
-- `vercel.json` — routing and rewrites. Do not change the `/tapped` rewrite unless you mean to.
+- **`static-pages-dev/` is DEAD — do not edit it.** It holds pre-redesign Webflow copies of the
+  marketing pages. `vercel.json` still carries legacy rewrites pointing marketing URLs at it, but
+  those rewrites are **inert**: Vercel serves the matching root file (via `cleanUrls`) before it
+  ever reaches a rewrite, so root always wins. Only exception: `/turnstile-proof` (no root copy;
+  a throwaway captcha test page). This dir + its rewrites are slated for removal.
+- `vercel.json` — routing and rewrites. The `static-pages/` rewrites (tapped, landing, handles,
+  album pages) ARE live; do not break them. Don't touch the `/tapped` rewrite unless you mean to.
 
 ## Working rules
 
