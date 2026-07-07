@@ -1365,6 +1365,13 @@ function isHostedUrl(v) { return typeof v === 'string' && /^https:\/\//.test(v);
 // uploads at ~1-3MB instead of 20MB+, which is what made uploads slow and
 // failure-prone (and could exceed Cloudinary's per-file limit).
 const MAX_UPLOAD_PX = 2048;
+// Print floor: never let downscaling push the SHORT side below 300 DPI
+// (827px at 70mm). Only matters for extreme aspect ratios (>~2.5:1), where
+// capping the long side at 2048 would otherwise degrade a compliant image.
+// Images already below 827px are left untouched (we never upscale); the
+// existing size warning covers those, deliberately advisory not blocking —
+// low-res art is handled with the customer after the order (Chris, 2026-07-07).
+const MIN_PRINT_PX = 827;
 
 // Map an upload error to a user-facing reason. Cloudinary's own error text
 // (thrown by uploadToCloudinary) names size problems explicitly; anything
@@ -1400,7 +1407,12 @@ function startArtUpload(side, dataUrl) {
   }
   const img = new Image();
   img.onload = () => {
-    const scale = Math.min(1, MAX_UPLOAD_PX / Math.max(img.naturalWidth, img.naturalHeight));
+    const longSide  = Math.max(img.naturalWidth, img.naturalHeight);
+    const shortSide = Math.min(img.naturalWidth, img.naturalHeight);
+    // Cap the long side at MAX_UPLOAD_PX, but never shrink the short side
+    // below MIN_PRINT_PX. When the two conflict (extreme aspect ratios), the
+    // print floor wins: max() picks the gentler downscale.
+    const scale = Math.min(1, Math.max(MAX_UPLOAD_PX / longSide, MIN_PRINT_PX / shortSide));
     const canvas = document.createElement('canvas');
     canvas.width  = Math.max(1, Math.round(img.naturalWidth  * scale));
     canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
