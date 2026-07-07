@@ -250,7 +250,7 @@
       .option-cards.music-cards { grid-template-columns: 1fr; }
     }
     /* Streaming service: tight horizontal row of small platform glyphs */
-    .streaming-logos { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; }
+    .streaming-logos { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; min-height: 33px; /* sibling cards' icon rows render at 33px (26px inline svg + line-box descent) — match so titles align */ }
     .streaming-logos svg { flex-shrink: 0; }
 
     /* Pricing grid */
