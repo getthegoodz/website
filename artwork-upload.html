@@ -1096,6 +1096,12 @@
       <div class="size-warning" id="back-size-warn">
         &#9888; Back image may be too small for 300 DPI print quality. We recommend at least 827&times;827px.
       </div>
+      <div class="size-warning" id="front-upload-warn" style="display:none">
+        &#9888; Artwork upload failed &mdash; check your connection. <a href="#" onclick="retryArtUpload('front', event)">Retry upload</a>
+      </div>
+      <div class="size-warning" id="back-upload-warn" style="display:none">
+        &#9888; Back artwork upload failed &mdash; check your connection. <a href="#" onclick="retryArtUpload('back', event)">Retry upload</a>
+      </div>
     </div>
 
     <div class="card-actions" id="card-actions">
@@ -1267,6 +1273,8 @@ let state = {
   backTooSmall:  false,
   uploadingFront: false,
   uploadingBack:  false,
+  frontUploadFailed: false,
+  backUploadFailed:  false,
   csvUrls:       [],
   csvDuplicates: 0,
   csvCloudUrl:   null,
@@ -1340,6 +1348,59 @@ function uploadToCloudinary(blob, filename, resourceType) {
   });
 }
 
+// Artwork is only "ready" once it lives at a hosted (Cloudinary) URL. A data
+// URL is preview-only: sent to checkout it becomes a multi-MB request body
+// that blows past Vercel's function payload limit (413) or stalls outright.
+function isHostedUrl(v) { return typeof v === 'string' && /^https:\/\//.test(v); }
+
+// Converts a picked file (as data URL) to PNG and uploads it, retrying once.
+// If both attempts fail, the side is flagged: step buttons stay disabled and
+// a Retry link appears. The data URL stays in state for preview and retry.
+function startArtUpload(side, dataUrl) {
+  const isFront = side === 'front';
+  if (isFront) { state.uploadingFront = true; state.frontUploadFailed = false; }
+  else         { state.uploadingBack  = true; state.backUploadFailed  = false; }
+  updateStepButtons(); renderUploadWarnings();
+  function finish(ok) {
+    if (isFront) { state.uploadingFront = false; state.frontUploadFailed = !ok; }
+    else         { state.uploadingBack  = false; state.backUploadFailed  = !ok; }
+    if (!ok) trackEvent('artwork_upload_failed', { side: side });
+    updateStepButtons(); renderUploadWarnings();
+  }
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    canvas.toBlob(blob => {
+      if (!blob) { finish(false); return; }
+      uploadToCloudinary(blob, `${side}_${Date.now()}.png`, 'image')
+        .catch(() => uploadToCloudinary(blob, `${side}_retry_${Date.now()}.png`, 'image'))
+        .then(url => {
+          if (isFront) state.frontArt = url; else state.backArt = url;
+          saveArtworkState();
+          finish(true);
+        })
+        .catch(() => finish(false));
+    }, 'image/png');
+  };
+  img.onerror = () => finish(false);
+  img.src = dataUrl;
+}
+
+function retryArtUpload(side, ev) {
+  if (ev) ev.preventDefault();
+  const art = side === 'front' ? state.frontArt : state.backArt;
+  if (art && !isHostedUrl(art)) startArtUpload(side, art);
+}
+
+function renderUploadWarnings() {
+  const f = document.getElementById('front-upload-warn');
+  const b = document.getElementById('back-upload-warn');
+  if (f) f.style.display = state.frontUploadFailed ? 'block' : 'none';
+  if (b) b.style.display = state.backUploadFailed  ? 'block' : 'none';
+}
+
 // ---- Image size warning (scoped to the currently visible side) ----
 function checkImageSize(dataUrl, side) {
   const img = new Image();
@@ -1400,22 +1461,7 @@ function handleFrontFile(file) {
     updateStatusBadges();
 
     // Upload to Cloudinary (non-blocking)
-    state.uploadingFront = true;
-    updateStepButtons();
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
-      canvas.getContext('2d').drawImage(img, 0, 0);
-      canvas.toBlob(blob => {
-        if (!blob) { state.uploadingFront = false; return; }
-        uploadToCloudinary(blob, `front_${Date.now()}.png`, 'image')
-          .then(url => { state.frontArt = url; saveArtworkState(); })
-          .catch(() => {})
-          .finally(() => { state.uploadingFront = false; updateStepButtons(); });
-      }, 'image/png');
-    };
-    img.src = dataUrl;
+    startArtUpload('front', dataUrl);
   };
   reader.readAsDataURL(file);
 }
@@ -1583,22 +1629,7 @@ function handleBackFile(file) {
     updateStepButtons();
     updateStatusBadges();
 
-    state.uploadingBack = true;
-    updateStepButtons();
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
-      canvas.getContext('2d').drawImage(img, 0, 0);
-      canvas.toBlob(blob => {
-        if (!blob) { state.uploadingBack = false; return; }
-        uploadToCloudinary(blob, `back_${Date.now()}.png`, 'image')
-          .then(url => { state.backArt = url; saveArtworkState(); })
-          .catch(() => {})
-          .finally(() => { state.uploadingBack = false; updateStepButtons(); });
-      }, 'image/png');
-    };
-    img.src = dataUrl;
+    startArtUpload('back', dataUrl);
   };
   reader.readAsDataURL(file);
 }
@@ -1932,8 +1963,10 @@ function hasMusic() {
 }
 
 function updateStepButtons() {
-  const frontReady = !!state.frontArt && !state.uploadingFront;
-  const backReady = !needsBack() || (!!state.backArt && !state.uploadingBack);
+  // Ready = hosted URL only. A data URL means the Cloudinary upload hasn't
+  // finished (or failed) and must never reach checkout — see placeOrder.
+  const frontReady = isHostedUrl(state.frontArt) && !state.uploadingFront;
+  const backReady = !needsBack() || (isHostedUrl(state.backArt) && !state.uploadingBack);
 
   document.getElementById('btn-step0').disabled = !hasMusic() || state.uploadingCSV;
   document.getElementById('btn-step1').disabled = !(frontReady && backReady);
@@ -1970,12 +2003,16 @@ function renderSummary() {
     preview.style.display = 'none';
   }
 
-  rows.push({ label: 'Front artwork',   value: state.frontArt ? 'Uploaded ✓' : 'Missing ✗', missing: !state.frontArt });
+  // "Uploaded ✓" only for hosted URLs; a lingering data URL is an upload
+  // that is still running or failed, and the row must say so.
+  const artStatus = (art, uploading) =>
+    uploading ? 'Uploading…' : isHostedUrl(art) ? 'Uploaded ✓' : art ? 'Upload failed ✗' : 'Missing ✗';
+  rows.push({ label: 'Front artwork',   value: artStatus(state.frontArt, state.uploadingFront), missing: !isHostedUrl(state.frontArt) });
   if (needsBack()) {
     const backLabel = isUpgradedToCustomBack()
       ? `Custom back (${fmtMoney(CUSTOM_BACK_UPCHARGE)}/unit)`
       : 'Back artwork';
-    rows.push({ label: backLabel, value: state.backArt ? 'Uploaded ✓' : 'Missing ✗', missing: !state.backArt });
+    rows.push({ label: backLabel, value: artStatus(state.backArt, state.uploadingBack), missing: !isHostedUrl(state.backArt) });
   } else {
     rows.push({ label: 'Back design', value: 'Standard Goodz Back' });
   }
@@ -2000,14 +2037,16 @@ function renderSummary() {
 
   const warnEl = document.getElementById('summary-warning');
   const issues = [];
-  if (!state.frontArt) issues.push('front artwork');
-  if (needsBack() && !state.backArt) issues.push('back artwork');
+  if (!isHostedUrl(state.frontArt)) issues.push('front artwork');
+  if (needsBack() && !isHostedUrl(state.backArt)) issues.push('back artwork');
   // No code-count friction: a music link (CSV uploaded or URL entered) is
   // all that's required; we reconcile Bandcamp codes after checkout.
   if (!hasMusic()) issues.push('music link');
   if (issues.length) {
     warnEl.style.display = 'block';
-    warnEl.textContent = `Still needed: ${issues.join(', ')}.`;
+    warnEl.textContent = (state.frontUploadFailed || state.backUploadFailed)
+      ? `Still needed: ${issues.join(', ')}. An upload failed — go back to the Artwork step and tap Retry.`
+      : `Still needed: ${issues.join(', ')}.`;
   } else {
     warnEl.style.display = 'none';
   }
@@ -2037,6 +2076,17 @@ function goToCheckout(url) {
 
 function placeOrder() {
   const btn = document.getElementById('btn-order');
+  // Backstop: never send a data URL to checkout. The base64 body blows past
+  // Vercel's ~4.5MB function payload limit (413 FUNCTION_PAYLOAD_TOO_LARGE)
+  // or stalls mid-upload on slow connections, hanging the request.
+  if (!isHostedUrl(state.frontArt) || (needsBack() && !isHostedUrl(state.backArt))) {
+    const w = document.getElementById('summary-warning');
+    w.style.display = 'block';
+    w.textContent = 'Your artwork hasn’t finished uploading. Go back to the Artwork step and tap Retry.';
+    trackEvent('checkout_error', { context: 'artwork_not_hosted' });
+    updateStepButtons();
+    return;
+  }
   btn.textContent = 'Preparing your order...';
   btn.disabled = true;
   const cfg = orderConfig || {};
@@ -2072,23 +2122,34 @@ function placeOrder() {
     payload.musicUrl = state.altURL;
   }
 
+  // Abort after 20s so the button can never lock on "Preparing your
+  // order..." forever — a stalled request re-enables it with a retry message.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+
   fetch(`${API_BASE}/api/custom-goodz-order`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+    signal: controller.signal,
   })
   .then(r => { if (!r.ok) throw new Error('Order failed'); return r.json(); })
   .then(data => {
+    clearTimeout(timeoutId);
     if (data.checkoutUrl) { goToCheckout(data.checkoutUrl); }
     else throw new Error('No checkout URL');
   })
-  .catch(() => {
+  .catch(err => {
+    clearTimeout(timeoutId);
+    const timedOut = err && err.name === 'AbortError';
     btn.textContent = 'Proceed to Checkout →';
     btn.disabled = false;
     const w = document.getElementById('summary-warning');
     w.style.display = 'block';
-    w.textContent = 'Could not connect to checkout. Please try again or contact info@getthegoodz.com.';
-    trackEvent('checkout_error', { context: 'place_order' });
+    w.textContent = timedOut
+      ? 'This is taking longer than expected — please try again. Your order details are saved.'
+      : 'Could not connect to checkout. Please try again or contact info@getthegoodz.com.';
+    trackEvent('checkout_error', { context: timedOut ? 'place_order_timeout' : 'place_order' });
   });
 }
 
