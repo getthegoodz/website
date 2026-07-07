@@ -251,6 +251,9 @@
     }
     /* Streaming service: tight horizontal row of small platform glyphs */
     .streaming-logos { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; min-height: 33px; /* sibling cards' icon rows render at 33px (26px inline svg + line-box descent) — match so titles align */ }
+    /* Back-design pair: the standard card leads with a 44px thumbnail, so the
+       custom card's icon row matches it and the two titles align. */
+    [data-option="back"] .option-card-icon { min-height: 44px; display: flex; align-items: center; }
     .streaming-logos svg { flex-shrink: 0; }
 
     /* Pricing grid */
@@ -763,7 +766,7 @@
 
       <!-- Option: Keychain Hole -->
       <div class="option-section">
-        <div class="option-section-label">Keychain hole</div>
+        <div class="option-section-label">Keychain hole (3mm)</div>
         <div class="option-cards" data-option="keychain">
           <div class="option-card selected" data-value="none">
             <div class="option-card-icon">
