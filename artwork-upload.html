@@ -1346,12 +1346,18 @@ function uploadToCloudinary(blob, filename, resourceType) {
   fd.append('file', blob, filename);
   fd.append('upload_preset', CLOUDINARY_PRESET);
   fd.append('folder', 'goodz');
+  // Abort a stalled upload after 30s — without this, a hung request leaves
+  // uploadingFront/Back true forever and the step buttons silently locked
+  // (the same no-timeout bug placeOrder had).
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
   return fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`, {
-    method: 'POST', body: fd,
+    method: 'POST', body: fd, signal: controller.signal,
   }).then(r => r.json()).then(d => {
     if (d.error) throw new Error(d.error.message);
+    if (!d.secure_url) throw new Error('No URL in upload response');
     return d.secure_url;
-  });
+  }).finally(() => clearTimeout(timeoutId));
 }
 
 // Artwork is only "ready" once it lives at a hosted (Cloudinary) URL. A data
@@ -1377,6 +1383,9 @@ const MIN_PRINT_PX = 827;
 // (thrown by uploadToCloudinary) names size problems explicitly; anything
 // else is almost always a connectivity failure.
 function uploadErrorMessage(err) {
+  if (err && err.name === 'AbortError') {
+    return 'The upload timed out — your connection may be slow. Retry, or try a smaller file.';
+  }
   if (err && /too large|file size/i.test(err.message || '')) {
     return 'This artwork file is too large to upload — try a smaller version.';
   }
@@ -2049,7 +2058,12 @@ function updateStepButtons() {
   const backReady = !needsBack() || (isHostedUrl(state.backArt) && !state.uploadingBack);
 
   document.getElementById('btn-step0').disabled = !hasMusic() || state.uploadingCSV;
-  document.getElementById('btn-step1').disabled = !(frontReady && backReady);
+  const step1Btn = document.getElementById('btn-step1');
+  step1Btn.disabled = !(frontReady && backReady);
+  // A silently disabled Next is indistinguishable from a hang — say why.
+  step1Btn.textContent = (state.uploadingFront || state.uploadingBack)
+    ? 'Uploading artwork...'
+    : 'Next: Review →';
 
   const orderReady = frontReady && backReady && hasMusic() && !state.uploadingCSV;
   const orderBtn = document.getElementById('btn-order');
