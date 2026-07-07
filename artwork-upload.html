@@ -1097,10 +1097,12 @@
         &#9888; Back image may be too small for 300 DPI print quality. We recommend at least 827&times;827px.
       </div>
       <div class="size-warning" id="front-upload-warn" style="display:none">
-        &#9888; Artwork upload failed &mdash; check your connection. <a href="#" onclick="retryArtUpload('front', event)">Retry upload</a>
+        &#9888; <span class="upload-warn-msg">Artwork upload failed &mdash; check your connection.</span>
+        <a href="#" onclick="retryArtUpload('front', event)">Retry upload</a><span class="upload-warn-help" style="display:none"> &middot; Still not working? Email your artwork to <a href="mailto:info@getthegoodz.com">info@getthegoodz.com</a> and we&rsquo;ll set up your order.</span>
       </div>
       <div class="size-warning" id="back-upload-warn" style="display:none">
-        &#9888; Back artwork upload failed &mdash; check your connection. <a href="#" onclick="retryArtUpload('back', event)">Retry upload</a>
+        &#9888; <span class="upload-warn-msg">Back artwork upload failed &mdash; check your connection.</span>
+        <a href="#" onclick="retryArtUpload('back', event)">Retry upload</a><span class="upload-warn-help" style="display:none"> &middot; Still not working? Email your artwork to <a href="mailto:info@getthegoodz.com">info@getthegoodz.com</a> and we&rsquo;ll set up your order.</span>
       </div>
     </div>
 
@@ -1158,8 +1160,8 @@
       </div>
     </div>
 
-    <input type="file" id="input-front" class="file-input" accept=".png,.jpg,.jpeg,.tiff,.tif,.pdf">
-    <input type="file" id="input-back"  class="file-input" accept=".png,.jpg,.jpeg,.tiff,.tif,.pdf">
+    <input type="file" id="input-front" class="file-input" accept=".png,.jpg,.jpeg">
+    <input type="file" id="input-back"  class="file-input" accept=".png,.jpg,.jpeg">
 
     <!-- Sleeve preview (hidden unless sleeve selected) -->
     <div id="sleeve-wrap" class="sleeve-wrap" style="display:none">
@@ -1184,7 +1186,7 @@
       <div class="specs-list">
         <div class="specs-list-item"><strong>300 DPI</strong> minimum resolution</div>
         <div class="specs-list-item"><strong>20 MB</strong> max file size</div>
-        <div class="specs-list-item"><strong>PNG, JPEG, TIFF, PDF</strong> file format</div>
+        <div class="specs-list-item"><strong>PNG or JPEG</strong> file format</div>
         <div class="specs-list-item"><strong><span data-mm-value data-mm="70">2.76"</span> &times; <span data-mm-value data-mm="70">2.76"</span> canvas</strong> with <strong><span data-mm-value data-mm="2.5">0.10"</span> bleed</strong> on all sides. Keep important elements <strong><span data-mm-value data-mm="1.5">0.06"</span> inside</strong> the trim edge.</div>
       </div>
       <div class="specs-templates">
@@ -1275,6 +1277,10 @@ let state = {
   uploadingBack:  false,
   frontUploadFailed: false,
   backUploadFailed:  false,
+  frontUploadError: '',      // user-facing reason for the last failure
+  backUploadError:  '',
+  frontUploadFails: 0,       // consecutive failures; >= 2 shows the email escape hatch
+  backUploadFails:  0,
   csvUrls:       [],
   csvDuplicates: 0,
   csvCloudUrl:   null,
@@ -1353,27 +1359,54 @@ function uploadToCloudinary(blob, filename, resourceType) {
 // that blows past Vercel's function payload limit (413) or stalls outright.
 function isHostedUrl(v) { return typeof v === 'string' && /^https:\/\//.test(v); }
 
-// Converts a picked file (as data URL) to PNG and uploads it, retrying once.
-// If both attempts fail, the side is flagged: step buttons stay disabled and
-// a Retry link appears. The data URL stays in state for preview and retry.
+// Upload size cap: the print canvas is 827×827px at 300 DPI (70mm with
+// bleed), so 2048px on the longest side is ~2.5× oversampled — no visible
+// quality cost on a 65mm tile. Downscaling before the PNG encode keeps photo
+// uploads at ~1-3MB instead of 20MB+, which is what made uploads slow and
+// failure-prone (and could exceed Cloudinary's per-file limit).
+const MAX_UPLOAD_PX = 2048;
+
+// Map an upload error to a user-facing reason. Cloudinary's own error text
+// (thrown by uploadToCloudinary) names size problems explicitly; anything
+// else is almost always a connectivity failure.
+function uploadErrorMessage(err) {
+  if (err && /too large|file size/i.test(err.message || '')) {
+    return 'This artwork file is too large to upload — try a smaller version.';
+  }
+  return 'Artwork upload failed — check your connection.';
+}
+
+// Converts a picked file (as data URL) to PNG — downscaled to MAX_UPLOAD_PX —
+// and uploads it, retrying once. If both attempts fail, the side is flagged:
+// step buttons stay disabled and a Retry link appears with the reason. The
+// data URL stays in state for preview and retry.
 function startArtUpload(side, dataUrl) {
   const isFront = side === 'front';
   if (isFront) { state.uploadingFront = true; state.frontUploadFailed = false; }
   else         { state.uploadingBack  = true; state.backUploadFailed  = false; }
   updateStepButtons(); renderUploadWarnings();
-  function finish(ok) {
-    if (isFront) { state.uploadingFront = false; state.frontUploadFailed = !ok; }
-    else         { state.uploadingBack  = false; state.backUploadFailed  = !ok; }
-    if (!ok) trackEvent('artwork_upload_failed', { side: side });
+  function finish(ok, msg) {
+    if (isFront) {
+      state.uploadingFront = false; state.frontUploadFailed = !ok;
+      state.frontUploadError = ok ? '' : msg;
+      state.frontUploadFails = ok ? 0 : state.frontUploadFails + 1;
+    } else {
+      state.uploadingBack = false; state.backUploadFailed = !ok;
+      state.backUploadError = ok ? '' : msg;
+      state.backUploadFails = ok ? 0 : state.backUploadFails + 1;
+    }
+    if (!ok) trackEvent('artwork_upload_failed', { side: side, reason: msg });
     updateStepButtons(); renderUploadWarnings();
   }
   const img = new Image();
   img.onload = () => {
+    const scale = Math.min(1, MAX_UPLOAD_PX / Math.max(img.naturalWidth, img.naturalHeight));
     const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
-    canvas.getContext('2d').drawImage(img, 0, 0);
+    canvas.width  = Math.max(1, Math.round(img.naturalWidth  * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
     canvas.toBlob(blob => {
-      if (!blob) { finish(false); return; }
+      if (!blob) { finish(false, 'We couldn’t process this image — try re-exporting it as a PNG or JPEG.'); return; }
       uploadToCloudinary(blob, `${side}_${Date.now()}.png`, 'image')
         .catch(() => uploadToCloudinary(blob, `${side}_retry_${Date.now()}.png`, 'image'))
         .then(url => {
@@ -1381,10 +1414,10 @@ function startArtUpload(side, dataUrl) {
           saveArtworkState();
           finish(true);
         })
-        .catch(() => finish(false));
+        .catch(err => finish(false, uploadErrorMessage(err)));
     }, 'image/png');
   };
-  img.onerror = () => finish(false);
+  img.onerror = () => finish(false, 'We couldn’t read this file — please upload a standard PNG or JPEG.');
   img.src = dataUrl;
 }
 
@@ -1395,10 +1428,21 @@ function retryArtUpload(side, ev) {
 }
 
 function renderUploadWarnings() {
-  const f = document.getElementById('front-upload-warn');
-  const b = document.getElementById('back-upload-warn');
-  if (f) f.style.display = state.frontUploadFailed ? 'block' : 'none';
-  if (b) b.style.display = state.backUploadFailed  ? 'block' : 'none';
+  const sides = [
+    ['front-upload-warn', state.frontUploadFailed, state.frontUploadError, state.frontUploadFails],
+    ['back-upload-warn',  state.backUploadFailed,  state.backUploadError,  state.backUploadFails],
+  ];
+  for (const [id, failed, msg, fails] of sides) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.style.display = failed ? 'block' : 'none';
+    if (failed) {
+      if (msg) el.querySelector('.upload-warn-msg').textContent = msg;
+      // After the initial attempt AND a manual retry both fail, offer the
+      // human escape hatch rather than letting the customer rage-quit.
+      el.querySelector('.upload-warn-help').style.display = fails >= 2 ? 'inline' : 'none';
+    }
+  }
 }
 
 // ---- Image size warning (scoped to the currently visible side) ----
@@ -1438,15 +1482,26 @@ function renderArtworkSubsteps() {
 }
 
 // ---- Front art ----
-const ARTWORK_EXTS = ['.png', '.jpg', '.jpeg', '.tiff', '.tif', '.pdf'];
+// PNG/JPEG only: the upload pipeline decodes via <img> + canvas, which cannot
+// process PDF or TIFF in most browsers — those uploads always failed (they
+// used to hang silently on "Uploading artwork..."). Re-allow them if/when
+// uploads send original file bytes for Cloudinary to convert server-side.
+const ARTWORK_EXTS = ['.png', '.jpg', '.jpeg'];
+const LEGACY_EXTS  = ['.tiff', '.tif', '.pdf'];
 function isArtworkFile(name) {
   const lower = name.toLowerCase();
   return ARTWORK_EXTS.some(ext => lower.endsWith(ext));
 }
+function rejectArtworkFile(name) {
+  const lower = name.toLowerCase();
+  alert(LEGACY_EXTS.some(ext => lower.endsWith(ext))
+    ? 'PDF and TIFF files can’t be processed by the order builder yet — please export your artwork as a PNG or JPEG and upload that instead.'
+    : 'Please upload a PNG or JPEG file.');
+}
 
 function handleFrontFile(file) {
   if (!isArtworkFile(file.name)) {
-    alert('Please upload a PNG, JPEG, TIFF, or PDF file.');
+    rejectArtworkFile(file.name);
     return;
   }
   const reader = new FileReader();
@@ -1615,7 +1670,7 @@ function clearFront(e) {
 // ---- Back art ----
 function handleBackFile(file) {
   if (!isArtworkFile(file.name)) {
-    alert('Please upload a PNG, JPEG, TIFF, or PDF file.');
+    rejectArtworkFile(file.name);
     return;
   }
   const reader = new FileReader();
