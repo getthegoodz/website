@@ -2061,9 +2061,17 @@ function updateStepButtons() {
   const step1Btn = document.getElementById('btn-step1');
   step1Btn.disabled = !(frontReady && backReady);
   // A silently disabled Next is indistinguishable from a hang — say why.
-  step1Btn.textContent = (state.uploadingFront || state.uploadingBack)
-    ? 'Uploading artwork...'
-    : 'Next: Review →';
+  // In particular: custom-back orders wait here for back artwork, and
+  // without the label users read the disabled button as a freeze.
+  if (state.uploadingFront || state.uploadingBack) {
+    step1Btn.textContent = 'Uploading artwork...';
+  } else if (frontReady && !backReady) {
+    step1Btn.textContent = 'Add back artwork to continue';
+  } else if (!frontReady && backReady && needsBack()) {
+    step1Btn.textContent = 'Add front artwork to continue';
+  } else {
+    step1Btn.textContent = 'Next: Review →';
+  }
 
   const orderReady = frontReady && backReady && hasMusic() && !state.uploadingCSV;
   const orderBtn = document.getElementById('btn-order');
