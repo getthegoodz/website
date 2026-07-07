@@ -879,7 +879,8 @@
     }
 
     /* Spinner */
-    .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 5px; }
+    /* currentColor so it reads on any button, including pale disabled ones */
+    .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid; border-color: currentColor; border-top-color: transparent; opacity: 0.75; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: -2px; margin-right: 7px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Success */
@@ -2097,7 +2098,7 @@ function updateStepButtons() {
   // In particular: custom-back orders wait here for back artwork, and
   // without the label users read the disabled button as a freeze.
   if (state.uploadingFront || state.uploadingBack) {
-    step1Btn.textContent = 'Uploading artwork...';
+    step1Btn.innerHTML = '<span class="spinner"></span>Uploading artwork...';
   } else if (waitingOnBack) {
     step1Btn.textContent = 'Add back artwork to continue';
   } else if (!frontReady && backReady && needsBack()) {
@@ -2112,8 +2113,8 @@ function updateStepButtons() {
   const orderReady = frontReady && backReady && hasMusic() && !state.uploadingCSV;
   const orderBtn = document.getElementById('btn-order');
   orderBtn.disabled = !orderReady;
-  if (state.uploadingCSV) orderBtn.textContent = 'Uploading CSV...';
-  else if (state.uploadingFront || state.uploadingBack) orderBtn.textContent = 'Uploading artwork...';
+  if (state.uploadingCSV) orderBtn.innerHTML = '<span class="spinner"></span>Uploading CSV...';
+  else if (state.uploadingFront || state.uploadingBack) orderBtn.innerHTML = '<span class="spinner"></span>Uploading artwork...';
   else orderBtn.textContent = 'Proceed to Checkout →';
 
   updateCSVWarning();
@@ -2225,7 +2226,7 @@ function placeOrder() {
     updateStepButtons();
     return;
   }
-  btn.textContent = 'Preparing your order...';
+  btn.innerHTML = '<span class="spinner"></span>Preparing your order...';
   btn.disabled = true;
   const cfg = orderConfig || {};
   trackEvent('proceed_to_checkout_clicked', {
