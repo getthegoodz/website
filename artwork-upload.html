@@ -2053,13 +2053,15 @@ function goToStep(n) {
   state.currentStep = n;
   bumpFurthestStep(n + 1); // global step: 1=Music, 2=Artwork, 3=Review
   document.querySelectorAll('.step').forEach((el, i) => el.classList.toggle('active', i === n));
-  // Stepper cells: mark active for current, done for any previously-reached
-  // step that isn't current. Lets users see what they've already done.
-  const fi = furthestInternal();
+  // Stepper cells: filled = steps BEHIND the current one, outlined = current,
+  // muted = ahead. Marking previously-visited steps ahead of the user as
+  // "done" (the old behavior) read as being on the wrong stage the moment
+  // they navigated backwards. Forward jumps to already-reached steps still
+  // work via handleStepClick — the cell is just muted, not disabled.
   document.querySelectorAll('.step-cell[data-step]').forEach(el => {
     const i = +el.dataset.step;
     el.classList.toggle('active', i === n);
-    el.classList.toggle('done', i !== n && i <= fi);
+    el.classList.toggle('done', i < n);
   });
   if (n === 2) renderSummary();
   updateBackLink();
