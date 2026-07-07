@@ -1185,7 +1185,7 @@
       <div class="artwork-specs-heading">Artwork specs</div>
       <div class="specs-list">
         <div class="specs-list-item"><strong>300 DPI</strong> minimum resolution</div>
-        <div class="specs-list-item"><strong>20 MB</strong> max file size</div>
+        <div class="specs-list-item"><strong>10 MB</strong> max file size</div>
         <div class="specs-list-item"><strong>PNG or JPEG</strong> file format</div>
         <div class="specs-list-item"><strong><span data-mm-value data-mm="70">2.76"</span> &times; <span data-mm-value data-mm="70">2.76"</span> canvas</strong> with <strong><span data-mm-value data-mm="2.5">0.10"</span> bleed</strong> on all sides. Keep important elements <strong><span data-mm-value data-mm="1.5">0.06"</span> inside</strong> the trim edge.</div>
       </div>
@@ -1419,6 +1419,9 @@ function startArtUpload(side, dataUrl) {
     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
     canvas.toBlob(blob => {
       if (!blob) { finish(false, 'We couldn’t process this image — try re-exporting it as a PNG or JPEG.'); return; }
+      // Insurance: even post-downscale, don't send a blob Cloudinary's
+      // free-tier 10MB cap would reject — fail fast with the real reason.
+      if (blob.size > MAX_FILE_BYTES) { finish(false, 'This artwork file is too large to upload — try a smaller version.'); return; }
       uploadToCloudinary(blob, `${side}_${Date.now()}.png`, 'image')
         .catch(() => uploadToCloudinary(blob, `${side}_retry_${Date.now()}.png`, 'image'))
         .then(url => {
@@ -1511,11 +1514,20 @@ function rejectArtworkFile(name) {
     : 'Please upload a PNG or JPEG file.');
 }
 
+// Published spec + Cloudinary free-tier per-file cap (confirmed 2026-07-07).
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+function checkArtworkFileSize(file) {
+  if (file.size <= MAX_FILE_BYTES) return true;
+  alert(`This file is ${(file.size / 1048576).toFixed(0)} MB — the maximum is 10 MB. Please export a smaller version and try again.`);
+  return false;
+}
+
 function handleFrontFile(file) {
   if (!isArtworkFile(file.name)) {
     rejectArtworkFile(file.name);
     return;
   }
+  if (!checkArtworkFileSize(file)) return;
   const reader = new FileReader();
   reader.onload = e => {
     const dataUrl = e.target.result;
@@ -1685,6 +1697,7 @@ function handleBackFile(file) {
     rejectArtworkFile(file.name);
     return;
   }
+  if (!checkArtworkFileSize(file)) return;
   const reader = new FileReader();
   reader.onload = e => {
     const dataUrl = e.target.result;
