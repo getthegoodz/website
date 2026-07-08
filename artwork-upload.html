@@ -863,6 +863,44 @@
       letter-spacing: 0.06em;
       color: var(--muted);
     }
+    .review-art-card { cursor: zoom-in; }
+    .review-art-card:hover img { border-color: var(--black); }
+    .review-art-hint { font-size: 0.7rem; color: var(--muted); align-self: center; margin-left: 0.35rem; }
+
+    /* Full-size artwork lightbox (same pattern as the order page's
+       standard-back lightbox) */
+    .art-lightbox {
+      position: fixed; inset: 0; z-index: 300; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(14,12,10,0.78); cursor: zoom-out; padding: 2rem;
+    }
+    .art-lightbox.open { display: flex; }
+    .art-lightbox img {
+      max-width: min(82vw, 480px); max-height: 76vh;
+      border-radius: 14px; background: #fff;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.45);
+    }
+    .art-lightbox-caption {
+      position: absolute; bottom: 1.4rem; left: 0; right: 0;
+      text-align: center; color: #fff; font-size: 0.85rem; opacity: 0.85;
+    }
+
+    /* Reassurance strip: quiet quality bullets above the checkout button */
+    .review-assurance {
+      margin-top: 1.1rem;
+      display: grid;
+      gap: 0.45rem;
+    }
+    .assurance-item {
+      display: flex;
+      gap: 0.55rem;
+      align-items: baseline;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .assurance-item strong { color: var(--black); font-weight: 700; }
+    .assurance-check { color: var(--black); font-weight: 700; flex-shrink: 0; }
     .review-art-edit {
       margin-left: auto;
       background: none;
@@ -1228,19 +1266,28 @@
 
       <div class="review-art-preview" id="review-art-preview" style="display:none">
         <div class="review-art-cards">
-          <figure class="review-art-card">
+          <figure class="review-art-card" onclick="openArtLightbox('front', event)" title="View full size">
             <img id="review-front-img" src="" alt="Your front artwork">
             <figcaption>Front</figcaption>
           </figure>
-          <figure class="review-art-card">
+          <figure class="review-art-card" onclick="openArtLightbox('back', event)" title="View full size">
             <img id="review-back-img" src="" alt="Your back artwork">
             <figcaption>Back</figcaption>
           </figure>
+          <div class="review-art-hint">Tap an image to enlarge</div>
         </div>
         <button type="button" class="review-art-edit" onclick="goToStep(1)">Edit artwork &rarr;</button>
       </div>
 
       <div class="summary-rows" id="summary-rows"></div>
+
+      <div class="review-assurance" aria-label="What you're getting">
+        <div class="assurance-item"><span class="assurance-check">&#10003;</span><span><strong>Real 3mm basswood</strong> &mdash; solid wood, made to last.</span></div>
+        <div class="assurance-item"><span class="assurance-check">&#10003;</span><span><strong>Full-color UV printing</strong> &mdash; your artwork is sealed into the surface. It won&rsquo;t peel or fade.</span></div>
+        <div class="assurance-item"><span class="assurance-check">&#10003;</span><span><strong>Embedded NFC chip</strong> &mdash; links directly to your content. Tapping never uses it up.</span></div>
+        <div class="assurance-item"><span class="assurance-check">&#10003;</span><span><strong>Works with iPhone &amp; Android</strong> &mdash; just tap to play. No app, no account needed.</span></div>
+      </div>
+
       <div id="summary-warning" class="summary-warning" style="display:none"></div>
 
       <div class="btn-row">
@@ -2052,6 +2099,28 @@ function trackEcommerce(actionName, simple) {
   window.dataLayer.push({ event: actionName,         ecommerce: ecommerce });
 }
 
+// ---- Review artwork lightbox (same pattern as the order page) ----
+function openArtLightbox(side, ev) {
+  if (ev) ev.stopPropagation();
+  const img = document.getElementById('art-lightbox-img');
+  const cap = document.getElementById('art-lightbox-caption');
+  if (side === 'front') {
+    img.src = state.frontArt || '';
+    img.alt = 'Your front artwork, full size';
+    cap.textContent = 'Front — click anywhere to close';
+  } else {
+    img.src = state.backArt || 'templates/Goodz_Standard_back.png';
+    img.alt = 'Back artwork, full size';
+    cap.textContent = 'Back — click anywhere to close';
+  }
+  document.getElementById('art-lightbox').classList.add('open');
+  trackEvent('review_art_enlarged', { side: side });
+}
+function closeArtLightbox() {
+  document.getElementById('art-lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArtLightbox(); });
+
 function goToStep(n) {
   state.currentStep = n;
   bumpFurthestStep(n + 1); // global step: 1=Music, 2=Artwork, 3=Review
@@ -2440,5 +2509,11 @@ renderOrderStrip();
   }
 })();
 </script>
+
+<!-- Full-size artwork view, opened from the review step thumbnails -->
+<div class="art-lightbox" id="art-lightbox" onclick="closeArtLightbox()" role="dialog" aria-modal="true" aria-label="Artwork, full size">
+  <img id="art-lightbox-img" src="" alt="">
+  <div class="art-lightbox-caption" id="art-lightbox-caption"></div>
+</div>
 </body>
 </html>
