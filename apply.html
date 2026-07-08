@@ -33,6 +33,13 @@
   <style>
     .tour-body { max-width: 720px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
     .tour-intro { font-size: 1.05rem; color: var(--text-light); line-height: 1.8; margin: 0 0 0.9rem; }
+    .tour-intro a, .tour-note a, .tour-success a {
+      color: var(--amber-ink);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .tour-intro a:hover, .tour-note a:hover, .tour-success a:hover { color: var(--amber-dark); }
     .tour-note { font-size: 0.95rem; color: var(--text-light); line-height: 1.7; margin: 0 0 2.5rem; }
     .tour-form { display: flex; flex-direction: column; gap: 1.35rem; }
     .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
