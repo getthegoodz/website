@@ -647,6 +647,9 @@
       transition: all 0.15s;
     }
     .step-cell.active .step-square {
+      /* Current step is the loudest cell: brand-yellow fill (the site's
+         "selected" language), black border. Done stays solid black. */
+      background: var(--yellow);
       border-color: var(--black);
       color: var(--black);
     }
