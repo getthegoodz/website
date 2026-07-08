@@ -2135,6 +2135,17 @@ function goToStep(n) {
     el.classList.toggle('active', i === n);
     el.classList.toggle('done', i < n);
   });
+  // On Review the summary table shows everything the strip's Details
+  // dropdown would — hide the redundant toggle there (and close it).
+  const stripToggle = document.getElementById('order-strip-toggle');
+  const stripDetails = document.getElementById('order-strip-details');
+  if (stripToggle) {
+    stripToggle.style.display = n === 2 ? 'none' : '';
+    if (n === 2 && stripDetails && !stripDetails.hidden) {
+      stripDetails.hidden = true;
+      stripToggle.setAttribute('aria-expanded', 'false');
+    }
+  }
   if (n === 2) renderSummary();
   updateBackLink();
   const slug = STEP_NAMES[n];
