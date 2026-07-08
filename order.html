@@ -85,6 +85,9 @@
       transition: all 0.15s;
     }
     .step-cell.active .step-square {
+      /* Current step is the loudest cell: brand-yellow fill (the site's
+         "selected" language), black border. Done stays solid black. */
+      background: var(--yellow);
       border-color: var(--black);
       color: var(--black);
     }
@@ -217,6 +220,29 @@
     }
     .option-card.selected .option-upcharge { color: rgba(14,12,10,0.6); }
 
+    /* "View full size" affordance + lightbox for the standard back design */
+    .option-card-view {
+      background: none; border: none; padding: 0; margin-top: 0.3rem;
+      font: inherit; font-size: 0.78rem; font-weight: 500;
+      color: var(--muted); text-decoration: underline; cursor: zoom-in;
+    }
+    .option-card-view:hover { color: var(--black); }
+    .back-lightbox {
+      position: fixed; inset: 0; z-index: 300; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(14,12,10,0.78); cursor: zoom-out; padding: 2rem;
+    }
+    .back-lightbox.open { display: flex; }
+    .back-lightbox img {
+      max-width: min(82vw, 480px); max-height: 76vh;
+      border-radius: 14px; background: #fff;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.45);
+    }
+    .back-lightbox-caption {
+      position: absolute; bottom: 1.4rem; left: 0; right: 0;
+      text-align: center; color: #fff; font-size: 0.85rem; opacity: 0.85;
+    }
+
     /* Music source cards: 3-per-row grid */
     .option-cards.music-cards {
       display: grid;
@@ -227,7 +253,10 @@
       .option-cards.music-cards { grid-template-columns: 1fr; }
     }
     /* Streaming service: tight horizontal row of small platform glyphs */
-    .streaming-logos { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; }
+    .streaming-logos { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; min-height: 33px; /* sibling cards' icon rows render at 33px (26px inline svg + line-box descent) — match so titles align */ }
+    /* Back-design pair: the standard card leads with a 44px thumbnail, so the
+       custom card's icon row matches it and the two titles align. */
+    [data-option="back"] .option-card-icon { min-height: 44px; display: flex; align-items: center; }
     .streaming-logos svg { flex-shrink: 0; }
 
     /* Pricing grid */
@@ -655,15 +684,6 @@
       <div class="option-section">
         <div class="option-section-label">Music Source</div>
         <div class="option-cards music-cards" data-option="music">
-          <div class="option-card" data-value="bandcamp_codes">
-            <div class="option-card-icon">
-              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7 7 L23 7 L19 19 L3 19 Z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="option-card-title">Bandcamp codes</div>
-            <div class="option-card-sub">Pre-load your Goodz with unique album download codes. Fans get something physical with their code.</div>
-          </div>
           <div class="option-card selected" data-value="streaming">
             <div class="option-card-icon streaming-logos" aria-label="Bandcamp, SoundCloud, YouTube, Spotify, Apple Music, Amazon">
               <svg width="16" height="16" viewBox="0 0 26 26" fill="none" aria-hidden="true" title="Bandcamp">
@@ -695,6 +715,15 @@
             <div class="option-card-title">Streaming service</div>
             <div class="option-card-sub">Any album or playlist on Spotify, SoundCloud, Bandcamp, YouTube, etc.</div>
           </div>
+          <div class="option-card" data-value="bandcamp_codes">
+            <div class="option-card-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 7 L23 7 L19 19 L3 19 Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="option-card-title">Bandcamp codes</div>
+            <div class="option-card-sub">Pre-load your Goodz with unique album download codes. Fans get something physical with their code.</div>
+          </div>
           <div class="option-card" data-value="url">
             <div class="option-card-icon">
               <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -720,6 +749,8 @@
               <img src="templates/Goodz_Standard_back.png" alt="Standard Goodz back">
             </div>
             <div class="option-card-title">Standard Design</div>
+            <div class="option-card-sub">Black-and-white UV printing on naturally finished basswood.</div>
+            <button type="button" class="option-card-view" onclick="openBackLightbox(event)">View full size</button>
           </div>
           <div class="option-card" data-value="custom">
             <div class="option-card-icon">
@@ -729,6 +760,7 @@
               </svg>
             </div>
             <div class="option-card-title">Upload Custom Design <span class="option-upcharge">$0.10/unit</span></div>
+            <div class="option-card-sub">Full-color UV printing of your own design.</div>
           </div>
         </div>
       </div>
@@ -737,7 +769,7 @@
 
       <!-- Option: Keychain Hole -->
       <div class="option-section">
-        <div class="option-section-label">Keychain hole</div>
+        <div class="option-section-label">Keychain hole (3mm)</div>
         <div class="option-cards" data-option="keychain">
           <div class="option-card selected" data-value="none">
             <div class="option-card-icon">
@@ -1145,6 +1177,19 @@ updateFromPrice();
   __suppressTracking = false;
 })();
 
+// ---- Standard back design lightbox ----
+// stopPropagation keeps the "View full size" click from also toggling the
+// option-card selection it sits inside.
+function openBackLightbox(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('back-lightbox').classList.add('open');
+  trackEvent('back_design_preview_opened', {});
+}
+function closeBackLightbox() {
+  document.getElementById('back-lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBackLightbox(); });
+
 trackEvent('step_view', { step: 'customize' });
 // Page-load view_item (Custom Goodz enters the funnel)
 (function() {
@@ -1159,5 +1204,11 @@ trackEvent('step_view', { step: 'customize' });
 })();
 
 </script>
+
+<!-- Standard back design, full size (opened from the Back Design card) -->
+<div class="back-lightbox" id="back-lightbox" onclick="closeBackLightbox()" role="dialog" aria-modal="true" aria-label="Standard back design, full size">
+  <img src="templates/Goodz_Standard_back.png" alt="Standard Goodz back design, full size">
+  <div class="back-lightbox-caption">Standard Goodz back &mdash; included with every order. Click anywhere to close.</div>
+</div>
 </body>
 </html>
