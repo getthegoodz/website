@@ -31,27 +31,44 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
   <style>
-    .tour-body { max-width: 860px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
-    .tour-intro {
-      font-size: 1.05rem;
-      color: var(--text-light);
-      line-height: 1.8;
-      margin: 0 0 2.5rem;
+    .tour-body { max-width: 720px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
+    .tour-intro { font-size: 1.05rem; color: var(--text-light); line-height: 1.8; margin: 0 0 0.9rem; }
+    .tour-note { font-size: 0.95rem; color: var(--text-light); line-height: 1.7; margin: 0 0 2.5rem; }
+    .tour-form { display: flex; flex-direction: column; gap: 1.35rem; }
+    .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .tour-field label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--black);
     }
-    .tour-form-wrap {
-      border: var(--border);
+    .tour-field .tour-hint { font-size: 0.9rem; color: var(--text-light); margin: 0; }
+    .tour-field input,
+    .tour-field textarea,
+    .tour-field select {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
       background: var(--white);
-    }
-    .tour-form-wrap iframe {
-      display: block;
+      border: var(--border);
+      border-radius: 0;
+      padding: 0.8rem 0.9rem;
       width: 100%;
-      height: 2150px;
-      border: 0;
+      transition: border-color 0.15s ease;
     }
-    @media (max-width: 480px) {
-      .tour-body { padding: 2.5rem 1.25rem 4rem; }
-      .tour-form-wrap iframe { height: 2400px; }
-    }
+    .tour-field input:focus,
+    .tour-field textarea:focus,
+    .tour-field select:focus { outline: none; border-color: var(--amber-dark); }
+    .tour-field textarea { resize: vertical; min-height: 90px; }
+    #turnstile-container { min-height: 65px; }
+    .tour-form .btn { align-self: flex-start; }
+    .tour-status { font-size: 0.95rem; line-height: 1.6; margin: 0; }
+    .tour-status.is-ok { color: #1f7a3d; font-weight: 600; }
+    .tour-status.is-error { color: #b3261e; font-weight: 600; }
+    .tour-success { display: none; }
+    .tour-success h2 { margin: 0 0 0.75rem; }
+    .tour-success p { font-size: 1.05rem; color: var(--text-light); line-height: 1.8; margin: 0; }
   </style>
 </head>
 <body>
@@ -78,10 +95,84 @@
 
 <!-- BODY -->
 <div class="tour-body">
-  <p class="tour-intro">Curious what these are? See <a href="/custom">Custom Goodz</a>. If your application is a fit, you'll hear from us within a week.</p>
+  <p class="tour-intro">We're Goodz, a small startup making <a href="/custom">wooden collectibles</a> fans can tap with their phones to hear your streaming music. We're sending free custom packs of 50 to a handful of artists touring this fall, to sell at the merch table. Yours to sell, and you keep the money. All we ask is honest feedback, and a post if you genuinely like them.</p>
+  <p class="tour-note">This takes about 2 minutes. Spots are limited, so we can't say yes to everyone, but we read every submission and we'll be in touch either way.</p>
 
-  <div class="tour-form-wrap">
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfaV7t9uF4q7ietNSZvZHNFbT7SZ2N_OETpijBPfUxUvvx2bw/viewform?embedded=true" title="Free 50-pack application form" loading="lazy">Loading…</iframe>
+  <form id="tour-form" class="tour-form" novalidate>
+    <div class="tour-field">
+      <label for="artistName">Artist or band name</label>
+      <input type="text" id="artistName" name="artistName" maxlength="256" required>
+    </div>
+
+    <div class="tour-field">
+      <label for="links">Drop your links</label>
+      <p class="tour-hint">Spotify, Bandcamp, Instagram, TikTok, whatever shows us who you are. One or two is plenty.</p>
+      <textarea id="links" name="links" maxlength="2000" required></textarea>
+    </div>
+
+    <div class="tour-field">
+      <label for="shows">Are you playing shows this fall?</label>
+      <p class="tour-hint">If so, roughly how many between September and December?</p>
+      <textarea id="shows" name="shows" maxlength="2000" required></textarea>
+    </div>
+
+    <div class="tour-field">
+      <label for="roomSize">What capacity rooms do you usually play?</label>
+      <select id="roomSize" name="roomSize">
+        <option value="" selected>Choose one...</option>
+        <option>Under 100</option>
+        <option>100-300</option>
+        <option>300-700</option>
+        <option>700+</option>
+      </select>
+    </div>
+
+    <div class="tour-field">
+      <label for="merch">Do you sell merch at shows now?</label>
+      <p class="tour-hint">If yes, what sells best for you?</p>
+      <textarea id="merch" name="merch" maxlength="2000" required></textarea>
+    </div>
+
+    <div class="tour-field">
+      <label for="tapOpen">Any idea what you'd want a fan's tap to open?</label>
+      <p class="tour-hint">No commitment, you can change it at any time.</p>
+      <select id="tapOpen" name="tapOpen">
+        <option value="" selected>Choose one...</option>
+        <option>My album (as download or stream)</option>
+        <option>A link hub (Linktree etc.)</option>
+        <option>Something fans can't get anywhere else</option>
+        <option>Something else / No idea yet</option>
+      </select>
+    </div>
+
+    <div class="tour-field">
+      <label for="wouldPost">If you end up loving them, would you post about them and tag us?</label>
+      <select id="wouldPost" name="wouldPost">
+        <option value="" selected>Choose one...</option>
+        <option>Yes</option>
+        <option>Probably</option>
+        <option>Rather not</option>
+      </select>
+    </div>
+
+    <div class="tour-field">
+      <label for="email">Best email address to reach you at?</label>
+      <input type="email" id="email" name="email" maxlength="256" autocomplete="email" required>
+    </div>
+
+    <!-- Cloudflare Turnstile renders here -->
+    <div id="turnstile-container"></div>
+
+    <!-- Honeypot: hidden from humans, bots fill it -->
+    <input type="text" name="company" id="company" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;pointer-events:none;">
+
+    <button type="submit" class="btn btn-amber">Submit application</button>
+    <p id="tour-status" class="tour-status" role="status" aria-live="polite"></p>
+  </form>
+
+  <div id="tour-success" class="tour-success">
+    <h2>Thanks, you're in the pile.</h2>
+    <p>We read every one of these. If it's a fit, you'll hear from us within a week. In the meantime, you can see what these actually are on the <a href="/custom">Custom Goodz</a> page.</p>
   </div>
 </div>
 
@@ -117,5 +208,91 @@
   </div>
 </footer>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+(function () {
+  var API_BASE = '';
+  var form = document.getElementById('tour-form');
+  if (!form) return;
+  var statusEl = document.getElementById('tour-status');
+  var successEl = document.getElementById('tour-success');
+  var submitBtn = form.querySelector('button[type="submit"]');
+  var container = document.getElementById('turnstile-container');
+  var turnstileToken = '';
+
+  function setStatus(kind, text) {
+    statusEl.textContent = text || '';
+    statusEl.className = 'tour-status' + (kind ? ' is-' + kind : '');
+  }
+
+  // Pull the Turnstile sitekey from the backend, then render the widget
+  // once the Cloudflare script has loaded.
+  fetch(API_BASE + '/api/public-config')
+    .then(function (r) { return r.json(); })
+    .then(function (cfg) {
+      var key = cfg && cfg.turnstileSiteKey;
+      if (!key) return;
+      (function render() {
+        if (!window.turnstile) { setTimeout(render, 200); return; }
+        window.turnstile.render(container, {
+          sitekey: key,
+          callback: function (t) { turnstileToken = t || ''; },
+          'error-callback': function () { turnstileToken = ''; },
+          'expired-callback': function () { turnstileToken = ''; }
+        });
+      })();
+    })
+    .catch(function () {});
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    setStatus('', '');
+
+    var body = {
+      artistName: form.artistName.value.trim(),
+      links: form.links.value.trim(),
+      shows: form.shows.value.trim(),
+      roomSize: form.roomSize.value,
+      merch: form.merch.value.trim(),
+      tapOpen: form.tapOpen.value,
+      wouldPost: form.wouldPost.value,
+      email: form.email.value.trim(),
+      company: form.company.value.trim(),
+      turnstileToken: turnstileToken
+    };
+
+    var oldLabel = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    fetch(API_BASE + '/api/tour-application', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok) throw new Error(data.error || 'Could not submit. Please try again.');
+          return data;
+        });
+      })
+      .then(function () {
+        if (window.dataLayer) {
+          window.dataLayer.push({ event: 'tour_application_submitted' });
+        }
+        form.style.display = 'none';
+        successEl.style.display = 'block';
+        successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      })
+      .catch(function (err) {
+        setStatus('error', (err && err.message) ? err.message : 'Could not submit. Please try again.');
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = oldLabel;
+      });
+  });
+})();
+</script>
 </body>
 </html>
