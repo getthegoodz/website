@@ -1,6 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/tour",
+      "destination": "/apply",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/custom-goodz",
