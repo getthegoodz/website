@@ -58,8 +58,6 @@ const TAP_OPTIONS = [
   'Something fans can\'t get anywhere else',
   'Something else / No idea yet',
 ];
-const POST_OPTIONS = ['Yes', 'Probably', 'Rather not'];
-
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -78,7 +76,6 @@ module.exports = async (req, res) => {
   const roomSize = String(body.roomSize || '').trim();
   const merch = String(body.merch || '').trim().slice(0, 2000);
   const tapOpen = String(body.tapOpen || '').trim();
-  const wouldPost = String(body.wouldPost || '').trim();
   const email = String(body.email || '').trim().slice(0, 256);
   const company = String(body.company || '').trim(); // honeypot
   const turnstileToken = String(body.turnstileToken || '').trim();
@@ -102,10 +99,6 @@ module.exports = async (req, res) => {
   if (tapOpen && !TAP_OPTIONS.includes(tapOpen)) {
     return badRequest(res, 400, 'Invalid tap selection.');
   }
-  if (wouldPost && !POST_OPTIONS.includes(wouldPost)) {
-    return badRequest(res, 400, 'Invalid posting selection.');
-  }
-
   const captcha = await verifyTurnstile(turnstileToken, ip);
   if (!captcha.ok) {
     return badRequest(res, 400, 'Captcha verification failed. Please try again.');
@@ -138,7 +131,6 @@ module.exports = async (req, res) => {
       merch,
       '',
       `Tap would open: ${tapOpen || '(not answered)'}`,
-      `Would post about them: ${wouldPost || '(not answered)'}`,
       '',
       `IP: ${ip}`,
     ].join('\n'),

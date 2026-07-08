@@ -146,16 +146,6 @@
     </div>
 
     <div class="tour-field">
-      <label for="wouldPost">If you end up loving them, would you post about them and tag us?</label>
-      <select id="wouldPost" name="wouldPost">
-        <option value="" selected>Choose one...</option>
-        <option>Yes</option>
-        <option>Probably</option>
-        <option>Rather not</option>
-      </select>
-    </div>
-
-    <div class="tour-field">
       <label for="email">Best email address to reach you at?</label>
       <input type="email" id="email" name="email" maxlength="256" autocomplete="email" required>
     </div>
@@ -255,7 +245,6 @@
       roomSize: form.roomSize.value,
       merch: form.merch.value.trim(),
       tapOpen: form.tapOpen.value,
-      wouldPost: form.wouldPost.value,
       email: form.email.value.trim(),
       company: form.company.value.trim(),
       turnstileToken: turnstileToken
