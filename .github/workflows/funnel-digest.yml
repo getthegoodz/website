@@ -1,0 +1,63 @@
+# Weekly funnel-health digest, in the cloud.
+#
+# Runs scripts/funnel-digest.py every Monday against GA4 (property 415113115)
+# using the GA_SA_KEY repo secret (read-only service account). Behavior:
+#   - healthy week: silent (digest text only in the run log)
+#   - ALERT (June-bug signature: checkout clicks w/ zero purchases, retry
+#     ratio >= 2, or failure events): opens/updates an issue tagging both founders
+#   - digest itself fails to run: also opens an issue — a dead alarm must be loud
+
+name: funnel-digest
+
+on:
+  schedule:
+    - cron: '29 13 * * 1'   # Mondays 13:29 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GA client
+        run: pip install --quiet google-analytics-data
+
+      - name: Run digest
+        id: digest
+        env:
+          GA_SA_KEY: ${{ secrets.GA_SA_KEY }}
+        run: |
+          echo "$GA_SA_KEY" > /tmp/ga-sa.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/ga-sa.json
+          set +e
+          python3 scripts/funnel-digest.py | tee digest-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update alert issue
+        if: steps.digest.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ steps.digest.outputs.exit_code }}" = "1" ]; then
+            TITLE="🚨 Funnel digest ALERT"
+          else
+            TITLE="⚠️ Funnel digest failed to run"
+          fi
+          BODY="@zonxs7 @mikerosenthal — $(date -u)
+
+          \`\`\`
+          $(cat digest-output.txt)
+          \`\`\`
+
+          Run details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXISTING=$(gh issue list --repo "${{ github.repository }}" --state open --search "in:title Funnel digest" --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "${{ github.repository }}" --body "$BODY"
+          else
+            gh issue create --repo "${{ github.repository }}" --title "$TITLE" --body "$BODY"
+          fi
