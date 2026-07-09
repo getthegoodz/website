@@ -1,0 +1,111 @@
+# Money-path smoke test automation.
+#
+# Runs scripts/smoke-test.py:
+#   - on every Vercel deployment (preview AND production), against that deploy's URL
+#   - daily against production (catches rot with no deploy: token expiry, preset changes)
+#   - weekly with --deep (real Shopify cartCreate probe; creates one throwaway cart)
+#
+# Alerting:
+#   - any failure: red X on the commit + GitHub's email to the pusher
+#   - PRODUCTION failures: opens/updates a GitHub issue mentioning both founders
+#   - direct email to chris@/mike@getthegoodz.com: wired below but dormant until
+#     a RESEND_API_KEY repo secret exists (requires repo admin to add).
+#     resend.com free tier is fine; the key needs send permission only.
+#
+# Preview-deploy failures are advisory (no issue): a branch may legitimately
+# change a marker string; production must never fail.
+
+name: smoke-test
+
+on:
+  deployment_status:
+  schedule:
+    - cron: '23 13 * * *'   # daily, 13:23 UTC — shallow, against production
+    - cron: '41 13 * * 1'   # Mondays, 13:41 UTC — deep probe
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  smoke:
+    # For deployment events: only run once the deploy is actually live
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine target and mode
+        id: target
+        run: |
+          if [ "${{ github.event_name }}" = "deployment_status" ]; then
+            echo "url=${{ github.event.deployment_status.environment_url }}" >> "$GITHUB_OUTPUT"
+            echo "env_name=${{ github.event.deployment_status.environment }}" >> "$GITHUB_OUTPUT"
+            echo "deep=" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=https://getthegoodz.com" >> "$GITHUB_OUTPUT"
+            echo "env_name=Production" >> "$GITHUB_OUTPUT"
+            # weekly schedule entry gets the deep probe
+            if [ "${{ github.event.schedule }}" = "41 13 * * 1" ]; then
+              echo "deep=--deep" >> "$GITHUB_OUTPUT"
+            else
+              echo "deep=" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Run smoke test
+        id: smoke
+        run: |
+          set +e
+          python3 scripts/smoke-test.py "${{ steps.target.outputs.url }}" ${{ steps.target.outputs.deep }} | tee smoke-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update alert issue (production failures only)
+        if: steps.smoke.outputs.exit_code != '0' && contains(steps.target.outputs.env_name, 'roduction')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="🚨 Money-path smoke test FAILING on production"
+          BODY="@zonxs7 @mikerosenthal — the smoke test failed against ${{ steps.target.outputs.url }} ($(date -u)).
+
+          \`\`\`
+          $(cat smoke-output.txt)
+          \`\`\`
+
+          Run details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXISTING=$(gh issue list --repo "${{ github.repository }}" --state open --search "in:title Money-path smoke test FAILING" --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "${{ github.repository }}" --body "$BODY"
+          else
+            gh issue create --repo "${{ github.repository }}" --title "$TITLE" --body "$BODY"
+          fi
+
+      - name: Email both founders (dormant until RESEND_API_KEY secret exists)
+        if: steps.smoke.outputs.exit_code != '0' && contains(steps.target.outputs.env_name, 'roduction')
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: |
+          if [ -z "$RESEND_API_KEY" ]; then
+            echo "RESEND_API_KEY not set — skipping direct email (issue + GitHub notifications still sent)."
+            exit 0
+          fi
+          BODY=$(cat smoke-output.txt | head -40)
+          curl -s -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer $RESEND_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$(python3 - <<PYEOF
+          import json
+          body = open('smoke-output.txt').read()[:4000]
+          print(json.dumps({
+            "from": "alerts@getthegoodz.com",
+            "to": ["chris@getthegoodz.com", "mike@getthegoodz.com"],
+            "subject": "ALERT: Goodz money-path smoke test failing on production",
+            "text": body + "\n\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+          }))
+          PYEOF
+          )"
+
+      - name: Fail the run if smoke failed
+        if: steps.smoke.outputs.exit_code != '0'
+        run: exit 1
