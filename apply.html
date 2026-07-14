@@ -33,6 +33,13 @@
   <style>
     .tour-body { max-width: 720px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
     .tour-intro { font-size: 1.05rem; color: var(--text-light); line-height: 1.8; margin: 0 0 0.9rem; }
+    .tour-photo {
+      border: var(--border);
+      overflow: hidden;
+      margin: 1.4rem 0 1.6rem;
+      max-height: 320px;
+    }
+    .tour-photo img { display: block; width: 100%; height: 100%; max-height: 320px; object-fit: cover; }
     .tour-intro a, .tour-note a, .tour-success a {
       color: var(--amber-ink);
       font-weight: 600;
@@ -103,6 +110,9 @@
 <!-- BODY -->
 <div class="tour-body">
   <p class="tour-intro">Here at Goodz we make wooden collectibles for musicians that fans tap with their phones to hear your streaming music.</p>
+  <div class="tour-photo">
+    <img src="photos/custom-hero.webp" alt="A hand holding a Custom Goodz card next to a phone playing the album it links to." loading="lazy">
+  </div>
   <p class="tour-intro">Before we get too far along, we want real touring artists to try them out and tell us if they're any good.</p>
   <p class="tour-intro">If you're playing shows this fall, we'd love to send you a custom pack of 50 Goodz for free. Sell them at your merch table, keep the money, and afterwards just tell us what your fans thought of them.</p>
   <p class="tour-intro">Interested? Fill out this form to see if you are a fit.</p>
