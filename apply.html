@@ -38,9 +38,10 @@
       border: var(--border);
       overflow: hidden;
       margin: 1.4rem 0 1.6rem;
-      max-height: 320px;
+      max-width: 500px;
+      aspect-ratio: 1 / 1;
     }
-    .tour-photo img { display: block; width: 100%; height: 100%; max-height: 320px; object-fit: cover; }
+    .tour-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .tour-intro a, .tour-note a, .tour-success a {
       color: var(--amber-ink);
       font-weight: 600;
@@ -48,7 +49,12 @@
       text-underline-offset: 3px;
     }
     .tour-intro a:hover, .tour-note a:hover, .tour-success a:hover { color: var(--amber-dark); }
-    .tour-note { font-size: 0.95rem; color: var(--text-light); line-height: 1.7; margin: 0 0 2.5rem; }
+    .tour-note { font-size: 0.95rem; color: var(--text-light); line-height: 1.7; margin: 0 0 0; }
+    /* Close the letter, open the form: a structural divider plus a header so
+       the switch from letter to questions reads as a deliberate new section. */
+    .tour-divider { border: none; border-top: 1px solid #2e2a1e; margin: 2.75rem 0 2rem; }
+    .tour-form-title { font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--black); margin: 0 0 0.5rem; }
+    .tour-form-sub { font-size: 0.95rem; color: var(--text-light); line-height: 1.6; margin: 0 0 1.9rem; }
     .tour-form { display: flex; flex-direction: column; gap: 2rem; max-width: 480px; }
     .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
     .tour-field > label,
@@ -189,6 +195,11 @@
   <p class="tour-intro">You can read more about them <a href="/custom">here</a>.</p>
   <p class="tour-intro">Thanks,</p>
   <p class="tour-note">Mike and Chris<br>Co-founders, Goodz</p>
+
+  <hr class="tour-divider">
+  <p class="section-label">Apply</p>
+  <h2 class="tour-form-title">A few quick questions</h2>
+  <p class="tour-form-sub">Takes about a minute. If it's a fit, you'll hear from us within a week.</p>
 
   <form id="tour-form" class="tour-form" novalidate>
     <div class="tour-field">
