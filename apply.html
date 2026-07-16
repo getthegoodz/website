@@ -34,6 +34,7 @@
   <style>
     .tour-body { max-width: 680px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
     .tour-intro { font-size: 1.05rem; color: var(--text-light); line-height: 1.9; margin: 0 0 1.25rem; }
+    .tour-subhead { font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 700; line-height: 1.4; letter-spacing: -0.01em; color: var(--black); margin: 0 0 1.1rem; }
     .tour-photo {
       border: var(--border);
       overflow: hidden;
@@ -53,8 +54,7 @@
     /* Close the letter, open the form: a structural divider plus a header so
        the switch from letter to questions reads as a deliberate new section. */
     .tour-divider { border: none; border-top: 1px solid #2e2a1e; margin: 2.75rem 0 2rem; }
-    .tour-form-title { font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--black); margin: 0 0 0.5rem; }
-    .tour-form-sub { font-size: 0.95rem; color: var(--text-light); line-height: 1.6; margin: 0 0 1.9rem; }
+    .tour-form-title { font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--black); margin: 0 0 1.5rem; }
     .tour-form { display: flex; flex-direction: column; gap: 2rem; max-width: 480px; }
     .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
     .tour-field > label,
@@ -184,22 +184,19 @@
 
 <!-- BODY -->
 <div class="tour-body">
-  <p class="tour-intro">Here at Goodz we make wooden collectibles for musicians that fans tap with their phones to hear your streaming music.</p>
+  <p class="tour-subhead">Here at Goodz we make wooden collectibles that fans tap with their phones to hear your music.</p>
+  <p class="tour-intro">We need real touring artists to try them out and tell us if they're any good.</p>
   <div class="tour-photo">
     <img src="photos/apply-hero.webp" alt="A hand holding a Custom Goodz card next to a phone streaming the album it links to, over a spread of other Goodz." loading="lazy">
   </div>
-  <p class="tour-intro">Before we get too far along, we want real touring artists to try them out and tell us if they're any good.</p>
-  <p class="tour-intro">If you're playing shows this fall, we'd love to send you a custom pack of 50 Goodz for free. Sell them at your merch table, keep the money, and afterwards just tell us what your fans thought of them.</p>
-  <p class="tour-intro">Interested? Fill out this form to see if you are a fit.</p>
-  <p class="tour-intro">No fine print. No hidden fees. We won't spam you. We won't try to sell you anything. We just think we're better off spending money on giving these free to artists for feedback than we are spending money on ads.</p>
-  <p class="tour-intro">You can read more about them <a href="/custom">here</a>.</p>
+  <p class="tour-intro">If you're playing shows this fall, we'd love to send you a custom pack of 50 Goodz, printed with your artwork, for free. Sell them at your merch table, keep the money, and afterwards just tell us what your fans thought of them. You can learn more about them <a href="/custom">here</a>.</p>
+  <p class="tour-intro">We'd rather spend the money putting these in artists' hands than spend it on ads.</p>
+  <p class="tour-intro">Interested? Fill out this form to see if you're a fit.</p>
   <p class="tour-intro">Thanks,</p>
   <p class="tour-note">Mike and Chris<br>Co-founders, Goodz</p>
 
   <hr class="tour-divider">
-  <p class="section-label">Apply</p>
-  <h2 class="tour-form-title">A few quick questions</h2>
-  <p class="tour-form-sub">Takes about a minute. If it's a fit, you'll hear from us within a week.</p>
+  <h2 class="tour-form-title">Apply</h2>
 
   <form id="tour-form" class="tour-form" novalidate>
     <div class="tour-field">
