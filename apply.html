@@ -52,11 +52,11 @@
     .tour-form { display: flex; flex-direction: column; gap: 1.35rem; }
     .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
     .tour-field label {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--black);
+      letter-spacing: 0.1em;
+      color: var(--text-light);
     }
     .tour-field .tour-hint { font-size: 0.9rem; color: var(--text-light); margin: 0; }
     .tour-field input,
@@ -66,15 +66,15 @@
       font-size: 1rem;
       color: var(--text);
       background: var(--white);
-      border: var(--border);
-      border-radius: 0;
+      border: 1.5px solid #cdc8b2;
+      border-radius: 10px;
       padding: 0.8rem 0.9rem;
       width: 100%;
       transition: border-color 0.15s ease;
     }
     .tour-field input:focus,
     .tour-field textarea:focus,
-    .tour-field select:focus { outline: none; border-color: var(--amber-dark); }
+    .tour-field select:focus { outline: none; border-color: var(--black); }
     .tour-field textarea { resize: vertical; min-height: 90px; }
     #turnstile-container { min-height: 65px; }
     .tour-form .btn { align-self: flex-start; }
