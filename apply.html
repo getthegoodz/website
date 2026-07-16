@@ -51,7 +51,8 @@
     .tour-note { font-size: 0.95rem; color: var(--text-light); line-height: 1.7; margin: 0 0 2.5rem; }
     .tour-form { display: flex; flex-direction: column; gap: 2rem; max-width: 480px; }
     .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
-    .tour-field label {
+    .tour-field > label,
+    .tour-field > .tour-field-label {
       font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
@@ -118,6 +119,31 @@
     }
     .add-link:hover { color: var(--amber-dark); }
     .add-link:disabled { opacity: 0.45; cursor: default; }
+    /* Selectable option cards (capacity + tap questions). No default selection. */
+    .pick-group { display: flex; gap: 0.6rem; }
+    .pick-group-h { flex-wrap: wrap; }
+    .pick-group-h .pick-card { flex: 1 1 0; min-width: 72px; justify-content: center; text-align: center; }
+    .pick-group-v { flex-direction: column; }
+    .pick-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0.8rem 0.9rem;
+      border: 1.5px solid #cdc8b2;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.12s ease, background 0.12s ease;
+    }
+    .pick-card span { font-size: 0.95rem; font-weight: 600; color: var(--text); line-height: 1.25; }
+    .pick-card input { position: absolute; opacity: 0; pointer-events: none; }
+    .pick-card:hover { border-color: var(--black); }
+    .pick-card:focus-within { border-color: var(--black); }
+    .pick-card:has(input:checked) { border-color: var(--black); background: var(--amber); }
+    .tour-submit { display: flex; flex-direction: column; align-items: flex-start; gap: 0.55rem; }
+    .tour-reassure { font-size: 0.85rem; color: var(--text-light); margin: 0; }
     #turnstile-container { min-height: 65px; }
     .tour-form .btn { align-self: flex-start; }
     .tour-status { font-size: 0.95rem; line-height: 1.6; margin: 0; }
@@ -154,7 +180,7 @@
 <div class="tour-body">
   <p class="tour-intro">Here at Goodz we make wooden collectibles for musicians that fans tap with their phones to hear your streaming music.</p>
   <div class="tour-photo">
-    <img src="photos/custom-hero.webp" alt="A hand holding a Custom Goodz card next to a phone playing the album it links to." loading="lazy">
+    <img src="photos/apply-hero.webp" alt="A hand holding a Custom Goodz card next to a phone streaming the album it links to, over a spread of other Goodz." loading="lazy">
   </div>
   <p class="tour-intro">Before we get too far along, we want real touring artists to try them out and tell us if they're any good.</p>
   <p class="tour-intro">If you're playing shows this fall, we'd love to send you a custom pack of 50 Goodz for free. Sell them at your merch table, keep the money, and afterwards just tell us what your fans thought of them.</p>
@@ -184,18 +210,17 @@
     <div class="tour-field">
       <label for="shows">Are you playing shows this fall?</label>
       <p class="tour-hint">If so, roughly how many between September and December?</p>
-      <textarea id="shows" name="shows" maxlength="2000" required></textarea>
+      <input type="text" id="shows" name="shows" maxlength="500" required>
     </div>
 
     <div class="tour-field">
-      <label for="roomSize">What capacity rooms do you usually play?</label>
-      <select id="roomSize" name="roomSize">
-        <option value="" selected>Choose one...</option>
-        <option>Under 100</option>
-        <option>100-300</option>
-        <option>300-700</option>
-        <option>700+</option>
-      </select>
+      <span class="tour-field-label">What capacity rooms do you usually play?</span>
+      <div class="pick-group pick-group-h" role="radiogroup" aria-label="What capacity rooms do you usually play?">
+        <label class="pick-card"><input type="radio" name="roomSize" value="Under 100"><span>Under 100</span></label>
+        <label class="pick-card"><input type="radio" name="roomSize" value="100-300"><span>100-300</span></label>
+        <label class="pick-card"><input type="radio" name="roomSize" value="300-700"><span>300-700</span></label>
+        <label class="pick-card"><input type="radio" name="roomSize" value="700+"><span>700+</span></label>
+      </div>
     </div>
 
     <div class="tour-field">
@@ -205,19 +230,18 @@
     </div>
 
     <div class="tour-field">
-      <label for="tapOpen">Any idea what you'd want a fan's tap to open?</label>
+      <span class="tour-field-label">Any idea what you'd want a fan's tap to open?</span>
       <p class="tour-hint">No commitment, you can change it at any time.</p>
-      <select id="tapOpen" name="tapOpen">
-        <option value="" selected>Choose one...</option>
-        <option>My album (as download or stream)</option>
-        <option>A link hub (Linktree etc.)</option>
-        <option>Something fans can't get anywhere else</option>
-        <option>Something else / No idea yet</option>
-      </select>
+      <div class="pick-group pick-group-v" role="radiogroup" aria-label="Any idea what you'd want a fan's tap to open?">
+        <label class="pick-card"><input type="radio" name="tapOpen" value="My album (as download or stream)"><span>My album (as download or stream)</span></label>
+        <label class="pick-card"><input type="radio" name="tapOpen" value="A link hub (Linktree etc.)"><span>A link hub (Linktree etc.)</span></label>
+        <label class="pick-card"><input type="radio" name="tapOpen" value="Something fans can't get anywhere else"><span>Something fans can't get anywhere else</span></label>
+        <label class="pick-card"><input type="radio" name="tapOpen" value="Something else / No idea yet"><span>Something else / No idea yet</span></label>
+      </div>
     </div>
 
     <div class="tour-field">
-      <label for="email">Best email address to reach you at?</label>
+      <label for="email">Best email address to reach you?</label>
       <input type="email" id="email" name="email" maxlength="256" autocomplete="email" required>
     </div>
 
@@ -227,7 +251,10 @@
     <!-- Honeypot: hidden from humans, bots fill it -->
     <input type="text" name="company" id="company" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;pointer-events:none;">
 
-    <button type="submit" class="btn btn-amber">Submit application</button>
+    <div class="tour-submit">
+      <button type="submit" class="btn btn-amber">See if you're a fit</button>
+      <p class="tour-reassure">We read every one.</p>
+    </div>
     <p id="tour-status" class="tour-status" role="status" aria-live="polite"></p>
   </form>
 
@@ -369,9 +396,9 @@
       artistName: form.artistName.value.trim(),
       links: links,
       shows: form.shows.value.trim(),
-      roomSize: form.roomSize.value,
+      roomSize: form.elements.roomSize.value,
       merch: form.merch.value.trim(),
-      tapOpen: form.tapOpen.value,
+      tapOpen: form.elements.tapOpen.value,
       email: form.email.value.trim(),
       company: form.company.value.trim(),
       turnstileToken: turnstileToken
