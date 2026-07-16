@@ -86,6 +86,38 @@
       background-position: right 0.95rem center;
       padding-right: 2.4rem;
     }
+    /* "Drop your links": one field to start, add more as needed. */
+    .links-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .link-row { display: flex; gap: 0.5rem; align-items: center; }
+    .link-row .link-input { flex: 1; }
+    .link-remove {
+      flex-shrink: 0;
+      width: 2.4rem;
+      align-self: stretch;
+      border: 1.5px solid #cdc8b2;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text-light);
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .link-remove:hover { border-color: var(--black); color: var(--black); }
+    .add-link {
+      align-self: flex-start;
+      margin-top: 0.6rem;
+      background: none;
+      border: none;
+      padding: 0.2rem 0;
+      font-family: 'DM Sans', 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--amber-ink);
+      cursor: pointer;
+    }
+    .add-link:hover { color: var(--amber-dark); }
+    .add-link:disabled { opacity: 0.45; cursor: default; }
     #turnstile-container { min-height: 65px; }
     .tour-form .btn { align-self: flex-start; }
     .tour-status { font-size: 0.95rem; line-height: 1.6; margin: 0; }
@@ -139,9 +171,14 @@
     </div>
 
     <div class="tour-field">
-      <label for="links">Drop your links</label>
+      <label for="link-1">Drop your links</label>
       <p class="tour-hint">Spotify, Bandcamp, Instagram, TikTok, whatever shows us who you are. One or two is plenty.</p>
-      <textarea id="links" name="links" maxlength="2000" required></textarea>
+      <div id="links-list" class="links-list">
+        <div class="link-row">
+          <input type="url" id="link-1" class="link-input" name="link" maxlength="400" inputmode="url" placeholder="https://..." aria-label="Link 1" required>
+        </div>
+      </div>
+      <button type="button" id="add-link" class="add-link">+ Add another link</button>
     </div>
 
     <div class="tour-field">
@@ -244,6 +281,57 @@
   var container = document.getElementById('turnstile-container');
   var turnstileToken = '';
 
+  // "Drop your links": start with one field, let artists add up to a few more.
+  var linksList = document.getElementById('links-list');
+  var addLinkBtn = document.getElementById('add-link');
+  var MAX_LINKS = 5;
+  var linkCount = 1;
+
+  function updateLinkRows() {
+    var rows = linksList.querySelectorAll('.link-row');
+    // Remove buttons only make sense once there's more than one link.
+    Array.prototype.forEach.call(rows, function (row) {
+      var rm = row.querySelector('.link-remove');
+      if (rm) rm.style.display = rows.length > 1 ? '' : 'none';
+    });
+    addLinkBtn.disabled = rows.length >= MAX_LINKS;
+  }
+
+  if (addLinkBtn && linksList) {
+    addLinkBtn.addEventListener('click', function () {
+      if (linksList.querySelectorAll('.link-row').length >= MAX_LINKS) return;
+      linkCount++;
+      var row = document.createElement('div');
+      row.className = 'link-row';
+      var input = document.createElement('input');
+      input.type = 'url';
+      input.className = 'link-input';
+      input.name = 'link';
+      input.maxLength = 400;
+      input.setAttribute('inputmode', 'url');
+      input.placeholder = 'https://...';
+      input.setAttribute('aria-label', 'Link ' + linkCount);
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'link-remove';
+      rm.setAttribute('aria-label', 'Remove link');
+      rm.innerHTML = '&times;';
+      row.appendChild(input);
+      row.appendChild(rm);
+      linksList.appendChild(row);
+      input.focus();
+      updateLinkRows();
+    });
+
+    linksList.addEventListener('click', function (e) {
+      var rm = e.target.closest('.link-remove');
+      if (!rm) return;
+      var row = rm.closest('.link-row');
+      if (row) row.parentNode.removeChild(row);
+      updateLinkRows();
+    });
+  }
+
   function setStatus(kind, text) {
     statusEl.textContent = text || '';
     statusEl.className = 'tour-status' + (kind ? ' is-' + kind : '');
@@ -272,9 +360,14 @@
     e.preventDefault();
     setStatus('', '');
 
+    var links = Array.prototype.map.call(
+      form.querySelectorAll('.link-input'),
+      function (i) { return i.value.trim(); }
+    ).filter(Boolean).join('\n');
+
     var body = {
       artistName: form.artistName.value.trim(),
-      links: form.links.value.trim(),
+      links: links,
       shows: form.shows.value.trim(),
       roomSize: form.roomSize.value,
       merch: form.merch.value.trim(),
