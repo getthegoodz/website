@@ -49,7 +49,7 @@
     }
     .tour-intro a:hover, .tour-note a:hover, .tour-success a:hover { color: var(--amber-dark); }
     .tour-note { font-size: 0.95rem; color: var(--text-light); line-height: 1.7; margin: 0 0 2.5rem; }
-    .tour-form { display: flex; flex-direction: column; gap: 1.35rem; }
+    .tour-form { display: flex; flex-direction: column; gap: 2rem; max-width: 480px; }
     .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
     .tour-field label {
       font-size: 0.82rem;
@@ -65,7 +65,7 @@
       font-family: 'DM Sans', 'Inter', sans-serif;
       font-size: 1rem;
       color: var(--text);
-      background: var(--white);
+      background: #fff;
       border: 1.5px solid #cdc8b2;
       border-radius: 10px;
       padding: 0.8rem 0.9rem;
@@ -76,6 +76,16 @@
     .tour-field textarea:focus,
     .tour-field select:focus { outline: none; border-color: var(--black); }
     .tour-field textarea { resize: vertical; min-height: 90px; }
+    /* Custom chevron so the native selects match the inputs (no OS chevron). */
+    .tour-field select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%236b6354' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.95rem center;
+      padding-right: 2.4rem;
+    }
     #turnstile-container { min-height: 65px; }
     .tour-form .btn { align-self: flex-start; }
     .tour-status { font-size: 0.95rem; line-height: 1.6; margin: 0; }
