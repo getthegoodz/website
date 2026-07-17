@@ -30,16 +30,21 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-warm.css">
   <style>
-    .tour-body { max-width: 720px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
-    .tour-intro { font-size: 1.05rem; color: var(--text-light); line-height: 1.8; margin: 0 0 0.9rem; }
+    .tour-body { max-width: 680px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
+    .tour-intro { font-size: 1.05rem; color: var(--text-light); line-height: 1.9; margin: 0 0 1.25rem; }
+    /* Lede: bigger and darker than body, but stays in the body font and a
+       medium weight, so it reads as an emphasized opening line, not a heading. */
+    .tour-lede { font-family: 'DM Sans', 'Inter', sans-serif; font-size: 1.25rem; font-weight: 500; line-height: 1.6; color: var(--text); margin: 0 0 1.15rem; }
     .tour-photo {
       border: var(--border);
       overflow: hidden;
       margin: 1.4rem 0 1.6rem;
-      max-height: 320px;
+      max-width: 500px;
+      aspect-ratio: 1 / 1;
     }
-    .tour-photo img { display: block; width: 100%; height: 100%; max-height: 320px; object-fit: cover; }
+    .tour-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .tour-intro a, .tour-note a, .tour-success a {
       color: var(--amber-ink);
       font-weight: 600;
@@ -47,34 +52,106 @@
       text-underline-offset: 3px;
     }
     .tour-intro a:hover, .tour-note a:hover, .tour-success a:hover { color: var(--amber-dark); }
-    .tour-note { font-size: 0.95rem; color: var(--text-light); line-height: 1.7; margin: 0 0 2.5rem; }
-    .tour-form { display: flex; flex-direction: column; gap: 1.35rem; }
-    .tour-field { display: flex; flex-direction: column; gap: 0.4rem; }
-    .tour-field label {
-      font-size: 0.8rem;
+    .tour-note { font-size: 1.05rem; color: var(--text-light); line-height: 1.7; margin: 0 0 0; }
+    /* Close the letter, open the form: a structural divider plus a header so
+       the switch from letter to questions reads as a deliberate new section. */
+    .tour-divider { border: none; border-top: 1px solid #2e2a1e; margin: 2.75rem 0 2rem; }
+    .tour-form-title { font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--black); margin: 0 0 1.5rem; }
+    .tour-form { display: flex; flex-direction: column; gap: 2rem; max-width: 480px; }
+    .tour-field { display: flex; flex-direction: column; gap: 0.55rem; }
+    .tour-field > label,
+    .tour-field > .tour-field-label {
+      font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--black);
+      letter-spacing: 0.1em;
+      color: var(--text-light);
     }
     .tour-field .tour-hint { font-size: 0.9rem; color: var(--text-light); margin: 0; }
     .tour-field input,
     .tour-field textarea,
     .tour-field select {
-      font-family: 'Inter', sans-serif;
+      font-family: 'DM Sans', 'Inter', sans-serif;
       font-size: 1rem;
       color: var(--text);
-      background: var(--white);
-      border: var(--border);
-      border-radius: 0;
+      background: #fff;
+      border: 1.5px solid #cdc8b2;
+      border-radius: 10px;
       padding: 0.8rem 0.9rem;
       width: 100%;
       transition: border-color 0.15s ease;
     }
     .tour-field input:focus,
     .tour-field textarea:focus,
-    .tour-field select:focus { outline: none; border-color: var(--amber-dark); }
+    .tour-field select:focus { outline: none; border-color: var(--black); }
     .tour-field textarea { resize: vertical; min-height: 90px; }
+    /* Custom chevron so the native selects match the inputs (no OS chevron). */
+    .tour-field select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%236b6354' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.95rem center;
+      padding-right: 2.4rem;
+    }
+    /* "Drop your links": one field to start, add more as needed. */
+    .links-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .link-row { display: flex; gap: 0.5rem; align-items: center; }
+    .link-row .link-input { flex: 1; }
+    .link-remove {
+      flex-shrink: 0;
+      width: 2.4rem;
+      align-self: stretch;
+      border: 1.5px solid #cdc8b2;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text-light);
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .link-remove:hover { border-color: var(--black); color: var(--black); }
+    .add-link {
+      align-self: flex-start;
+      margin-top: 0.6rem;
+      background: none;
+      border: none;
+      padding: 0.2rem 0;
+      font-family: 'DM Sans', 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--amber-ink);
+      cursor: pointer;
+    }
+    .add-link:hover { color: var(--amber-dark); }
+    .add-link:disabled { opacity: 0.45; cursor: default; }
+    /* Selectable option cards (capacity + tap questions). No default selection. */
+    .pick-group { display: flex; gap: 0.6rem; }
+    .pick-group-h { flex-wrap: wrap; }
+    .pick-group-h .pick-card { flex: 1 1 0; min-width: 72px; justify-content: center; text-align: center; }
+    .pick-group-v { flex-direction: column; }
+    .pick-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0.8rem 0.9rem;
+      border: 1.5px solid #cdc8b2;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.12s ease, background 0.12s ease;
+    }
+    .pick-card span { font-size: 0.95rem; font-weight: 600; color: var(--text); line-height: 1.25; }
+    .pick-card input { position: absolute; opacity: 0; pointer-events: none; }
+    .pick-card:hover { border-color: var(--black); }
+    .pick-card:focus-within { border-color: var(--black); }
+    .pick-card:has(input:checked) { border-color: var(--black); background: var(--amber); }
+    .tour-submit { display: flex; flex-direction: column; align-items: flex-start; gap: 0.55rem; }
+    .tour-reassure { font-size: 0.85rem; color: var(--text-light); margin: 0; }
     #turnstile-container { min-height: 65px; }
     .tour-form .btn { align-self: flex-start; }
     .tour-status { font-size: 0.95rem; line-height: 1.6; margin: 0; }
@@ -83,6 +160,9 @@
     .tour-success { display: none; }
     .tour-success h2 { margin: 0 0 0.75rem; }
     .tour-success p { font-size: 1.05rem; color: var(--text-light); line-height: 1.8; margin: 0; }
+    @media (max-width: 600px) {
+      .tour-form { gap: 2.6rem; }
+    }
   </style>
 </head>
 <body>
@@ -109,17 +189,19 @@
 
 <!-- BODY -->
 <div class="tour-body">
-  <p class="tour-intro">Here at Goodz we make wooden collectibles for musicians that fans tap with their phones to hear your streaming music.</p>
+  <p class="tour-lede">Here at Goodz we make wooden collectibles that fans tap with their phones to hear your music.</p>
+  <p class="tour-intro">We need real touring artists to try them out and tell us if they're any good.</p>
   <div class="tour-photo">
-    <img src="photos/custom-hero.webp" alt="A hand holding a Custom Goodz card next to a phone playing the album it links to." loading="lazy">
+    <img src="photos/apply-hero.webp" alt="A hand holding a Custom Goodz card next to a phone streaming the album it links to, over a spread of other Goodz." loading="lazy">
   </div>
-  <p class="tour-intro">Before we get too far along, we want real touring artists to try them out and tell us if they're any good.</p>
-  <p class="tour-intro">If you're playing shows this fall, we'd love to send you a custom pack of 50 Goodz for free. Sell them at your merch table, keep the money, and afterwards just tell us what your fans thought of them.</p>
-  <p class="tour-intro">Interested? Fill out this form to see if you are a fit.</p>
-  <p class="tour-intro">No fine print. No hidden fees. We won't spam you. We won't try to sell you anything. We just think we're better off spending money on giving these free to artists for feedback than we are spending money on ads.</p>
-  <p class="tour-intro">You can read more about them <a href="/custom">here</a>.</p>
+  <p class="tour-intro">If you're playing shows this fall, we'd love to send you a custom pack of 50 Goodz, printed with your artwork, for free. Sell them at your merch table, keep the money, and afterwards just tell us what your fans thought of them. You can learn more about them <a href="/custom">here</a>.</p>
+  <p class="tour-intro">We'd rather spend the money putting these in artists' hands than spend it on ads.</p>
+  <p class="tour-intro">Interested? Fill out this form to see if you're a fit.</p>
   <p class="tour-intro">Thanks,</p>
-  <p class="tour-note">Mike and Chris<br>Co-founders, Goodz</p>
+  <p class="tour-note">Mike &amp; Chris<br>Co-founders, Goodz</p>
+
+  <hr class="tour-divider">
+  <h2 class="tour-form-title">Apply</h2>
 
   <form id="tour-form" class="tour-form" novalidate>
     <div class="tour-field">
@@ -128,26 +210,30 @@
     </div>
 
     <div class="tour-field">
-      <label for="links">Drop your links</label>
+      <label for="link-1">Drop your links</label>
       <p class="tour-hint">Spotify, Bandcamp, Instagram, TikTok, whatever shows us who you are. One or two is plenty.</p>
-      <textarea id="links" name="links" maxlength="2000" required></textarea>
+      <div id="links-list" class="links-list">
+        <div class="link-row">
+          <input type="url" id="link-1" class="link-input" name="link" maxlength="400" inputmode="url" placeholder="https://..." aria-label="Link 1" required>
+        </div>
+      </div>
+      <button type="button" id="add-link" class="add-link">+ Add another link</button>
     </div>
 
     <div class="tour-field">
       <label for="shows">Are you playing shows this fall?</label>
       <p class="tour-hint">If so, roughly how many between September and December?</p>
-      <textarea id="shows" name="shows" maxlength="2000" required></textarea>
+      <input type="text" id="shows" name="shows" maxlength="500" required>
     </div>
 
     <div class="tour-field">
-      <label for="roomSize">What capacity rooms do you usually play?</label>
-      <select id="roomSize" name="roomSize">
-        <option value="" selected>Choose one...</option>
-        <option>Under 100</option>
-        <option>100-300</option>
-        <option>300-700</option>
-        <option>700+</option>
-      </select>
+      <span class="tour-field-label">What capacity rooms do you usually play?</span>
+      <div class="pick-group pick-group-h" role="radiogroup" aria-label="What capacity rooms do you usually play?">
+        <label class="pick-card"><input type="radio" name="roomSize" value="Under 100"><span>Under 100</span></label>
+        <label class="pick-card"><input type="radio" name="roomSize" value="100-300"><span>100-300</span></label>
+        <label class="pick-card"><input type="radio" name="roomSize" value="300-700"><span>300-700</span></label>
+        <label class="pick-card"><input type="radio" name="roomSize" value="700+"><span>700+</span></label>
+      </div>
     </div>
 
     <div class="tour-field">
@@ -157,19 +243,18 @@
     </div>
 
     <div class="tour-field">
-      <label for="tapOpen">Any idea what you'd want a fan's tap to open?</label>
+      <span class="tour-field-label">Any idea what you'd want a fan's tap to open?</span>
       <p class="tour-hint">No commitment, you can change it at any time.</p>
-      <select id="tapOpen" name="tapOpen">
-        <option value="" selected>Choose one...</option>
-        <option>My album (as download or stream)</option>
-        <option>A link hub (Linktree etc.)</option>
-        <option>Something fans can't get anywhere else</option>
-        <option>Something else / No idea yet</option>
-      </select>
+      <div class="pick-group pick-group-v" role="radiogroup" aria-label="Any idea what you'd want a fan's tap to open?">
+        <label class="pick-card"><input type="radio" name="tapOpen" value="My album (as download or stream)"><span>My album (as download or stream)</span></label>
+        <label class="pick-card"><input type="radio" name="tapOpen" value="A link hub (Linktree etc.)"><span>A link hub (Linktree etc.)</span></label>
+        <label class="pick-card"><input type="radio" name="tapOpen" value="Something fans can't get anywhere else"><span>Something fans can't get anywhere else</span></label>
+        <label class="pick-card"><input type="radio" name="tapOpen" value="Something else / No idea yet"><span>Something else / No idea yet</span></label>
+      </div>
     </div>
 
     <div class="tour-field">
-      <label for="email">Best email address to reach you at?</label>
+      <label for="email">Best email address to reach you?</label>
       <input type="email" id="email" name="email" maxlength="256" autocomplete="email" required>
     </div>
 
@@ -179,7 +264,10 @@
     <!-- Honeypot: hidden from humans, bots fill it -->
     <input type="text" name="company" id="company" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;pointer-events:none;">
 
-    <button type="submit" class="btn btn-amber">Submit application</button>
+    <div class="tour-submit">
+      <button type="submit" class="btn btn-amber">See if you're a fit</button>
+      <p class="tour-reassure">We read every one.</p>
+    </div>
     <p id="tour-status" class="tour-status" role="status" aria-live="polite"></p>
   </form>
 
@@ -233,6 +321,57 @@
   var container = document.getElementById('turnstile-container');
   var turnstileToken = '';
 
+  // "Drop your links": start with one field, let artists add up to a few more.
+  var linksList = document.getElementById('links-list');
+  var addLinkBtn = document.getElementById('add-link');
+  var MAX_LINKS = 5;
+  var linkCount = 1;
+
+  function updateLinkRows() {
+    var rows = linksList.querySelectorAll('.link-row');
+    // Remove buttons only make sense once there's more than one link.
+    Array.prototype.forEach.call(rows, function (row) {
+      var rm = row.querySelector('.link-remove');
+      if (rm) rm.style.display = rows.length > 1 ? '' : 'none';
+    });
+    addLinkBtn.disabled = rows.length >= MAX_LINKS;
+  }
+
+  if (addLinkBtn && linksList) {
+    addLinkBtn.addEventListener('click', function () {
+      if (linksList.querySelectorAll('.link-row').length >= MAX_LINKS) return;
+      linkCount++;
+      var row = document.createElement('div');
+      row.className = 'link-row';
+      var input = document.createElement('input');
+      input.type = 'url';
+      input.className = 'link-input';
+      input.name = 'link';
+      input.maxLength = 400;
+      input.setAttribute('inputmode', 'url');
+      input.placeholder = 'https://...';
+      input.setAttribute('aria-label', 'Link ' + linkCount);
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'link-remove';
+      rm.setAttribute('aria-label', 'Remove link');
+      rm.innerHTML = '&times;';
+      row.appendChild(input);
+      row.appendChild(rm);
+      linksList.appendChild(row);
+      input.focus();
+      updateLinkRows();
+    });
+
+    linksList.addEventListener('click', function (e) {
+      var rm = e.target.closest('.link-remove');
+      if (!rm) return;
+      var row = rm.closest('.link-row');
+      if (row) row.parentNode.removeChild(row);
+      updateLinkRows();
+    });
+  }
+
   function setStatus(kind, text) {
     statusEl.textContent = text || '';
     statusEl.className = 'tour-status' + (kind ? ' is-' + kind : '');
@@ -261,13 +400,18 @@
     e.preventDefault();
     setStatus('', '');
 
+    var links = Array.prototype.map.call(
+      form.querySelectorAll('.link-input'),
+      function (i) { return i.value.trim(); }
+    ).filter(Boolean).join('\n');
+
     var body = {
       artistName: form.artistName.value.trim(),
-      links: form.links.value.trim(),
+      links: links,
       shows: form.shows.value.trim(),
-      roomSize: form.roomSize.value,
+      roomSize: form.elements.roomSize.value,
       merch: form.merch.value.trim(),
-      tapOpen: form.tapOpen.value,
+      tapOpen: form.elements.tapOpen.value,
       email: form.email.value.trim(),
       company: form.company.value.trim(),
       turnstileToken: turnstileToken

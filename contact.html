@@ -30,6 +30,7 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-warm.css">
   <style>
     .contact-body { max-width: 1040px; margin: 0 auto; padding: 4rem 2rem 5rem; }
     .contact-grid {
@@ -44,26 +45,26 @@
     .contact-row .contact-field { flex: 1; }
     .contact-field { display: flex; flex-direction: column; gap: 0.4rem; }
     .contact-field label {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--black);
+      letter-spacing: 0.1em;
+      color: var(--text-light);
     }
     .contact-field input,
     .contact-field textarea {
-      font-family: 'Inter', sans-serif;
+      font-family: 'DM Sans', 'Inter', sans-serif;
       font-size: 1rem;
       color: var(--text);
-      background: var(--white);
-      border: var(--border);
-      border-radius: 0;
+      background: #fff;
+      border: 1.5px solid #cdc8b2;
+      border-radius: 10px;
       padding: 0.8rem 0.9rem;
       width: 100%;
       transition: border-color 0.15s ease;
     }
     .contact-field input:focus,
-    .contact-field textarea:focus { outline: none; border-color: var(--amber-dark); }
+    .contact-field textarea:focus { outline: none; border-color: var(--black); }
     .contact-field textarea { resize: vertical; min-height: 140px; }
     #turnstile-container { min-height: 65px; }
     .contact-form .btn { align-self: flex-start; }
