@@ -779,7 +779,6 @@
       transition: border-color 0.15s; background: #fff;
     }
     .url-input:focus { outline: none; border-color: var(--black); }
-    .url-hint { margin-top: 0.4rem; font-size: 0.88rem; color: var(--muted); }
 
     .csv-filled-zone {
       border: 1.5px solid rgba(255,200,82,0.4); border-radius: 12px;
@@ -1055,9 +1054,8 @@
 
     <!-- URL mode (everything else) -->
     <div id="url-area" style="display:none">
-      <p class="music-desc">All Goodz will link to this URL. Works with Bandcamp albums, Spotify, YouTube, SoundCloud, or any link.</p>
-      <input type="url" id="url-input" class="url-input" placeholder="https://yourband.bandcamp.com/album/..." oninput="handleURLInput()">
-      <div class="url-hint">Bandcamp, Spotify, YouTube, or any streaming URL.</div>
+      <p class="music-desc">All Goodz will link to this URL. Works with Bandcamp albums, Spotify, YouTube, SoundCloud, or any streaming link.</p>
+      <input type="url" id="url-input" class="url-input" placeholder="https://..." oninput="handleURLInput()">
       <div id="url-success" class="csv-success" style="display:none;margin-top:0.75rem">
         <div class="csv-success-title">&#10003; URL saved</div>
         <div class="csv-success-sub">All Goodz will link to this URL.</div>
@@ -2038,16 +2036,11 @@ function setMode(mode) {
 
 // Music source is now picked upstream on order.html as one of:
 //   'bandcamp_codes' → CSV upload mode
-//   'streaming'      → single URL (placeholder hints at a streaming link)
-//   'url'            → single URL (placeholder is generic)
+//   'streaming'      → single URL
+//   'url'            → single URL
+// The URL field keeps its static "https://..." placeholder in all URL modes.
 function applyMusicSource(source) {
   state.musicSource = source;
-  const urlInput = document.getElementById('url-input');
-  if (urlInput) {
-    urlInput.placeholder = source === 'streaming'
-      ? 'https://open.spotify.com/album/...  •  any streaming link'
-      : 'https://...';
-  }
   setMode(source === 'bandcamp_codes' ? 'csv' : 'url');
 }
 
