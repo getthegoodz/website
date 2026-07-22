@@ -10,6 +10,7 @@
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-W4XC7RKC');</script>
   <!-- End Google Tag Manager -->
+  <script src="assets/attribution.js"></script>
   <title>Upload Your Artwork - Custom Goodz</title>
   <meta name="description" content="Upload your album art and music link to complete your Custom Goodz order.">
   <link rel="canonical" href="https://getthegoodz.com/artwork-upload">
@@ -2360,6 +2361,15 @@ function placeOrder() {
   } else if (state.musicMode === 'url' && state.altURL) {
     payload.musicUrl = state.altURL;
   }
+
+  // Attribution (captured by assets/attribution.js on the landing page).
+  // The cart is created server-side, so Shopify never sees the marketing-site
+  // session — without this the order lands with no UTMs and is unattributable.
+  // Wrapped so a storage failure can never block checkout.
+  try {
+    const attr = JSON.parse(localStorage.getItem('goodzAttribution') || '{}');
+    if (attr && (attr.first || attr.last)) payload.attribution = attr;
+  } catch (e) { /* ignore */ }
 
   // Abort after 20s so the button can never lock on "Preparing your
   // order..." forever — a stalled request re-enables it with a retry message.

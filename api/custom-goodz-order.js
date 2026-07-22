@@ -77,6 +77,7 @@ module.exports = async (req, res) => {
       csvUrl,          // when musicType === 'csv'
       csvCount,        // when musicType === 'csv': number of codes in the CSV
       buyerEmail,      // optional, attaches to cart
+      attribution,     // optional, { first, last } touch captured client-side
     } = req.body || {};
 
     const unitsInt = parseInt(units, 10);
@@ -111,6 +112,39 @@ module.exports = async (req, res) => {
     } else if (musicType === 'csv' && csvUrl) {
       lineAttributes.push({ key: '_csv_url', value: csvUrl });
       if (csvCount != null) lineAttributes.push({ key: '_csv_code_count', value: String(csvCount) });
+    }
+
+    // Attribution. The cart is created here, server-side, so Shopify only ever
+    // observes the checkout hop: orders arrive with no UTMs and
+    // customerJourneySummary shows a single moment (referrer getthegoodz.com).
+    // Stamping the client-captured touch onto the order makes the real traffic
+    // source permanently visible in admin. Defensive throughout — attribution
+    // must never be able to break cart creation.
+    try {
+      const clip = (v) => String(v).slice(0, 255);
+      const TOUCH_KEYS = [
+        'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+        'fbclid', 'gclid', 'ttclid', 'msclkid',
+      ];
+      const first = attribution && attribution.first;
+      const last = attribution && attribution.last;
+
+      if (first && typeof first === 'object') {
+        for (const k of TOUCH_KEYS) {
+          if (first[k]) lineAttributes.push({ key: `_${k}`, value: clip(first[k]) });
+        }
+        if (first.landing_page) lineAttributes.push({ key: '_landing_page', value: clip(first.landing_page) });
+        if (first.referrer) lineAttributes.push({ key: '_referrer', value: clip(first.referrer) });
+        if (first.ts) lineAttributes.push({ key: '_first_touch_at', value: clip(first.ts) });
+      }
+      // Only record last touch when it differs, so single-session orders stay tidy.
+      if (last && first && last.ts !== first.ts) {
+        if (last.utm_source) lineAttributes.push({ key: '_last_utm_source', value: clip(last.utm_source) });
+        if (last.utm_campaign) lineAttributes.push({ key: '_last_utm_campaign', value: clip(last.utm_campaign) });
+        if (last.ts) lineAttributes.push({ key: '_last_touch_at', value: clip(last.ts) });
+      }
+    } catch (e) {
+      // Attribution is instrumentation only; never fail the order over it.
     }
 
     // Cart-level attributes mirror the line-level ones for visibility in the
