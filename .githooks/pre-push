@@ -1,0 +1,44 @@
+#!/bin/sh
+# Refuse pushes containing commits from unknown author identities.
+# Vercel (Hobby plan) can silently skip auto-deploys for commits whose author
+# isn't recognized by the connected account, so an unknown author can mean a
+# push that looks fine and a deploy that never happens. Fail loudly here.
+#
+# Unlike mixtape-club's single-identity guard, this repo allows the identities
+# that have already proven to deploy on the goodz-website Vercel project.
+#
+# One-time wiring after clone (this repo has no npm prepare step):
+#   git config core.hooksPath .githooks
+
+allowed="272060531+getthegoodz@users.noreply.github.com
+mike@getthegoodz.com
+32581630+mikerosenthal@users.noreply.github.com
+8040613+zonxs7@users.noreply.github.com"
+
+zero="0000000000000000000000000000000000000000"
+fail=0
+
+while read local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue  # branch deletion
+  if [ "$remote_sha" = "$zero" ]; then
+    # New branch: check everything not already on the remote.
+    range="$local_sha --not --remotes=origin"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+  bad=$(git log --format='%h %ae' $range | while read h e; do
+    echo "$allowed" | grep -qxF "$e" || echo "$h $e"
+  done)
+  if [ -n "$bad" ]; then
+    echo "PUSH REFUSED: these commits have an author not on the deploy allowlist:"
+    echo "$bad"
+    echo ""
+    echo "Vercel may silently skip deploying them. Fix with:"
+    echo "  git config user.name \"Goodz\""
+    echo "  git config user.email \"272060531+getthegoodz@users.noreply.github.com\""
+    echo "  git rebase --exec 'git commit --amend --reset-author --no-edit' origin/main"
+    fail=1
+  fi
+done
+
+exit $fail

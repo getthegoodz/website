@@ -14,6 +14,10 @@ pages, and `api/*` serverless functions.
 - You do **not** need a Vercel account or login. Do **NOT** run `vercel link` or `vercel --prod` —
   deploys run through the GitHub integration, not any local `.vercel` folder. Any local `.vercel*`
   is gitignored and irrelevant to how the site ships.
+- **Commit-author guard:** `.githooks/pre-push` refuses pushes with commits from authors outside
+  the deploy allowlist (Hobby-plan Vercel can silently skip deploys from unknown authors). One-time
+  wiring after clone: `git config core.hooksPath .githooks`. New contributors author as
+  `Goodz <272060531+getthegoodz@users.noreply.github.com>`; see README "Contributor setup".
 
 ## Preview any branch before going live
 
