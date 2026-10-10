@@ -32,6 +32,10 @@ they're in. The check records drift for a later fix instead of blocking work.
 - Check run locally: 0 problems in this change, 89 across the site, exit code 0. A test edit to
   `order.html` (off-palette color, unknown font, 5px radius, a marketing button class) plus an
   unassigned new page produced exactly those 6 warnings; the test edits were reverted.
+- Preview deployment (`style-guides`): all 15 root pages plus `style.css` and `style-warm.css`
+  are byte-identical to production; the guides serve at `/docs/style/*.md` and nothing links to
+  them. The style-check workflow ran in GitHub (0 in this change, 89 site-wide, run passed, no
+  issue created off `main`). The automated smoke test passed 7/7 against the preview.
 
 ## 2026-10-10: Order builder pricing table, profit calculator, sample offer
 
