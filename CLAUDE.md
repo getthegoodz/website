@@ -54,3 +54,7 @@ form is also the deployment's `url` in the Vercel dashboard).
 - **Log every change in `CHANGELOG.md`**, newest first, in the same commit as the change: what
   changed, why, and how it was verified. This applies to everyone (Chris, Mike, and any Claude
   session).
+- **Every visual change passes the style test** in `docs/style/README.md`: match the guide for that
+  page's section (marketing, order flow, Shopify), reuse existing classes and tokens, run
+  `python3 scripts/style-check.py`, and note the result in the CHANGELOG entry. The check only
+  warns; it never blocks a push. Tap pages in `static-pages/` aren't covered yet.

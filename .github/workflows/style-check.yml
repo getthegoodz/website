@@ -1,0 +1,74 @@
+# Style check (warn-only): docs/style/README.md explains the style test.
+#
+# Runs scripts/style-check.py on every push, to any branch:
+#   - problems on lines the push changed show as yellow warnings on the commit
+#     and in the run summary. The run itself always passes; nothing is blocked.
+#   - on main only, the full list of known problems is kept in ONE rolling
+#     GitHub issue, "Style drift to fix later" (body rewritten each push,
+#     closed automatically when the list reaches zero).
+
+name: style-check
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed to compare against the previous push
+
+      - name: Run style check (warns only)
+        id: check
+        run: |
+          BASE="${{ github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            BASE=$(git merge-base origin/main HEAD)
+          fi
+          python3 scripts/style-check.py --base "$BASE" --report style-report.md | tee style-output.txt
+          {
+            echo "## Style check (warns only)"
+            echo '```'
+            grep -v '^::warning' style-output.txt
+            echo '```'
+            echo "<details><summary>All known style problems on the site</summary>"
+            echo
+            cat style-report.md
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update "Style drift to fix later" issue (main only)
+        if: github.ref == 'refs/heads/main' && steps.check.outputs.total != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Style drift to fix later"
+          REPO="${{ github.repository }}"
+          EXISTING=$(gh issue list --repo "$REPO" --state open --search "in:title \"$TITLE\"" \
+            --json number,title --jq "map(select(.title == \"$TITLE\")) | .[0].number // empty")
+          if [ "${{ steps.check.outputs.total }}" = "0" ]; then
+            if [ -n "$EXISTING" ]; then
+              gh issue close "$EXISTING" --repo "$REPO" --comment "Style check found no remaining problems ($(date -u +%F))."
+            fi
+            exit 0
+          fi
+          {
+            echo "Maintained automatically by the style-check workflow; edited on every push to \`main\`. Last updated $(date -u '+%F %H:%M UTC') from ${{ github.sha }}."
+            echo
+            echo "The style guides and the style test are in [\`docs/style/\`](${{ github.server_url }}/${{ github.repository }}/blob/main/docs/style/README.md). Run \`python3 scripts/style-check.py --all\` locally for the same list."
+            echo
+            head -c 60000 style-report.md
+          } > issue-body.md
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --repo "$REPO" --body-file issue-body.md
+          else
+            gh issue create --repo "$REPO" --title "$TITLE" --body-file issue-body.md
+          fi

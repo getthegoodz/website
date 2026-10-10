@@ -4,6 +4,35 @@ Every change to the live site gets an entry here, in the same commit as the chan
 why, and how it was verified. Newest first. History from before this file started lives in
 `git log` and the pull requests.
 
+## 2026-10-10: Style guides and style check
+
+**Pages:** none. No live page, stylesheet or script that a page loads was changed. **Requested by:**
+Chris.
+
+**What changed**
+- **Style guides** in `docs/style/`: one per customer-facing section (marketing pages, order flow,
+  Shopify store), measured from the live site, plus a README with the style test every change
+  must pass and a list of cross-section inconsistencies for Chris and Mike to decide on. Tap pages
+  are deferred to a later fourth guide.
+- **`scripts/style-check.py`**: checks colors, fonts, order-flow corner radii, section-specific
+  button classes and page setup against the guides. It reports problems on the lines a change
+  touched, lists older problems separately, and always exits successfully (warns, never blocks).
+- **`.github/workflows/style-check.yml`**: runs the check on every push. Warnings show on the
+  commit; on `main` the full list is kept in one GitHub issue, "Style drift to fix later".
+- **`CLAUDE.md`**: working rule that every visual change passes the style test.
+
+**Why:** the three sections look deliberately different, and new changes should match the section
+they're in. The check records drift for a later fix instead of blocking work.
+
+**Style check:** passed (this change touches no page). 89 existing problems logged for later.
+
+**Verified (2026-10-10)**
+- `git diff main` contains only new files under `docs/style/`, the new script and workflow, and
+  edits to `CLAUDE.md` and this file.
+- Check run locally: 0 problems in this change, 89 across the site, exit code 0. A test edit to
+  `order.html` (off-palette color, unknown font, 5px radius, a marketing button class) plus an
+  unassigned new page produced exactly those 6 warnings; the test edits were reverted.
+
 ## 2026-10-10: Order builder pricing table, profit calculator, sample offer
 
 **Page:** `/order` (`order.html`). **Requested by:** Chris.
