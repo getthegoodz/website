@@ -34,3 +34,6 @@ step, checkout code, and the order API.
 - New sample link: the shop page returns 200, and GA4's cross-domain linker decorates the identical
   link already live on `/custom`.
 - `scripts/smoke-test.py --deep` passed 8/8 against production.
+- Preview deployment (`order-pricing-polish`): the served `/order` is byte-identical to the tested
+  file; `smoke-test.py --deep` passed 8/8 against the preview, including a real Shopify cart
+  created through the preview's order API; the automated smoke-test workflow passed on the deploy.
