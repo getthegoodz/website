@@ -51,3 +51,6 @@ form is also the deployment's `url` in the Vercel dashboard).
 - `git pull` before you start and before you push. This repo is edited from multiple machines.
 - Never force-push or rewrite history on `main`.
 - If a push to `main` is rejected, someone pushed first: `git pull --rebase`, then push again.
+- **Log every change in `CHANGELOG.md`**, newest first, in the same commit as the change: what
+  changed, why, and how it was verified. This applies to everyone (Chris, Mike, and any Claude
+  session).
